@@ -29,26 +29,25 @@
 
         /* --- PRELOADER STYLES --- */
         #preloader {
-            position: fixed; /* Stays over everything */
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background-color: #ffffff;
-            z-index: 9999; /* Ensures it is on top */
+            z-index: 9999;
             display: flex;
             justify-content: center;
             align-items: center;
+            /* The fade out transition */
             transition: opacity 0.5s ease, visibility 0.5s;
         }
 
-        /* Controls the size of the GIF */
         #preloader img {
-            width: 150px; /* Adjust this if the GIF looks too big/small */
+            width: 150px;
             height: auto;
         }
 
-        /* Class to hide the loader */
         .loader-hidden {
             opacity: 0;
             visibility: hidden;
@@ -162,11 +161,15 @@
         window.addEventListener("load", function () {
             const loader = document.getElementById("preloader");
             
-            // Using a slight timeout to ensure the user sees the branding 
-            // even if the page loads instantly
+            // We force the site to wait 4200ms (4.2 seconds) to match your GIF
             setTimeout(function() {
                 loader.classList.add("loader-hidden");
-            }, 800); // 800 milliseconds delay (0.8 seconds)
+                
+                // Completely remove the loader from the HTML after the fade is done
+                loader.addEventListener("transitionend", function() {
+                    document.body.removeChild(loader);
+                });
+            }, 4200); 
         });
     </script>
 </body>
