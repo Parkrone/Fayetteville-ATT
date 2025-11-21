@@ -25,6 +25,7 @@
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
+            overflow-x: hidden; /* Prevent side scrolling */
         }
 
         /* --- PRELOADER STYLES --- */
@@ -39,12 +40,12 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            /* The fade out transition */
             transition: opacity 0.5s ease, visibility 0.5s;
         }
 
         #preloader img {
-            width: 150px;
+            /* Scaled up 50% from previous 150px */
+            width: 225px;
             height: auto;
         }
 
@@ -53,23 +54,32 @@
             visibility: hidden;
         }
 
-        /* --- MAIN SITE STYLES --- */
+        /* --- HEADER STYLES --- */
         header {
             width: 100%;
             background-color: #fff;
-            padding: 20px 0;
+            padding: 15px 0;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
             margin-bottom: 40px;
+        }
+
+        header img {
+            height: 40px; /* Adjust logo height */
+            width: auto;
         }
 
         header h1 {
             font-size: 24px;
             font-weight: 700;
-            color: #0057B8;
+            color: #000; /* Black text for location name */
             letter-spacing: -0.5px;
         }
 
+        /* --- CONTAINER & ANIMATION --- */
         .container {
             width: 90%;
             max-width: 500px;
@@ -78,6 +88,17 @@
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             text-align: center;
+            
+            /* Initial state for flow-in animation */
+            opacity: 0; 
+            transform: translateY(20px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        /* The class that triggers the flow-in */
+        .content-visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .welcome-text {
@@ -87,17 +108,19 @@
             line-height: 1.5;
         }
 
+        /* --- BUTTONS --- */
         .btn {
             display: block;
             width: 100%;
             padding: 15px 20px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             text-decoration: none;
             border-radius: 30px;
             font-weight: 600;
             font-size: 16px;
             transition: all 0.3s ease;
             border: 2px solid transparent;
+            cursor: pointer;
         }
 
         .btn-primary {
@@ -121,11 +144,72 @@
             transform: translateY(-2px);
         }
 
+        .btn-game {
+            background-color: #ff7900; /* AT&T Orange accent color */
+            color: white;
+            border: none;
+        }
+        .btn-game:hover {
+            background-color: #e66c00;
+            transform: translateY(-2px);
+        }
+
+        /* --- SNAKE GAME SECTION --- */
+        #game-area {
+            display: none; /* Hidden by default */
+            margin-top: 20px;
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+
+        canvas {
+            background-color: #fff;
+            border: 2px solid #ccc;
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
+        }
+
+        .score-board {
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #0057B8;
+        }
+
+        /* Mobile Controls */
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 5px;
+            max-width: 200px;
+            margin: 15px auto 0;
+        }
+        
+        .ctrl-btn {
+            padding: 15px;
+            background: #ddd;
+            border: none;
+            border-radius: 8px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
+        .ctrl-btn:active { background: #bbb; }
+
+        /* --- FOOTER --- */
         footer {
             margin-top: auto;
-            padding: 20px;
+            padding: 30px 20px;
             font-size: 12px;
             color: #777;
+            text-align: center;
+            line-height: 1.6;
+        }
+        
+        footer strong {
+            color: #0057B8;
         }
     </style>
 </head>
@@ -136,10 +220,11 @@
     </div>
 
     <header>
-        <h1>AT&T Fayetteville</h1>
+        <img src="attlogo.png" alt="AT&T Logo">
+        <h1>Fayetteville</h1>
     </header>
 
-    <div class="container">
+    <div class="container" id="mainContainer">
         <p class="welcome-text">
             Welcome to your local Fayetteville store portal. Explore our exclusive location deals or let us know how we did today.
         </p>
@@ -151,26 +236,183 @@
         <a href="https://search.google.com/local/writereview?placeid=ChIJ84Inr4tryYcRQUkKOVeSnF8" class="btn btn-secondary" target="_blank">
             Leave Us a Review
         </a>
+
+        <p style="margin: 15px 0; color: #999; font-size: 14px;">— OR —</p>
+
+        <button onclick="toggleGame()" class="btn btn-game">
+            Play AT&T Snake While You Wait 🐍
+        </button>
+
+        <div id="game-area">
+            <div class="score-board">Score: <span id="score">0</span></div>
+            <canvas id="snakeCanvas" width="300" height="300"></canvas>
+            
+            <div class="controls">
+                <div></div>
+                <button class="ctrl-btn" onclick="changeDirection('UP')">⬆️</button>
+                <div></div>
+                <button class="ctrl-btn" onclick="changeDirection('LEFT')">⬅️</button>
+                <button class="ctrl-btn" onclick="changeDirection('DOWN')">⬇️</button>
+                <button class="ctrl-btn" onclick="changeDirection('RIGHT')">➡️</button>
+            </div>
+        </div>
     </div>
 
     <footer>
-        &copy; 2025 Fayetteville Store Location
+        &copy; 2025 Fayetteville Store Location.<br>
+        Built by <strong>Parker Thompson</strong> - Your Local Fayetteville Sales Consultant.
     </footer>
 
     <script>
+        // --- 1. PRELOADER & ANIMATION LOGIC ---
         window.addEventListener("load", function () {
             const loader = document.getElementById("preloader");
+            const container = document.getElementById("mainContainer");
             
-            // We force the site to wait 4200ms (4.2 seconds) to match your GIF
+            // Wait 4.2 seconds for GIF to finish
             setTimeout(function() {
                 loader.classList.add("loader-hidden");
                 
-                // Completely remove the loader from the HTML after the fade is done
-                loader.addEventListener("transitionend", function() {
-                    document.body.removeChild(loader);
-                });
+                // Once loader fades out, trigger the content "flow in" animation
+                setTimeout(() => {
+                    container.classList.add("content-visible");
+                    // Remove loader from DOM
+                    loader.parentNode.removeChild(loader);
+                }, 500);
+
             }, 4200); 
         });
+
+        // --- 2. SNAKE GAME LOGIC ---
+        const canvas = document.getElementById("snakeCanvas");
+        const ctx = canvas.getContext("2d");
+        const box = 20; // Size of one grid square (the phone size)
+        let snake = [];
+        let food = {};
+        let score = 0;
+        let d;
+        let game;
+        let gameRunning = false;
+
+        function toggleGame() {
+            const gameArea = document.getElementById('game-area');
+            if (gameArea.style.display === 'block') {
+                gameArea.style.display = 'none';
+                clearInterval(game);
+                gameRunning = false;
+            } else {
+                gameArea.style.display = 'block';
+                startGame();
+            }
+        }
+
+        function startGame() {
+            snake = [];
+            snake[0] = { x: 9 * box, y: 10 * box };
+            score = 0;
+            d = null; // No movement until key press
+            document.getElementById('score').innerText = score;
+            generateFood();
+            
+            if(gameRunning) clearInterval(game);
+            game = setInterval(draw, 150); // Game speed
+            gameRunning = true;
+        }
+
+        function generateFood() {
+            food = {
+                x: Math.floor(Math.random() * 15) * box,
+                y: Math.floor(Math.random() * 15) * box
+            };
+        }
+
+        // Keyboard Controls
+        document.addEventListener("keydown", direction);
+        function direction(event) {
+            let key = event.keyCode;
+            if( key == 37 && d != "RIGHT") d = "LEFT";
+            else if(key == 38 && d != "DOWN") d = "UP";
+            else if(key == 39 && d != "LEFT") d = "RIGHT";
+            else if(key == 40 && d != "UP") d = "DOWN";
+        }
+
+        // Mobile Button Controls
+        function changeDirection(dir) {
+            if(dir == "LEFT" && d != "RIGHT") d = "LEFT";
+            if(dir == "UP" && d != "DOWN") d = "UP";
+            if(dir == "RIGHT" && d != "LEFT") d = "RIGHT";
+            if(dir == "DOWN" && d != "UP") d = "DOWN";
+        }
+
+        // Draw "Phone" Shape
+        function drawPhone(x, y) {
+            ctx.fillStyle = "#0057B8"; // AT&T Blue Body
+            ctx.fillRect(x, y, box, box);
+            
+            // Draw screen inside to make it look like a phone
+            ctx.fillStyle = "#4CA0FF"; // Lighter blue screen
+            ctx.fillRect(x + 4, y + 4, box - 8, box - 8);
+        }
+
+        function draw() {
+            // Clear Canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Snake
+            for( let i = 0; i < snake.length; i++){
+                drawPhone(snake[i].x, snake[i].y);
+            }
+
+            // Draw Food (Simple Red Dot)
+            ctx.fillStyle = "red";
+            ctx.fillRect(food.x, food.y, box, box);
+
+            // Snake Logic
+            let snakeX = snake[0].x;
+            let snakeY = snake[0].y;
+
+            if( d == "LEFT") snakeX -= box;
+            if( d == "UP") snakeY -= box;
+            if( d == "RIGHT") snakeX += box;
+            if( d == "DOWN") snakeY += box;
+
+            // Eat Food
+            if(snakeX == food.x && snakeY == food.y){
+                score++;
+                document.getElementById('score').innerText = score;
+                generateFood();
+            } else {
+                // Remove tail
+                snake.pop();
+            }
+
+            // Game Over Rules (Wall or Self)
+            if(snakeX < 0 || snakeX >= canvas.width || snakeY < 0 || snakeY >= canvas.height || collision(snakeX, snakeY, snake)){
+                clearInterval(game);
+                alert("Game Over! Score: " + score + ". Press 'Play' to restart.");
+                startGame();
+                return;
+            }
+
+            let newHead = { x : snakeX, y : snakeY };
+
+            // Don't add head if we haven't started moving
+            if(d != null) {
+                snake.unshift(newHead);
+            } else {
+                // Keep snake drawing in place if not moving
+                snake.unshift(snake.pop());
+            }
+        }
+
+        function collision(x, y, array){
+            for(let i = 0; i < array.length; i++){
+                if(x == array[i].x && y == array[i].y){
+                    return true;
+                }
+            }
+            return false;
+        }
     </script>
 </body>
 </html>
