@@ -15,6 +15,9 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            /* Prevent text selection during swipe interactions */
+            user-select: none; 
+            -webkit-user-select: none;
         }
 
         body {
@@ -25,7 +28,7 @@
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            overflow-x: hidden; /* Prevent side scrolling */
+            overflow-x: hidden;
         }
 
         /* --- PRELOADER STYLES --- */
@@ -44,7 +47,6 @@
         }
 
         #preloader img {
-            /* Scaled up 50% from previous 150px */
             width: 225px;
             height: auto;
         }
@@ -68,18 +70,18 @@
         }
 
         header img {
-            height: 40px; /* Adjust logo height */
+            height: 40px;
             width: auto;
         }
 
         header h1 {
             font-size: 24px;
             font-weight: 700;
-            color: #000; /* Black text for location name */
+            color: #000;
             letter-spacing: -0.5px;
         }
 
-        /* --- CONTAINER & ANIMATION --- */
+        /* --- CONTAINER --- */
         .container {
             width: 90%;
             max-width: 500px;
@@ -88,14 +90,11 @@
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             text-align: center;
-            
-            /* Initial state for flow-in animation */
             opacity: 0; 
             transform: translateY(20px);
             transition: opacity 0.8s ease, transform 0.8s ease;
         }
 
-        /* The class that triggers the flow-in */
         .content-visible {
             opacity: 1;
             transform: translateY(0);
@@ -145,7 +144,7 @@
         }
 
         .btn-game {
-            background-color: #ff7900; /* AT&T Orange accent color */
+            background-color: #ff7900;
             color: white;
             border: none;
         }
@@ -156,7 +155,7 @@
 
         /* --- SNAKE GAME SECTION --- */
         #game-area {
-            display: none; /* Hidden by default */
+            display: none;
             margin-top: 20px;
             background: #f9f9f9;
             padding: 10px;
@@ -170,33 +169,23 @@
             display: block;
             margin: 0 auto;
             max-width: 100%;
+            /* IMPORTANT: Prevents page scrolling while swiping on canvas */
+            touch-action: none; 
         }
 
         .score-board {
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             font-weight: bold;
             color: #0057B8;
-        }
-
-        /* Mobile Controls */
-        .controls {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 5px;
-            max-width: 200px;
-            margin: 15px auto 0;
+            font-size: 18px;
         }
         
-        .ctrl-btn {
-            padding: 15px;
-            background: #ddd;
-            border: none;
-            border-radius: 8px;
-            font-size: 20px;
-            cursor: pointer;
+        .game-instructions {
+            font-size: 12px;
+            color: #777;
+            margin-bottom: 10px;
+            font-style: italic;
         }
-        
-        .ctrl-btn:active { background: #bbb; }
 
         /* --- FOOTER --- */
         footer {
@@ -245,16 +234,8 @@
 
         <div id="game-area">
             <div class="score-board">Score: <span id="score">0</span></div>
+            <div class="game-instructions">Swipe on the board to move. Collect the energy bolts!</div>
             <canvas id="snakeCanvas" width="300" height="300"></canvas>
-            
-            <div class="controls">
-                <div></div>
-                <button class="ctrl-btn" onclick="changeDirection('UP')">⬆️</button>
-                <div></div>
-                <button class="ctrl-btn" onclick="changeDirection('LEFT')">⬅️</button>
-                <button class="ctrl-btn" onclick="changeDirection('DOWN')">⬇️</button>
-                <button class="ctrl-btn" onclick="changeDirection('RIGHT')">➡️</button>
-            </div>
         </div>
     </div>
 
@@ -264,59 +245,63 @@
     </footer>
 
     <script>
-        // --- 1. PRELOADER & ANIMATION LOGIC ---
+        // --- 1. PAGE LOAD ANIMATION ---
         window.addEventListener("load", function () {
             const loader = document.getElementById("preloader");
             const container = document.getElementById("mainContainer");
             
-            // Wait 4.2 seconds for GIF to finish
             setTimeout(function() {
                 loader.classList.add("loader-hidden");
-                
-                // Once loader fades out, trigger the content "flow in" animation
                 setTimeout(() => {
                     container.classList.add("content-visible");
-                    // Remove loader from DOM
                     loader.parentNode.removeChild(loader);
                 }, 500);
-
             }, 4200); 
         });
 
         // --- 2. SNAKE GAME LOGIC ---
         const canvas = document.getElementById("snakeCanvas");
         const ctx = canvas.getContext("2d");
-        const box = 20; // Size of one grid square (the phone size)
+        
+        // Load Images
+        const snakeImg = new Image();
+        snakeImg.src = 'phone.png'; // The blue phone image
+        
+        const foodImg = new Image();
+        foodImg.src = 'bolt.png'; // The orange bolt image
+
+        const box = 20; // Grid size
         let snake = [];
         let food = {};
         let score = 0;
-        let d;
-        let game;
+        let d; // Direction
+        let gameLoop;
         let gameRunning = false;
 
+        // Toggle visibility
         function toggleGame() {
             const gameArea = document.getElementById('game-area');
             if (gameArea.style.display === 'block') {
                 gameArea.style.display = 'none';
-                clearInterval(game);
+                clearInterval(gameLoop);
                 gameRunning = false;
             } else {
                 gameArea.style.display = 'block';
-                startGame();
+                // Wait slightly for div to render, then start
+                setTimeout(startGame, 100); 
             }
         }
 
         function startGame() {
+            clearInterval(gameLoop); // Safety clear
             snake = [];
-            snake[0] = { x: 9 * box, y: 10 * box };
+            snake[0] = { x: 9 * box, y: 10 * box }; // Initial position
             score = 0;
-            d = null; // No movement until key press
+            d = null; // Wait for input to move
             document.getElementById('score').innerText = score;
             generateFood();
-            
-            if(gameRunning) clearInterval(game);
-            game = setInterval(draw, 150); // Game speed
             gameRunning = true;
+            gameLoop = setInterval(draw, 150); // 150ms = speed
         }
 
         function generateFood() {
@@ -324,90 +309,111 @@
                 x: Math.floor(Math.random() * 15) * box,
                 y: Math.floor(Math.random() * 15) * box
             };
+            // Ensure food doesn't spawn on snake body
+            for(let part of snake){
+                if(part.x === food.x && part.y === food.y) generateFood();
+            }
         }
 
-        // Keyboard Controls
-        document.addEventListener("keydown", direction);
-        function direction(event) {
+        // --- TOUCH / SWIPE CONTROLS ---
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        canvas.addEventListener('touchstart', function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+            touchStartY = e.changedTouches[0].screenY;
+        }, false);
+
+        canvas.addEventListener('touchend', function(e) {
+            if(!gameRunning) return;
+            
+            let touchEndX = e.changedTouches[0].screenX;
+            let touchEndY = e.changedTouches[0].screenY;
+            
+            handleSwipeGesture(touchStartX, touchStartY, touchEndX, touchEndY);
+        }, false);
+
+        function handleSwipeGesture(startX, startY, endX, endY) {
+            let xDiff = endX - startX;
+            let yDiff = endY - startY;
+
+            // Determine if horizontal or vertical swipe was stronger
+            if (Math.abs(xDiff) > Math.abs(yDiff)) {
+                // Horizontal
+                if (xDiff > 0 && d != "LEFT") d = "RIGHT";
+                else if (xDiff < 0 && d != "RIGHT") d = "LEFT";
+            } else {
+                // Vertical
+                if (yDiff > 0 && d != "UP") d = "DOWN";
+                else if (yDiff < 0 && d != "DOWN") d = "UP";
+            }
+        }
+
+        // --- KEYBOARD CONTROLS (Desktop Backup) ---
+        document.addEventListener("keydown", function(event) {
+            if(!gameRunning) return;
             let key = event.keyCode;
             if( key == 37 && d != "RIGHT") d = "LEFT";
             else if(key == 38 && d != "DOWN") d = "UP";
             else if(key == 39 && d != "LEFT") d = "RIGHT";
             else if(key == 40 && d != "UP") d = "DOWN";
-        }
+        });
 
-        // Mobile Button Controls
-        function changeDirection(dir) {
-            if(dir == "LEFT" && d != "RIGHT") d = "LEFT";
-            if(dir == "UP" && d != "DOWN") d = "UP";
-            if(dir == "RIGHT" && d != "LEFT") d = "RIGHT";
-            if(dir == "DOWN" && d != "UP") d = "DOWN";
-        }
-
-        // Draw "Phone" Shape
-        function drawPhone(x, y) {
-            ctx.fillStyle = "#0057B8"; // AT&T Blue Body
-            ctx.fillRect(x, y, box, box);
-            
-            // Draw screen inside to make it look like a phone
-            ctx.fillStyle = "#4CA0FF"; // Lighter blue screen
-            ctx.fillRect(x + 4, y + 4, box - 8, box - 8);
-        }
-
+        // --- DRAW FUNCTION ---
         function draw() {
-            // Clear Canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // 1. Clear Canvas
+            ctx.fillStyle = "#fff";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = "#ccc";
+            ctx.strokeRect(0, 0, canvas.width, canvas.height);
 
-            // Draw Snake
+            // 2. Draw Snake (Using Images)
             for( let i = 0; i < snake.length; i++){
-                drawPhone(snake[i].x, snake[i].y);
+                // Draw the phone image for each body part
+                ctx.drawImage(snakeImg, snake[i].x, snake[i].y, box, box);
             }
 
-            // Draw Food (Simple Red Dot)
-            ctx.fillStyle = "red";
-            ctx.fillRect(food.x, food.y, box, box);
+            // 3. Draw Food (Using Bolt Image)
+            ctx.drawImage(foodImg, food.x, food.y, box, box);
 
-            // Snake Logic
+            // 4. Move Logic
             let snakeX = snake[0].x;
             let snakeY = snake[0].y;
+
+            // If no direction is set yet, don't move, just render
+            if(d == null) return;
 
             if( d == "LEFT") snakeX -= box;
             if( d == "UP") snakeY -= box;
             if( d == "RIGHT") snakeX += box;
             if( d == "DOWN") snakeY += box;
 
-            // Eat Food
+            // 5. Collision Check (Walls or Self)
+            if(snakeX < 0 || snakeX >= canvas.width || snakeY < 0 || snakeY >= canvas.height || collision(snakeX, snakeY, snake)){
+                clearInterval(gameLoop);
+                gameRunning = false;
+                alert("Game Over! Score: " + score);
+                startGame(); // Reset immediately
+                return;
+            }
+
+            // 6. Eating Logic
             if(snakeX == food.x && snakeY == food.y){
                 score++;
                 document.getElementById('score').innerText = score;
                 generateFood();
             } else {
-                // Remove tail
-                snake.pop();
+                snake.pop(); // Remove tail
             }
 
-            // Game Over Rules (Wall or Self)
-            if(snakeX < 0 || snakeX >= canvas.width || snakeY < 0 || snakeY >= canvas.height || collision(snakeX, snakeY, snake)){
-                clearInterval(game);
-                alert("Game Over! Score: " + score + ". Press 'Play' to restart.");
-                startGame();
-                return;
-            }
-
+            // 7. Add New Head
             let newHead = { x : snakeX, y : snakeY };
-
-            // Don't add head if we haven't started moving
-            if(d != null) {
-                snake.unshift(newHead);
-            } else {
-                // Keep snake drawing in place if not moving
-                snake.unshift(snake.pop());
-            }
+            snake.unshift(newHead);
         }
 
-        function collision(x, y, array){
+        function collision(headX, headY, array){
             for(let i = 0; i < array.length; i++){
-                if(x == array[i].x && y == array[i].y){
+                if(headX == array[i].x && headY == array[i].y){
                     return true;
                 }
             }
