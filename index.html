@@ -198,7 +198,8 @@
 
         // Configuration
         const GRID_SIZE = 20; 
-        const SPEED = 2; // Pixels per frame (Must be a divisor of GRID_SIZE, e.g., 1, 2, 4, 5)
+        // CHANGED: Speed is now 1 (Slower, smoother)
+        const SPEED = 1; 
         const TILE_COUNT = canvas.width / GRID_SIZE;
 
         // Game State
@@ -207,10 +208,9 @@
         let score = 0;
 
         // The Snake
-        // 'path' stores coordinates {x, y} that the head has visited.
-        // The body segments just follow this path.
         let path = []; 
-        let snakeLength = 5; // Starting length (in grid units)
+        // CHANGED: Shorter starting snake for easier start
+        let snakeLength = 3; 
         
         // Position & Velocity
         let headX = 0;
@@ -232,6 +232,7 @@
                 stopGame();
             } else {
                 gameArea.style.display = 'block';
+                // Wait slightly for div to render, then initialize
                 setTimeout(initGame, 100); 
             }
         }
@@ -239,16 +240,17 @@
         function initGame() {
             stopGame();
             score = 0;
+            snakeLength = 3; // Reset length
             document.getElementById('score').innerText = score;
             
-            // Reset Snake to Center
+            // Center Start
             headX = Math.floor(TILE_COUNT / 2) * GRID_SIZE;
             headY = Math.floor(TILE_COUNT / 2) * GRID_SIZE;
             
-            // Initialize path with current position so the snake exists
+            // Initialize path (Tail going down)
             path = [];
             for(let i=0; i < snakeLength * (GRID_SIZE/SPEED); i++) {
-                path.push({x: headX, y: headY + i}); // Pre-fill tail downwards
+                path.push({x: headX, y: headY + i}); 
             }
 
             // Start moving UP
@@ -258,8 +260,48 @@
             nextVelY = -SPEED;
 
             spawnFood();
-            gameRunning = true;
-            gameLoop();
+            
+            // START COUNTDOWN instead of starting game immediately
+            startCountdown();
+        }
+
+        function startCountdown() {
+            let count = 3;
+            
+            // Draw initial state (Static snake)
+            draw(); 
+            drawCountdownText(count);
+
+            let countTimer = setInterval(() => {
+                count--;
+                if(count > 0) {
+                    draw(); // Clear canvas
+                    drawCountdownText(count);
+                } else {
+                    clearInterval(countTimer);
+                    draw();
+                    drawCountdownText("GO!");
+                    
+                    // Small delay after "GO!" before movement starts
+                    setTimeout(() => {
+                        gameRunning = true;
+                        gameLoop();
+                    }, 500);
+                }
+            }, 1000);
+        }
+
+        function drawCountdownText(text) {
+            ctx.save();
+            ctx.fillStyle = "rgba(255, 255, 255, 0.7)"; // Semi-transparent background
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = "#0057B8"; // AT&T Blue
+            ctx.font = "bold 80px 'Open Sans', sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(text, canvas.width/2, canvas.height/2);
+            ctx.restore();
         }
 
         function stopGame() {
@@ -268,12 +310,11 @@
         }
 
         function spawnFood() {
-            // Align food strictly to grid
             food.x = Math.floor(Math.random() * TILE_COUNT) * GRID_SIZE;
             food.y = Math.floor(Math.random() * TILE_COUNT) * GRID_SIZE;
         }
 
-        // --- MAIN LOOP (60 FPS) ---
+        // --- MAIN LOOP ---
         function gameLoop() {
             if (!gameRunning) return;
 
@@ -285,11 +326,9 @@
 
         function update() {
             // 1. TURN LOGIC (Grid Locking)
-            // Only allow turning when the head is exactly aligned with the grid
             if (headX % GRID_SIZE === 0 && headY % GRID_SIZE === 0) {
-                // If we have a buffered input, apply it now
                 if (nextVelX !== 0 || nextVelY !== 0) {
-                    // Prevent 180 turns (running into self)
+                    // Prevent 180 turns
                     if (velX === 0 && nextVelY !== -velY || velY === 0 && nextVelX !== -velX) {
                         velX = nextVelX;
                         velY = nextVelY;
@@ -302,11 +341,9 @@
             headY += velY;
 
             // 3. RECORD PATH
-            // Add new head position to the start of the path
             path.unshift({ x: headX, y: headY });
 
             // 4. MANAGE TAIL LENGTH
-            // The number of points in the path = snakeLength * (pixels per block / speed)
             const desiredPathLength = snakeLength * (GRID_SIZE / SPEED);
             if (path.length > desiredPathLength) {
                 path.pop();
@@ -319,10 +356,7 @@
             }
 
             // 6. SELF COLLISION
-            // We check collision with the body. 
-            // We skip the first few points of the path (the head itself) to avoid false triggers
-            // We only check coordinates that align with the grid to save performance
-            let skipHead = GRID_SIZE / SPEED * 2; // Skip first 2 segments
+            let skipHead = GRID_SIZE / SPEED * 2;
             for (let i = skipHead; i < path.length; i++) {
                 if (path[i].x === headX && path[i].y === headY) {
                     gameOver();
@@ -331,16 +365,14 @@
             }
 
             // 7. EATING FOOD
-            // Distance check is safer than exact pixel match for smooth movement
             let dist = Math.hypot(headX - food.x, headY - food.y);
             if (dist < SPEED) {
-                // Snap to food exact position to avoid drift
                 headX = food.x; 
                 headY = food.y;
                 
                 score++;
                 document.getElementById('score').innerText = score;
-                snakeLength++; // This automatically lengthens the trail
+                snakeLength++; 
                 spawnFood();
             }
         }
@@ -354,32 +386,26 @@
             ctx.drawImage(foodImg, food.x, food.y, GRID_SIZE, GRID_SIZE);
 
             // Draw Snake Body
-            // We iterate through the path at intervals of (GRID_SIZE / SPEED)
-            // This ensures we draw a phone image every 20px, not every 2px
             const step = GRID_SIZE / SPEED;
 
             for (let i = 0; i < path.length; i += step) {
-                // Ensure index is integer
                 let idx = Math.floor(i);
                 if (idx >= path.length) break;
 
                 let segment = path[idx];
-                
-                // Calculate Rotation
                 let angle = 0;
                 
-                // If it's the head (i=0), use current velocity
+                // Head Rotation
                 if (i === 0) {
                     if (velX > 0) angle = Math.PI / 2;
                     else if (velX < 0) angle = -Math.PI / 2;
                     else if (velY > 0) angle = Math.PI;
                     else if (velY < 0) angle = 0;
                 } 
-                // If it's a body part, look at the segment "ahead" of it in the path
+                // Body Rotation
                 else {
                     let nextIdx = Math.max(0, idx - step);
                     let nextSeg = path[nextIdx];
-                    
                     let dx = nextSeg.x - segment.x;
                     let dy = nextSeg.y - segment.y;
 
@@ -403,8 +429,11 @@
 
         function gameOver() {
             gameRunning = false;
-            alert("Game Over! Score: " + score);
-            initGame();
+            // Small delay so they can see they hit the wall before alert pops up
+            setTimeout(() => {
+                alert("Game Over! Score: " + score);
+                initGame();
+            }, 100);
         }
 
         // --- INPUT HANDLING ---
@@ -423,28 +452,21 @@
             handleInput(dx, dy);
         }, {passive: false});
 
-        // Keyboard
         document.addEventListener('keydown', e => {
             if (!gameRunning) return;
-            if (e.keyCode === 37) handleInput(-1, 0); // Left
-            if (e.keyCode === 38) handleInput(0, -1); // Up
-            if (e.keyCode === 39) handleInput(1, 0);  // Right
-            if (e.keyCode === 40) handleInput(0, 1);  // Down
+            if (e.keyCode === 37) handleInput(-1, 0);
+            if (e.keyCode === 38) handleInput(0, -1);
+            if (e.keyCode === 39) handleInput(1, 0);
+            if (e.keyCode === 40) handleInput(0, 1);
         });
 
         function handleInput(dx, dy) {
-            // Threshold for tap vs swipe
             if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
 
-            // Buffer the input into nextVel variables
-            // We do NOT change velX/velY immediately. The update loop does that
-            // when the snake reaches a grid intersection.
             if (Math.abs(dx) > Math.abs(dy)) {
-                // Horizontal
                 if (dx > 0) { nextVelX = SPEED; nextVelY = 0; }
                 else        { nextVelX = -SPEED; nextVelY = 0; }
             } else {
-                // Vertical
                 if (dy > 0) { nextVelX = 0; nextVelY = SPEED; }
                 else        { nextVelX = 0; nextVelY = -SPEED; }
             }
