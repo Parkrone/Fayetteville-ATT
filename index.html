@@ -79,7 +79,7 @@
         .content-visible { opacity: 1; transform: translateY(0); }
         .welcome-text { margin-bottom: 30px; font-size: 18px; color: #444; line-height: 1.5; }
 
-        /* --- BUTTONS --- */
+        /* --- BUTTONS & ANIMATIONS --- */
         .btn {
             display: block;
             width: 100%;
@@ -89,16 +89,36 @@
             border-radius: 30px;
             font-weight: 600;
             font-size: 16px;
-            transition: all 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.1s ease;
             border: 2px solid transparent;
             cursor: pointer;
+            /* Important: allow scale transform */
+            transform-origin: center;
         }
+
+        /* The "Jelly" Animation Keyframes */
+        @keyframes jellyPop {
+            0%   { transform: scale(1); }
+            30%  { transform: scale(0.90); } /* Squeeze In */
+            50%  { transform: scale(1.05); } /* Pop Out */
+            70%  { transform: scale(0.98); } /* Settle In */
+            100% { transform: scale(1); }
+        }
+
+        /* The class triggered by JS */
+        .btn-animate {
+            animation: jellyPop 0.4s ease-out forwards;
+        }
+
         .btn-primary { background-color: #0057B8; color: white; }
-        .btn-primary:hover { background-color: #004694; transform: translateY(-2px); }
+        /* Removed hover transform so it doesn't conflict with click animation */
+        .btn-primary:hover { background-color: #004694; }
+        
         .btn-secondary { background-color: #fff; color: #0057B8; border: 2px solid #0057B8; }
-        .btn-secondary:hover { background-color: #f0f8ff; transform: translateY(-2px); }
+        .btn-secondary:hover { background-color: #f0f8ff; }
+        
         .btn-game { background-color: #ff7900; color: white; border: none; }
-        .btn-game:hover { background-color: #e66c00; transform: translateY(-2px); }
+        .btn-game:hover { background-color: #e66c00; }
 
         /* --- GAME AREA & OVERLAY --- */
         #game-area {
@@ -108,7 +128,7 @@
             padding: 10px;
             border-radius: 10px;
             border: 1px solid #ddd;
-            position: relative; /* Important for overlay positioning */
+            position: relative; 
         }
 
         canvas {
@@ -119,14 +139,13 @@
             touch-action: none; 
         }
 
-        /* The HTML Overlay for Game Over */
         #game-overlay {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
+            background-color: rgba(255, 255, 255, 0.95); 
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -155,7 +174,7 @@
             color: #0057B8; 
             font-size: 16px; 
             display: flex;
-            justify-content: space-between; /* Separates Score and High Score */
+            justify-content: space-between; 
             padding: 0 10px;
         }
 
@@ -231,7 +250,20 @@
             const loader = document.getElementById("preloader");
             const container = document.getElementById("mainContainer");
             
-            // Load High Score from Browser Storage
+            // Initialize Button Click Animations
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    // Remove class if it exists (allows re-clicking)
+                    this.classList.remove('btn-animate');
+                    // Trigger reflow to restart animation
+                    void this.offsetWidth; 
+                    // Add class back
+                    this.classList.add('btn-animate');
+                });
+            });
+
+            // Load High Score
             const savedScore = localStorage.getItem('attSnakeHighScore');
             if(savedScore) {
                 document.getElementById('highScore').innerText = savedScore;
@@ -246,37 +278,21 @@
             }, 4200); 
         });
 
-        // --- 2. SMOOTH SNAKE ENGINE ---
+        // --- 2. SNAKE ENGINE ---
         const canvas = document.getElementById("snakeCanvas");
         const ctx = canvas.getContext("2d");
-
-        // Images
         const snakeImg = new Image(); snakeImg.src = 'phone.png';
         const foodImg = new Image(); foodImg.src = 'bolt.png';
-
-        // Configuration
         const GRID_SIZE = 20; 
         const SPEED = 1; 
         const TILE_COUNT = canvas.width / GRID_SIZE;
 
-        // Game State
         let animationId;
         let gameRunning = false;
         let score = 0;
-        
-        // The Snake
         let path = []; 
         let snakeLength = 3; 
-        
-        // Position & Velocity
-        let headX = 0;
-        let headY = 0;
-        let velX = 0;
-        let velY = 0;
-        let nextVelX = 0;
-        let nextVelY = 0;
-
-        // Food
+        let headX = 0, headY = 0, velX = 0, velY = 0, nextVelX = 0, nextVelY = 0;
         let food = { x: 0, y: 0 };
 
         function toggleGame() {
@@ -292,33 +308,23 @@
 
         function initGame() {
             stopGame();
-            document.getElementById('game-overlay').classList.add('hidden'); // Hide overlay
-            
+            document.getElementById('game-overlay').classList.add('hidden');
             score = 0;
             snakeLength = 3; 
             document.getElementById('score').innerText = score;
             
-            // Center Start
             headX = Math.floor(TILE_COUNT / 2) * GRID_SIZE;
             headY = Math.floor(TILE_COUNT / 2) * GRID_SIZE;
             
-            // Initialize path
             path = [];
             for(let i=0; i < snakeLength * (GRID_SIZE/SPEED); i++) {
                 path.push({x: headX, y: headY + i}); 
             }
-
-            // Start moving UP
-            velX = 0;
-            velY = -SPEED;
-            nextVelX = 0;
-            nextVelY = -SPEED;
-
+            velX = 0; velY = -SPEED; nextVelX = 0; nextVelY = -SPEED;
             spawnFood();
             startCountdown();
         }
         
-        // Linked to the "Try Again" button
         function restartGame() {
             initGame();
         }
@@ -327,7 +333,6 @@
             let count = 3;
             draw(); 
             drawCountdownText(count);
-
             let countTimer = setInterval(() => {
                 count--;
                 if(count > 0) {
@@ -337,7 +342,6 @@
                     clearInterval(countTimer);
                     draw();
                     drawCountdownText("GO!");
-                    
                     setTimeout(() => {
                         gameRunning = true;
                         gameLoop();
@@ -350,7 +354,6 @@
             ctx.save();
             ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
             ctx.fillStyle = "#0057B8"; 
             ctx.font = "bold 80px 'Open Sans', sans-serif";
             ctx.textAlign = "center";
@@ -369,7 +372,6 @@
             food.y = Math.floor(Math.random() * TILE_COUNT) * GRID_SIZE;
         }
 
-        // --- MAIN LOOP ---
         function gameLoop() {
             if (!gameRunning) return;
             update();
@@ -378,7 +380,6 @@
         }
 
         function update() {
-            // 1. TURN LOGIC
             if (headX % GRID_SIZE === 0 && headY % GRID_SIZE === 0) {
                 if (nextVelX !== 0 || nextVelY !== 0) {
                     if (velX === 0 && nextVelY !== -velY || velY === 0 && nextVelX !== -velX) {
@@ -387,25 +388,17 @@
                     }
                 }
             }
-
-            // 2. MOVE HEAD
             headX += velX;
             headY += velY;
-
-            // 3. PATH & TAIL
             path.unshift({ x: headX, y: headY });
+            
             const desiredPathLength = snakeLength * (GRID_SIZE / SPEED);
-            if (path.length > desiredPathLength) {
-                path.pop();
-            }
+            if (path.length > desiredPathLength) path.pop();
 
-            // 4. WALL COLLISION
             if (headX < 0 || headX >= canvas.width || headY < 0 || headY >= canvas.height) {
                 triggerGameOver();
                 return;
             }
-
-            // 5. SELF COLLISION
             let skipHead = GRID_SIZE / SPEED * 2;
             for (let i = skipHead; i < path.length; i++) {
                 if (path[i].x === headX && path[i].y === headY) {
@@ -413,12 +406,9 @@
                     return;
                 }
             }
-
-            // 6. EATING FOOD
             let dist = Math.hypot(headX - food.x, headY - food.y);
             if (dist < SPEED) {
-                headX = food.x; 
-                headY = food.y;
+                headX = food.x; headY = food.y;
                 score++;
                 document.getElementById('score').innerText = score;
                 snakeLength++; 
@@ -430,15 +420,12 @@
             ctx.fillStyle = "#fff";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(foodImg, food.x, food.y, GRID_SIZE, GRID_SIZE);
-
             const step = GRID_SIZE / SPEED;
             for (let i = 0; i < path.length; i += step) {
                 let idx = Math.floor(i);
                 if (idx >= path.length) break;
-
                 let segment = path[idx];
                 let angle = 0;
-                
                 if (i === 0) {
                     if (velX > 0) angle = Math.PI / 2;
                     else if (velX < 0) angle = -Math.PI / 2;
@@ -449,7 +436,6 @@
                     let nextSeg = path[nextIdx];
                     let dx = nextSeg.x - segment.x;
                     let dy = nextSeg.y - segment.y;
-
                     if (dx > 0) angle = Math.PI / 2;
                     else if (dx < 0) angle = -Math.PI / 2;
                     else if (dy > 0) angle = Math.PI;
@@ -469,35 +455,26 @@
 
         function triggerGameOver() {
             gameRunning = false;
-            
-            // Update High Score Logic
             let currentHigh = parseInt(localStorage.getItem('attSnakeHighScore')) || 0;
             if(score > currentHigh) {
                 localStorage.setItem('attSnakeHighScore', score);
                 document.getElementById('highScore').innerText = score;
             }
-
-            // Show Overlay
             document.getElementById('final-score').innerText = score;
             document.getElementById('game-overlay').classList.remove('hidden');
         }
 
-        // --- INPUT HANDLING ---
-        let touchStartX = 0;
-        let touchStartY = 0;
-
+        let touchStartX = 0, touchStartY = 0;
         canvas.addEventListener('touchstart', e => {
             touchStartX = e.changedTouches[0].screenX;
             touchStartY = e.changedTouches[0].screenY;
         }, {passive: false});
-
         canvas.addEventListener('touchend', e => {
             if (!gameRunning) return;
             let dx = e.changedTouches[0].screenX - touchStartX;
             let dy = e.changedTouches[0].screenY - touchStartY;
             handleInput(dx, dy);
         }, {passive: false});
-
         document.addEventListener('keydown', e => {
             if (!gameRunning) return;
             if (e.keyCode === 37) handleInput(-1, 0);
@@ -505,10 +482,8 @@
             if (e.keyCode === 39) handleInput(1, 0);
             if (e.keyCode === 40) handleInput(0, 1);
         });
-
         function handleInput(dx, dy) {
             if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
-
             if (Math.abs(dx) > Math.abs(dy)) {
                 if (dx > 0) { nextVelX = SPEED; nextVelY = 0; }
                 else        { nextVelX = -SPEED; nextVelY = 0; }
