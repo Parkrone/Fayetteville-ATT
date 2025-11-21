@@ -15,9 +15,9 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            /* Prevent text selection during swipe interactions */
             user-select: none; 
             -webkit-user-select: none;
+            touch-action: manipulation;
         }
 
         body {
@@ -165,11 +165,11 @@
 
         canvas {
             background-color: #fff;
-            border: 2px solid #ccc;
+            /* We use a border to show the 'Wall' clearly */
+            border: 4px solid #333; 
             display: block;
             margin: 0 auto;
-            max-width: 100%;
-            /* IMPORTANT: Prevents page scrolling while swiping on canvas */
+            /* Prevents scrolling while playing */
             touch-action: none; 
         }
 
@@ -234,7 +234,7 @@
 
         <div id="game-area">
             <div class="score-board">Score: <span id="score">0</span></div>
-            <div class="game-instructions">Swipe on the board to move. Collect the energy bolts!</div>
+            <div class="game-instructions">Swipe to move. Don't hit the dark gray walls!</div>
             <canvas id="snakeCanvas" width="300" height="300"></canvas>
         </div>
     </div>
@@ -265,20 +265,24 @@
         
         // Load Images
         const snakeImg = new Image();
-        snakeImg.src = 'phone.png'; // The blue phone image
+        snakeImg.src = 'phone.png';
         
         const foodImg = new Image();
-        foodImg.src = 'bolt.png'; // The orange bolt image
+        foodImg.src = 'bolt.png'; 
 
-        const box = 20; // Grid size
+        // CONSTANTS
+        const box = 20; // The grid cell size
+        // We explicitly calculate rows/cols to ensure boundary logic is perfect
+        const cols = canvas.width / box; 
+        const rows = canvas.height / box;
+
         let snake = [];
         let food = {};
         let score = 0;
-        let d; // Direction
+        let d; // Current Direction
         let gameLoop;
         let gameRunning = false;
 
-        // Toggle visibility
         function toggleGame() {
             const gameArea = document.getElementById('game-area');
             if (gameArea.style.display === 'block') {
@@ -287,32 +291,51 @@
                 gameRunning = false;
             } else {
                 gameArea.style.display = 'block';
-                // Wait slightly for div to render, then start
                 setTimeout(startGame, 100); 
             }
         }
 
         function startGame() {
-            clearInterval(gameLoop); // Safety clear
+            clearInterval(gameLoop);
             snake = [];
-            snake[0] = { x: 9 * box, y: 10 * box }; // Initial position
+            // Start in the middle
+            snake[0] = { x: 7 * box, y: 7 * box }; 
             score = 0;
-            d = null; // Wait for input to move
+            d = "UP"; // Start facing UP so the phone looks right immediately
             document.getElementById('score').innerText = score;
             generateFood();
             gameRunning = true;
-            gameLoop = setInterval(draw, 150); // 150ms = speed
+            gameLoop = setInterval(draw, 150); 
         }
 
         function generateFood() {
+            // Generate random position strictly within grid limits (0 to cols-1)
             food = {
-                x: Math.floor(Math.random() * 15) * box,
-                y: Math.floor(Math.random() * 15) * box
+                x: Math.floor(Math.random() * cols) * box,
+                y: Math.floor(Math.random() * rows) * box
             };
-            // Ensure food doesn't spawn on snake body
+            // Don't spawn on snake body
             for(let part of snake){
                 if(part.x === food.x && part.y === food.y) generateFood();
             }
+        }
+
+        // --- ROTATION HELPER ---
+        // This function draws an image rotated to a specific angle
+        function drawRotatedImage(image, x, y, angleInRadians) {
+            ctx.save(); // Save current state
+            
+            // Move canvas origin to the center of the current grid box
+            ctx.translate(x + box/2, y + box/2); 
+            
+            // Rotate the canvas
+            ctx.rotate(angleInRadians); 
+            
+            // Draw image centered on the new origin
+            // We assume phone.png is UPRIGHT by default.
+            ctx.drawImage(image, -box/2, -box/2, box, box);
+            
+            ctx.restore(); // Restore original state for next draw
         }
 
         // --- TOUCH / SWIPE CONTROLS ---
@@ -322,34 +345,32 @@
         canvas.addEventListener('touchstart', function(e) {
             touchStartX = e.changedTouches[0].screenX;
             touchStartY = e.changedTouches[0].screenY;
-        }, false);
+        }, {passive: false});
 
         canvas.addEventListener('touchend', function(e) {
             if(!gameRunning) return;
-            
             let touchEndX = e.changedTouches[0].screenX;
             let touchEndY = e.changedTouches[0].screenY;
-            
             handleSwipeGesture(touchStartX, touchStartY, touchEndX, touchEndY);
-        }, false);
+        }, {passive: false});
 
         function handleSwipeGesture(startX, startY, endX, endY) {
             let xDiff = endX - startX;
             let yDiff = endY - startY;
+            
+            // 10px threshold avoids accidental tiny swipes
+            if (Math.abs(xDiff) < 10 && Math.abs(yDiff) < 10) return;
 
-            // Determine if horizontal or vertical swipe was stronger
             if (Math.abs(xDiff) > Math.abs(yDiff)) {
-                // Horizontal
                 if (xDiff > 0 && d != "LEFT") d = "RIGHT";
                 else if (xDiff < 0 && d != "RIGHT") d = "LEFT";
             } else {
-                // Vertical
                 if (yDiff > 0 && d != "UP") d = "DOWN";
                 else if (yDiff < 0 && d != "DOWN") d = "UP";
             }
         }
 
-        // --- KEYBOARD CONTROLS (Desktop Backup) ---
+        // --- KEYBOARD CONTROLS ---
         document.addEventListener("keydown", function(event) {
             if(!gameRunning) return;
             let key = event.keyCode;
@@ -359,41 +380,60 @@
             else if(key == 40 && d != "UP") d = "DOWN";
         });
 
-        // --- DRAW FUNCTION ---
+        // --- MAIN DRAW LOOP ---
         function draw() {
             // 1. Clear Canvas
             ctx.fillStyle = "#fff";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.strokeStyle = "#ccc";
-            ctx.strokeRect(0, 0, canvas.width, canvas.height);
 
-            // 2. Draw Snake (Using Images)
+            // 2. Draw Snake
             for( let i = 0; i < snake.length; i++){
-                // Draw the phone image for each body part
-                ctx.drawImage(snakeImg, snake[i].x, snake[i].y, box, box);
+                let rotation = 0;
+
+                if (i === 0) {
+                    // HEAD: Rotate based on current input direction
+                    if (d === "UP") rotation = 0;
+                    if (d === "RIGHT") rotation = Math.PI / 2; // 90 deg
+                    if (d === "DOWN") rotation = Math.PI;      // 180 deg
+                    if (d === "LEFT") rotation = -Math.PI / 2; // -90 deg
+                } else {
+                    // BODY: Rotate based on relation to the segment ahead of it
+                    let prev = snake[i-1];
+                    let curr = snake[i];
+                    
+                    if (prev.y < curr.y) rotation = 0;            // Up
+                    else if (prev.x > curr.x) rotation = Math.PI / 2;  // Right
+                    else if (prev.y > curr.y) rotation = Math.PI;      // Down
+                    else if (prev.x < curr.x) rotation = -Math.PI / 2; // Left
+                }
+
+                drawRotatedImage(snakeImg, snake[i].x, snake[i].y, rotation);
             }
 
-            // 3. Draw Food (Using Bolt Image)
+            // 3. Draw Food
             ctx.drawImage(foodImg, food.x, food.y, box, box);
 
-            // 4. Move Logic
+            // 4. Calculate New Position
             let snakeX = snake[0].x;
             let snakeY = snake[0].y;
-
-            // If no direction is set yet, don't move, just render
-            if(d == null) return;
 
             if( d == "LEFT") snakeX -= box;
             if( d == "UP") snakeY -= box;
             if( d == "RIGHT") snakeX += box;
             if( d == "DOWN") snakeY += box;
 
-            // 5. Collision Check (Walls or Self)
-            if(snakeX < 0 || snakeX >= canvas.width || snakeY < 0 || snakeY >= canvas.height || collision(snakeX, snakeY, snake)){
+            // 5. Collision Check 
+            // The logic here must match 0 to canvas.width EXACTLY.
+            // Since boxes are 0, 20, ... 280 (for a 300w canvas)
+            // Hitting -20 is death. Hitting 300 is death.
+            if(snakeX < 0 || snakeX >= canvas.width || 
+               snakeY < 0 || snakeY >= canvas.height || 
+               collision(snakeX, snakeY, snake)){
+                
                 clearInterval(gameLoop);
                 gameRunning = false;
                 alert("Game Over! Score: " + score);
-                startGame(); // Reset immediately
+                startGame(); 
                 return;
             }
 
@@ -403,10 +443,10 @@
                 document.getElementById('score').innerText = score;
                 generateFood();
             } else {
-                snake.pop(); // Remove tail
+                snake.pop();
             }
 
-            // 7. Add New Head
+            // 7. Move Head
             let newHead = { x : snakeX, y : snakeY };
             snake.unshift(newHead);
         }
