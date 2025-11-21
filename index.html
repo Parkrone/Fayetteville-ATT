@@ -31,7 +31,7 @@
             overflow-x: hidden;
         }
 
-        /* --- PRELOADER STYLES --- */
+        /* --- PRELOADER --- */
         #preloader {
             position: fixed;
             top: 0;
@@ -45,18 +45,10 @@
             align-items: center;
             transition: opacity 0.5s ease, visibility 0.5s;
         }
+        #preloader img { width: 225px; height: auto; }
+        .loader-hidden { opacity: 0; visibility: hidden; }
 
-        #preloader img {
-            width: 225px;
-            height: auto;
-        }
-
-        .loader-hidden {
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        /* --- HEADER STYLES --- */
+        /* --- HEADER --- */
         header {
             width: 100%;
             background-color: #fff;
@@ -68,18 +60,8 @@
             gap: 10px;
             margin-bottom: 40px;
         }
-
-        header img {
-            height: 40px;
-            width: auto;
-        }
-
-        header h1 {
-            font-size: 24px;
-            font-weight: 700;
-            color: #000;
-            letter-spacing: -0.5px;
-        }
+        header img { height: 40px; width: auto; }
+        header h1 { font-size: 24px; font-weight: 700; color: #000; letter-spacing: -0.5px; }
 
         /* --- CONTAINER --- */
         .container {
@@ -94,18 +76,8 @@
             transform: translateY(20px);
             transition: opacity 0.8s ease, transform 0.8s ease;
         }
-
-        .content-visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .welcome-text {
-            margin-bottom: 30px;
-            font-size: 18px;
-            color: #444;
-            line-height: 1.5;
-        }
+        .content-visible { opacity: 1; transform: translateY(0); }
+        .welcome-text { margin-bottom: 30px; font-size: 18px; color: #444; line-height: 1.5; }
 
         /* --- BUTTONS --- */
         .btn {
@@ -121,39 +93,14 @@
             border: 2px solid transparent;
             cursor: pointer;
         }
+        .btn-primary { background-color: #0057B8; color: white; }
+        .btn-primary:hover { background-color: #004694; transform: translateY(-2px); }
+        .btn-secondary { background-color: #fff; color: #0057B8; border: 2px solid #0057B8; }
+        .btn-secondary:hover { background-color: #f0f8ff; transform: translateY(-2px); }
+        .btn-game { background-color: #ff7900; color: white; border: none; }
+        .btn-game:hover { background-color: #e66c00; transform: translateY(-2px); }
 
-        .btn-primary {
-            background-color: #0057B8;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: #004694;
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            background-color: #fff;
-            color: #0057B8;
-            border: 2px solid #0057B8;
-        }
-
-        .btn-secondary:hover {
-            background-color: #f0f8ff;
-            transform: translateY(-2px);
-        }
-
-        .btn-game {
-            background-color: #ff7900;
-            color: white;
-            border: none;
-        }
-        .btn-game:hover {
-            background-color: #e66c00;
-            transform: translateY(-2px);
-        }
-
-        /* --- SNAKE GAME SECTION --- */
+        /* --- GAME AREA --- */
         #game-area {
             display: none;
             margin-top: 20px;
@@ -162,30 +109,15 @@
             border-radius: 10px;
             border: 1px solid #ddd;
         }
-
         canvas {
             background-color: #fff;
-            /* We use a border to show the 'Wall' clearly */
             border: 4px solid #333; 
             display: block;
             margin: 0 auto;
-            /* Prevents scrolling while playing */
             touch-action: none; 
         }
-
-        .score-board {
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #0057B8;
-            font-size: 18px;
-        }
-        
-        .game-instructions {
-            font-size: 12px;
-            color: #777;
-            margin-bottom: 10px;
-            font-style: italic;
-        }
+        .score-board { margin-bottom: 5px; font-weight: bold; color: #0057B8; font-size: 18px; }
+        .game-instructions { font-size: 12px; color: #777; margin-bottom: 10px; font-style: italic; }
 
         /* --- FOOTER --- */
         footer {
@@ -196,10 +128,7 @@
             text-align: center;
             line-height: 1.6;
         }
-        
-        footer strong {
-            color: #0057B8;
-        }
+        footer strong { color: #0057B8; }
     </style>
 </head>
 <body>
@@ -234,7 +163,7 @@
 
         <div id="game-area">
             <div class="score-board">Score: <span id="score">0</span></div>
-            <div class="game-instructions">Swipe to move. Don't hit the dark gray walls!</div>
+            <div class="game-instructions">Swipe to steer. Collect the energy bolts!</div>
             <canvas id="snakeCanvas" width="300" height="300"></canvas>
         </div>
     </div>
@@ -245,7 +174,7 @@
     </footer>
 
     <script>
-        // --- 1. PAGE LOAD ANIMATION ---
+        // --- 1. PAGE ANIMATIONS ---
         window.addEventListener("load", function () {
             const loader = document.getElementById("preloader");
             const container = document.getElementById("mainContainer");
@@ -259,205 +188,266 @@
             }, 4200); 
         });
 
-        // --- 2. SNAKE GAME LOGIC ---
+        // --- 2. SMOOTH SNAKE ENGINE ---
         const canvas = document.getElementById("snakeCanvas");
         const ctx = canvas.getContext("2d");
-        
-        // Load Images
-        const snakeImg = new Image();
-        snakeImg.src = 'phone.png';
-        
-        const foodImg = new Image();
-        foodImg.src = 'bolt.png'; 
 
-        // CONSTANTS
-        const box = 20; // The grid cell size
-        // We explicitly calculate rows/cols to ensure boundary logic is perfect
-        const cols = canvas.width / box; 
-        const rows = canvas.height / box;
+        // Images
+        const snakeImg = new Image(); snakeImg.src = 'phone.png';
+        const foodImg = new Image(); foodImg.src = 'bolt.png';
 
-        let snake = [];
-        let food = {};
-        let score = 0;
-        let d; // Current Direction
-        let gameLoop;
+        // Configuration
+        const GRID_SIZE = 20; 
+        const SPEED = 2; // Pixels per frame (Must be a divisor of GRID_SIZE, e.g., 1, 2, 4, 5)
+        const TILE_COUNT = canvas.width / GRID_SIZE;
+
+        // Game State
+        let animationId;
         let gameRunning = false;
+        let score = 0;
+
+        // The Snake
+        // 'path' stores coordinates {x, y} that the head has visited.
+        // The body segments just follow this path.
+        let path = []; 
+        let snakeLength = 5; // Starting length (in grid units)
+        
+        // Position & Velocity
+        let headX = 0;
+        let headY = 0;
+        let velX = 0;
+        let velY = 0;
+        
+        // Next Turn (Input Buffering)
+        let nextVelX = 0;
+        let nextVelY = 0;
+
+        // Food
+        let food = { x: 0, y: 0 };
 
         function toggleGame() {
             const gameArea = document.getElementById('game-area');
             if (gameArea.style.display === 'block') {
                 gameArea.style.display = 'none';
-                clearInterval(gameLoop);
-                gameRunning = false;
+                stopGame();
             } else {
                 gameArea.style.display = 'block';
-                setTimeout(startGame, 100); 
+                setTimeout(initGame, 100); 
             }
         }
 
-        function startGame() {
-            clearInterval(gameLoop);
-            snake = [];
-            // Start in the middle
-            snake[0] = { x: 7 * box, y: 7 * box }; 
+        function initGame() {
+            stopGame();
             score = 0;
-            d = "UP"; // Start facing UP so the phone looks right immediately
             document.getElementById('score').innerText = score;
-            generateFood();
+            
+            // Reset Snake to Center
+            headX = Math.floor(TILE_COUNT / 2) * GRID_SIZE;
+            headY = Math.floor(TILE_COUNT / 2) * GRID_SIZE;
+            
+            // Initialize path with current position so the snake exists
+            path = [];
+            for(let i=0; i < snakeLength * (GRID_SIZE/SPEED); i++) {
+                path.push({x: headX, y: headY + i}); // Pre-fill tail downwards
+            }
+
+            // Start moving UP
+            velX = 0;
+            velY = -SPEED;
+            nextVelX = 0;
+            nextVelY = -SPEED;
+
+            spawnFood();
             gameRunning = true;
-            gameLoop = setInterval(draw, 150); 
+            gameLoop();
         }
 
-        function generateFood() {
-            // Generate random position strictly within grid limits (0 to cols-1)
-            food = {
-                x: Math.floor(Math.random() * cols) * box,
-                y: Math.floor(Math.random() * rows) * box
-            };
-            // Don't spawn on snake body
-            for(let part of snake){
-                if(part.x === food.x && part.y === food.y) generateFood();
+        function stopGame() {
+            gameRunning = false;
+            cancelAnimationFrame(animationId);
+        }
+
+        function spawnFood() {
+            // Align food strictly to grid
+            food.x = Math.floor(Math.random() * TILE_COUNT) * GRID_SIZE;
+            food.y = Math.floor(Math.random() * TILE_COUNT) * GRID_SIZE;
+        }
+
+        // --- MAIN LOOP (60 FPS) ---
+        function gameLoop() {
+            if (!gameRunning) return;
+
+            update();
+            draw();
+
+            animationId = requestAnimationFrame(gameLoop);
+        }
+
+        function update() {
+            // 1. TURN LOGIC (Grid Locking)
+            // Only allow turning when the head is exactly aligned with the grid
+            if (headX % GRID_SIZE === 0 && headY % GRID_SIZE === 0) {
+                // If we have a buffered input, apply it now
+                if (nextVelX !== 0 || nextVelY !== 0) {
+                    // Prevent 180 turns (running into self)
+                    if (velX === 0 && nextVelY !== -velY || velY === 0 && nextVelX !== -velX) {
+                        velX = nextVelX;
+                        velY = nextVelY;
+                    }
+                }
+            }
+
+            // 2. MOVE HEAD
+            headX += velX;
+            headY += velY;
+
+            // 3. RECORD PATH
+            // Add new head position to the start of the path
+            path.unshift({ x: headX, y: headY });
+
+            // 4. MANAGE TAIL LENGTH
+            // The number of points in the path = snakeLength * (pixels per block / speed)
+            const desiredPathLength = snakeLength * (GRID_SIZE / SPEED);
+            if (path.length > desiredPathLength) {
+                path.pop();
+            }
+
+            // 5. WALL COLLISION
+            if (headX < 0 || headX >= canvas.width || headY < 0 || headY >= canvas.height) {
+                gameOver();
+                return;
+            }
+
+            // 6. SELF COLLISION
+            // We check collision with the body. 
+            // We skip the first few points of the path (the head itself) to avoid false triggers
+            // We only check coordinates that align with the grid to save performance
+            let skipHead = GRID_SIZE / SPEED * 2; // Skip first 2 segments
+            for (let i = skipHead; i < path.length; i++) {
+                if (path[i].x === headX && path[i].y === headY) {
+                    gameOver();
+                    return;
+                }
+            }
+
+            // 7. EATING FOOD
+            // Distance check is safer than exact pixel match for smooth movement
+            let dist = Math.hypot(headX - food.x, headY - food.y);
+            if (dist < SPEED) {
+                // Snap to food exact position to avoid drift
+                headX = food.x; 
+                headY = food.y;
+                
+                score++;
+                document.getElementById('score').innerText = score;
+                snakeLength++; // This automatically lengthens the trail
+                spawnFood();
             }
         }
 
-        // --- ROTATION HELPER ---
-        // This function draws an image rotated to a specific angle
-        function drawRotatedImage(image, x, y, angleInRadians) {
-            ctx.save(); // Save current state
-            
-            // Move canvas origin to the center of the current grid box
-            ctx.translate(x + box/2, y + box/2); 
-            
-            // Rotate the canvas
-            ctx.rotate(angleInRadians); 
-            
-            // Draw image centered on the new origin
-            // We assume phone.png is UPRIGHT by default.
-            ctx.drawImage(image, -box/2, -box/2, box, box);
-            
-            ctx.restore(); // Restore original state for next draw
+        function draw() {
+            // Clear
+            ctx.fillStyle = "#fff";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Food
+            ctx.drawImage(foodImg, food.x, food.y, GRID_SIZE, GRID_SIZE);
+
+            // Draw Snake Body
+            // We iterate through the path at intervals of (GRID_SIZE / SPEED)
+            // This ensures we draw a phone image every 20px, not every 2px
+            const step = GRID_SIZE / SPEED;
+
+            for (let i = 0; i < path.length; i += step) {
+                // Ensure index is integer
+                let idx = Math.floor(i);
+                if (idx >= path.length) break;
+
+                let segment = path[idx];
+                
+                // Calculate Rotation
+                let angle = 0;
+                
+                // If it's the head (i=0), use current velocity
+                if (i === 0) {
+                    if (velX > 0) angle = Math.PI / 2;
+                    else if (velX < 0) angle = -Math.PI / 2;
+                    else if (velY > 0) angle = Math.PI;
+                    else if (velY < 0) angle = 0;
+                } 
+                // If it's a body part, look at the segment "ahead" of it in the path
+                else {
+                    let nextIdx = Math.max(0, idx - step);
+                    let nextSeg = path[nextIdx];
+                    
+                    let dx = nextSeg.x - segment.x;
+                    let dy = nextSeg.y - segment.y;
+
+                    if (dx > 0) angle = Math.PI / 2;
+                    else if (dx < 0) angle = -Math.PI / 2;
+                    else if (dy > 0) angle = Math.PI;
+                    else if (dy < 0) angle = 0;
+                }
+
+                drawRotatedImage(snakeImg, segment.x, segment.y, angle);
+            }
         }
 
-        // --- TOUCH / SWIPE CONTROLS ---
+        function drawRotatedImage(img, x, y, angle) {
+            ctx.save();
+            ctx.translate(x + GRID_SIZE/2, y + GRID_SIZE/2);
+            ctx.rotate(angle);
+            ctx.drawImage(img, -GRID_SIZE/2, -GRID_SIZE/2, GRID_SIZE, GRID_SIZE);
+            ctx.restore();
+        }
+
+        function gameOver() {
+            gameRunning = false;
+            alert("Game Over! Score: " + score);
+            initGame();
+        }
+
+        // --- INPUT HANDLING ---
         let touchStartX = 0;
         let touchStartY = 0;
 
-        canvas.addEventListener('touchstart', function(e) {
+        canvas.addEventListener('touchstart', e => {
             touchStartX = e.changedTouches[0].screenX;
             touchStartY = e.changedTouches[0].screenY;
         }, {passive: false});
 
-        canvas.addEventListener('touchend', function(e) {
-            if(!gameRunning) return;
-            let touchEndX = e.changedTouches[0].screenX;
-            let touchEndY = e.changedTouches[0].screenY;
-            handleSwipeGesture(touchStartX, touchStartY, touchEndX, touchEndY);
+        canvas.addEventListener('touchend', e => {
+            if (!gameRunning) return;
+            let dx = e.changedTouches[0].screenX - touchStartX;
+            let dy = e.changedTouches[0].screenY - touchStartY;
+            handleInput(dx, dy);
         }, {passive: false});
 
-        function handleSwipeGesture(startX, startY, endX, endY) {
-            let xDiff = endX - startX;
-            let yDiff = endY - startY;
-            
-            // 10px threshold avoids accidental tiny swipes
-            if (Math.abs(xDiff) < 10 && Math.abs(yDiff) < 10) return;
-
-            if (Math.abs(xDiff) > Math.abs(yDiff)) {
-                if (xDiff > 0 && d != "LEFT") d = "RIGHT";
-                else if (xDiff < 0 && d != "RIGHT") d = "LEFT";
-            } else {
-                if (yDiff > 0 && d != "UP") d = "DOWN";
-                else if (yDiff < 0 && d != "DOWN") d = "UP";
-            }
-        }
-
-        // --- KEYBOARD CONTROLS ---
-        document.addEventListener("keydown", function(event) {
-            if(!gameRunning) return;
-            let key = event.keyCode;
-            if( key == 37 && d != "RIGHT") d = "LEFT";
-            else if(key == 38 && d != "DOWN") d = "UP";
-            else if(key == 39 && d != "LEFT") d = "RIGHT";
-            else if(key == 40 && d != "UP") d = "DOWN";
+        // Keyboard
+        document.addEventListener('keydown', e => {
+            if (!gameRunning) return;
+            if (e.keyCode === 37) handleInput(-1, 0); // Left
+            if (e.keyCode === 38) handleInput(0, -1); // Up
+            if (e.keyCode === 39) handleInput(1, 0);  // Right
+            if (e.keyCode === 40) handleInput(0, 1);  // Down
         });
 
-        // --- MAIN DRAW LOOP ---
-        function draw() {
-            // 1. Clear Canvas
-            ctx.fillStyle = "#fff";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        function handleInput(dx, dy) {
+            // Threshold for tap vs swipe
+            if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
 
-            // 2. Draw Snake
-            for( let i = 0; i < snake.length; i++){
-                let rotation = 0;
-
-                if (i === 0) {
-                    // HEAD: Rotate based on current input direction
-                    if (d === "UP") rotation = 0;
-                    if (d === "RIGHT") rotation = Math.PI / 2; // 90 deg
-                    if (d === "DOWN") rotation = Math.PI;      // 180 deg
-                    if (d === "LEFT") rotation = -Math.PI / 2; // -90 deg
-                } else {
-                    // BODY: Rotate based on relation to the segment ahead of it
-                    let prev = snake[i-1];
-                    let curr = snake[i];
-                    
-                    if (prev.y < curr.y) rotation = 0;            // Up
-                    else if (prev.x > curr.x) rotation = Math.PI / 2;  // Right
-                    else if (prev.y > curr.y) rotation = Math.PI;      // Down
-                    else if (prev.x < curr.x) rotation = -Math.PI / 2; // Left
-                }
-
-                drawRotatedImage(snakeImg, snake[i].x, snake[i].y, rotation);
-            }
-
-            // 3. Draw Food
-            ctx.drawImage(foodImg, food.x, food.y, box, box);
-
-            // 4. Calculate New Position
-            let snakeX = snake[0].x;
-            let snakeY = snake[0].y;
-
-            if( d == "LEFT") snakeX -= box;
-            if( d == "UP") snakeY -= box;
-            if( d == "RIGHT") snakeX += box;
-            if( d == "DOWN") snakeY += box;
-
-            // 5. Collision Check 
-            // The logic here must match 0 to canvas.width EXACTLY.
-            // Since boxes are 0, 20, ... 280 (for a 300w canvas)
-            // Hitting -20 is death. Hitting 300 is death.
-            if(snakeX < 0 || snakeX >= canvas.width || 
-               snakeY < 0 || snakeY >= canvas.height || 
-               collision(snakeX, snakeY, snake)){
-                
-                clearInterval(gameLoop);
-                gameRunning = false;
-                alert("Game Over! Score: " + score);
-                startGame(); 
-                return;
-            }
-
-            // 6. Eating Logic
-            if(snakeX == food.x && snakeY == food.y){
-                score++;
-                document.getElementById('score').innerText = score;
-                generateFood();
+            // Buffer the input into nextVel variables
+            // We do NOT change velX/velY immediately. The update loop does that
+            // when the snake reaches a grid intersection.
+            if (Math.abs(dx) > Math.abs(dy)) {
+                // Horizontal
+                if (dx > 0) { nextVelX = SPEED; nextVelY = 0; }
+                else        { nextVelX = -SPEED; nextVelY = 0; }
             } else {
-                snake.pop();
+                // Vertical
+                if (dy > 0) { nextVelX = 0; nextVelY = SPEED; }
+                else        { nextVelX = 0; nextVelY = -SPEED; }
             }
-
-            // 7. Move Head
-            let newHead = { x : snakeX, y : snakeY };
-            snake.unshift(newHead);
-        }
-
-        function collision(headX, headY, array){
-            for(let i = 0; i < array.length; i++){
-                if(headX == array[i].x && headY == array[i].y){
-                    return true;
-                }
-            }
-            return false;
         }
     </script>
 </body>
