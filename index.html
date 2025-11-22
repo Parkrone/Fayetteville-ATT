@@ -95,12 +95,11 @@
             transform-origin: center;
         }
 
-        /* The "Jelly" Animation */
         @keyframes jellyPop {
             0%   { transform: scale(1); }
-            30%  { transform: scale(0.90); } /* Squeeze */
-            50%  { transform: scale(1.05); } /* Pop */
-            70%  { transform: scale(0.98); } /* Settle */
+            30%  { transform: scale(0.90); } 
+            50%  { transform: scale(1.05); } 
+            70%  { transform: scale(0.98); } 
             100% { transform: scale(1); }
         }
 
@@ -117,7 +116,58 @@
         .btn-game { background-color: #ff7900; color: white; border: none; }
         .btn-game:hover { background-color: #e66c00; }
 
-        /* --- GAME AREA --- */
+        /* --- OVERLAYS (Game & Redirect) --- */
+        .overlay-base {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.96); 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            z-index: 20;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .hidden { display: none !important; }
+
+        /* Redirect Overlay Specifics */
+        #redirect-overlay {
+            /* Using fixed ensures it covers the whole screen, not just the container */
+            position: fixed; 
+            z-index: 10000;
+        }
+
+        #redirect-overlay h2 {
+            color: #0057B8;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        #redirect-overlay p {
+            font-size: 16px;
+            color: #555;
+            line-height: 1.5;
+            max-width: 300px;
+        }
+        
+        /* Loading Spinner for Redirect */
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #0057B8;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Game Overlay Specifics */
         #game-area {
             display: none;
             margin-top: 20px;
@@ -135,47 +185,11 @@
             margin: 0 auto;
             touch-action: none; 
         }
-
-        /* GAME OVER OVERLAY */
-        #game-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.95); 
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            border-radius: 10px;
-            z-index: 10;
-        }
         
-        .hidden { display: none !important; }
+        #game-overlay h2 { color: #0057B8; font-size: 32px; margin-bottom: 10px; }
+        #game-overlay p { font-size: 18px; margin-bottom: 20px; color: #555; }
 
-        #game-overlay h2 {
-            color: #0057B8;
-            font-size: 32px;
-            margin-bottom: 10px;
-        }
-
-        #game-overlay p {
-            font-size: 18px;
-            margin-bottom: 20px;
-            color: #555;
-        }
-
-        .score-board { 
-            margin-bottom: 5px; 
-            font-weight: bold; 
-            color: #0057B8; 
-            font-size: 16px; 
-            display: flex;
-            justify-content: space-between; 
-            padding: 0 10px;
-        }
-
+        .score-board { margin-bottom: 5px; font-weight: bold; color: #0057B8; font-size: 16px; display: flex; justify-content: space-between; padding: 0 10px; }
         .game-instructions { font-size: 12px; color: #777; margin-bottom: 10px; font-style: italic; }
 
         /* --- FOOTER --- */
@@ -196,6 +210,12 @@
         <img src="att.gif" alt="Loading...">
     </div>
 
+    <div id="redirect-overlay" class="overlay-base hidden">
+        <div class="spinner"></div>
+        <h2>Heading to Google...</h2>
+        <p>Please note: You may need to sign in to your Google account to leave a review.</p>
+    </div>
+
     <header>
         <img src="attlogo.png" alt="AT&T Logo">
         <h1>Fayetteville</h1>
@@ -210,8 +230,8 @@
             Explore Fayetteville Deals
         </a>
 
-        <a href="https://search.google.com/local/writereview?placeid=ChIJ84Inr4tryYcRQUkKOVeSnF8" class="btn btn-secondary link-delay">
-            Leave Us a Review
+        <a href="https://search.google.com/local/writereview?placeid=ChIJ84Inr4tryYcRQUkKOVeSnF8" id="googleBtn" class="btn btn-secondary">
+            Review us on Google
         </a>
 
         <p style="margin: 15px 0; color: #999; font-size: 14px;">— OR —</p>
@@ -229,7 +249,7 @@
             
             <canvas id="snakeCanvas" width="300" height="300"></canvas>
 
-            <div id="game-overlay" class="hidden">
+            <div id="game-overlay" class="overlay-base hidden" style="position: absolute; border-radius: 10px;">
                 <h2>GAME OVER</h2>
                 <p>Final Score: <span id="final-score">0</span></p>
                 <button onclick="restartGame()" class="btn btn-game" style="width: auto; padding: 10px 30px;">Try Again</button>
@@ -248,31 +268,44 @@
             const loader = document.getElementById("preloader");
             const container = document.getElementById("mainContainer");
             
-            // --- NEW: LINK DELAY LOGIC ---
-            // This selects the two buttons with class 'link-delay'
+            // A. STANDARD DELAY (For the Deals Link)
             const delayLinks = document.querySelectorAll('.link-delay');
-            
             delayLinks.forEach(link => {
                 link.addEventListener('click', function(e) {
-                    // 1. Stop the link from opening immediately
                     e.preventDefault();
-                    
-                    // 2. Play the Animation
                     this.classList.remove('btn-animate');
-                    void this.offsetWidth; // Trigger reflow
+                    void this.offsetWidth; 
                     this.classList.add('btn-animate');
-                    
-                    // 3. Wait 500ms (0.5 seconds) then go to the URL
                     const targetUrl = this.href;
-                    setTimeout(function() {
-                        // Uses window.location to ensure it works on mobile without popup blockers
-                        window.location.href = targetUrl;
-                    }, 500);
+                    setTimeout(function() { window.location.href = targetUrl; }, 500);
                 });
             });
 
-            // --- SNAKE GAME BUTTON ANIMATION ---
-            // We handle the Game button separately because it doesn't have a URL
+            // B. GOOGLE BUTTON LOGIC (Animation + Overlay + 2.5s Delay)
+            const googleBtn = document.getElementById('googleBtn');
+            const redirectOverlay = document.getElementById('redirect-overlay');
+            
+            googleBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // 1. Jelly Animation
+                this.classList.remove('btn-animate');
+                void this.offsetWidth; 
+                this.classList.add('btn-animate');
+
+                // 2. Show Overlay
+                redirectOverlay.classList.remove('hidden');
+
+                // 3. Wait 2.5 Seconds then Redirect
+                const targetUrl = this.href;
+                setTimeout(function() {
+                    window.location.href = targetUrl;
+                    // Optional: Hide overlay after redirect starts so back button works cleanly
+                    setTimeout(() => redirectOverlay.classList.add('hidden'), 1000);
+                }, 2500);
+            });
+
+            // C. SNAKE BUTTON ANIMATION
             const gameBtn = document.querySelector('.btn-game');
             gameBtn.addEventListener('click', function() {
                 this.classList.remove('btn-animate');
@@ -280,13 +313,10 @@
                 this.classList.add('btn-animate');
             });
 
-            // Load High Score
+            // D. HIGH SCORE & PRELOADER
             const savedScore = localStorage.getItem('attSnakeHighScore');
-            if(savedScore) {
-                document.getElementById('highScore').innerText = savedScore;
-            }
+            if(savedScore) document.getElementById('highScore').innerText = savedScore;
 
-            // Preloader Fade
             setTimeout(function() {
                 loader.classList.add("loader-hidden");
                 setTimeout(() => {
@@ -343,9 +373,7 @@
             startCountdown();
         }
         
-        function restartGame() {
-            initGame();
-        }
+        function restartGame() { initGame(); }
 
         function startCountdown() {
             let count = 3;
