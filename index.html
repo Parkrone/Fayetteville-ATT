@@ -90,8 +90,9 @@
         .button-group .btn {
             margin-bottom: 0; 
             flex: 1; 
-            font-size: 14px; 
-            padding: 12px 10px;
+            /* INCREASED FONT SIZE for readability */
+            font-size: 16px; 
+            padding: 14px 10px;
         }
 
         /* --- BUTTONS & ANIMATIONS --- */
@@ -100,12 +101,13 @@
             justify-content: center;
             align-items: center;
             width: 100%;
-            padding: 15px 20px;
+            padding: 16px 20px;
             margin-bottom: 15px;
             text-decoration: none;
             border-radius: 30px;
             font-weight: 600;
-            font-size: 16px;
+            /* INCREASED MAIN BUTTON FONT SIZE */
+            font-size: 18px;
             transition: background-color 0.3s ease, transform 0.1s ease;
             border: 2px solid transparent;
             cursor: pointer;
@@ -129,7 +131,7 @@
         .btn-secondary { background-color: #fff; color: #0057B8; border: 2px solid #0057B8; }
         .btn-secondary:hover { background-color: #f0f8ff; }
         
-        .btn-game { background-color: #ff7900; color: white; border: none; font-size: 14px;}
+        .btn-game { background-color: #ff7900; color: white; border: none; font-size: 15px;}
         .btn-game:hover { background-color: #e66c00; }
 
         .btn-call { background-color: #34c759; color: white; } 
@@ -138,12 +140,15 @@
         .btn-contact { background-color: #333; color: white; } 
         .btn-contact:hover { background-color: #000; }
 
+        /* Status Indicator for Store Hours */
         .status-badge {
             display: block; 
-            font-size: 10px;
-            margin-top: 4px;
-            opacity: 0.9;
-            font-weight: normal;
+            /* INCREASED SIZE AND WEIGHT for readability */
+            font-size: 13px; 
+            font-weight: 700;
+            margin-top: 5px;
+            opacity: 1;
+            letter-spacing: 0.3px;
         }
 
         /* --- OVERLAYS --- */
@@ -180,7 +185,7 @@
         /* Generic Action Overlay (Used for Contact & Closed) */
         .action-overlay { position: fixed; z-index: 10000; }
         .action-overlay h2 { color: #333; font-size: 22px; margin-bottom: 10px; }
-        .action-overlay p { font-size: 15px; color: #555; margin-bottom: 20px; max-width: 320px; line-height: 1.4; }
+        .action-overlay p { font-size: 16px; color: #555; margin-bottom: 20px; max-width: 320px; line-height: 1.4; }
         
         /* Contact Card Preview Box */
         .contact-preview-box {
@@ -193,8 +198,8 @@
             max-width: 300px;
             text-align: left;
         }
-        .contact-preview-box strong { color: #0057B8; display: block; margin-bottom: 5px; font-size: 16px; }
-        .contact-preview-box span { display: block; font-size: 14px; color: #444; margin-bottom: 3px; }
+        .contact-preview-box strong { color: #0057B8; display: block; margin-bottom: 5px; font-size: 17px; }
+        .contact-preview-box span { display: block; font-size: 15px; color: #444; margin-bottom: 4px; }
 
         .overlay-actions { display: flex; gap: 10px; width: 100%; margin-top: 10px; }
 
@@ -206,8 +211,10 @@
         .game-instructions { font-size: 12px; color: #777; margin-bottom: 10px; font-style: italic; }
 
         /* --- FOOTER --- */
-        footer { margin-top: auto; padding: 30px 20px; font-size: 12px; color: #777; text-align: center; line-height: 1.6; }
-        footer strong { color: #0057B8; }
+        footer { margin-top: auto; padding: 30px 20px; font-size: 13px; color: #777; text-align: center; line-height: 1.6; }
+        /* Footer Link Styling */
+        footer a { color: #0057B8; text-decoration: none; font-weight: 700; transition: color 0.2s;}
+        footer a:hover { color: #00387a; text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -304,7 +311,7 @@
 
     <footer>
         &copy; 2025 Fayetteville Mall Store Location.<br>
-        Built by <strong>Parker Thompson</strong> - Your Local Fayetteville Mall Sales Consultant.
+        Built by <a href="https://www.instagram.com/parkerthomps0n/" target="_blank">Parker Thompson</a> - Your Local Fayetteville Mall Sales Consultant.
     </footer>
 
     <script>
@@ -333,7 +340,6 @@
             const contactBtn = document.getElementById('contactBtn');
             contactBtn.addEventListener('click', function(e) {
                 playJelly(this);
-                // Show the overlay instead of downloading immediately
                 document.getElementById('contact-overlay').classList.remove('hidden');
             });
 
@@ -435,10 +441,8 @@
 
             if (isStoreOpen()) {
                 badge.innerText = `Open (${openStr} - ${closeStr})`;
-                badge.style.opacity = "0.8";
             } else {
                 badge.innerText = "Closed Now";
-                badge.style.opacity = "0.8";
                 document.getElementById('closed-msg').innerText = `We are currently closed. Our hours today are ${openStr} to ${closeStr}. (Hours may vary on holidays)`;
             }
         }
