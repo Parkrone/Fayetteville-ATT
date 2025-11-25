@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AT&T Fayetteville - Exclusive Deals & Reviews</title>
+    <title>AT&T Fayetteville Mall - Exclusive Deals & Reviews</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -58,7 +58,7 @@
             justify-content: center;
             align-items: center;
             gap: 10px;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
         header img { height: 40px; width: auto; }
         header h1 { font-size: 24px; font-weight: 700; color: #000; letter-spacing: -0.5px; }
@@ -68,20 +68,23 @@
             width: 90%;
             max-width: 500px;
             background: white;
-            padding: 40px;
+            padding: 30px;
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             text-align: center;
             opacity: 0; 
             transform: translateY(20px);
             transition: opacity 0.8s ease, transform 0.8s ease;
+            margin-bottom: 20px;
         }
         .content-visible { opacity: 1; transform: translateY(0); }
-        .welcome-text { margin-bottom: 30px; font-size: 18px; color: #444; line-height: 1.5; }
+        .welcome-text { margin-bottom: 25px; font-size: 16px; color: #444; line-height: 1.5; }
 
         /* --- BUTTONS & ANIMATIONS --- */
         .btn {
-            display: block;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             width: 100%;
             padding: 15px 20px;
             margin-bottom: 15px;
@@ -93,8 +96,10 @@
             border: 2px solid transparent;
             cursor: pointer;
             transform-origin: center;
+            line-height: 1.2;
         }
 
+        /* Jelly Animation */
         @keyframes jellyPop {
             0%   { transform: scale(1); }
             30%  { transform: scale(0.90); } 
@@ -102,105 +107,81 @@
             70%  { transform: scale(0.98); } 
             100% { transform: scale(1); }
         }
+        .btn-animate { animation: jellyPop 0.4s ease-out forwards; }
 
-        .btn-animate {
-            animation: jellyPop 0.4s ease-out forwards;
-        }
-
-        .btn-primary { background-color: #0057B8; color: white; }
+        /* Colors */
+        .btn-primary { background-color: #0057B8; color: white; } /* AT&T Blue */
         .btn-primary:hover { background-color: #004694; }
         
         .btn-secondary { background-color: #fff; color: #0057B8; border: 2px solid #0057B8; }
         .btn-secondary:hover { background-color: #f0f8ff; }
         
-        .btn-game { background-color: #ff7900; color: white; border: none; }
+        .btn-game { background-color: #ff7900; color: white; border: none; font-size: 14px;}
         .btn-game:hover { background-color: #e66c00; }
 
-        /* --- OVERLAYS (Game & Redirect) --- */
+        /* New Contact Buttons */
+        .btn-call { background-color: #34c759; color: white; } /* Phone Green */
+        .btn-call:hover { background-color: #2db14e; }
+
+        .btn-contact { background-color: #333; color: white; } /* Dark Gray */
+        .btn-contact:hover { background-color: #000; }
+
+        /* Status Indicator for Store Hours */
+        .status-badge {
+            font-size: 12px;
+            margin-left: 8px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: rgba(0,0,0,0.1);
+            font-weight: normal;
+        }
+
+        /* --- OVERLAYS --- */
         .overlay-base {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(255, 255, 255, 0.96); 
+            background-color: rgba(255, 255, 255, 0.98); 
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             border-radius: 10px;
             z-index: 20;
-            padding: 20px;
+            padding: 30px;
             text-align: center;
         }
         
         .hidden { display: none !important; }
 
-        /* Redirect Overlay Specifics */
-        #redirect-overlay {
-            /* Using fixed ensures it covers the whole screen, not just the container */
-            position: fixed; 
-            z-index: 10000;
-        }
-
-        #redirect-overlay h2 {
-            color: #0057B8;
-            font-size: 24px;
-            margin-bottom: 15px;
-        }
-        #redirect-overlay p {
-            font-size: 16px;
-            color: #555;
-            line-height: 1.5;
-            max-width: 300px;
-        }
-        
-        /* Loading Spinner for Redirect */
+        /* Redirect Overlay */
+        #redirect-overlay { position: fixed; z-index: 10000; }
+        #redirect-overlay h2 { color: #0057B8; font-size: 24px; margin-bottom: 15px; }
+        #redirect-overlay p { font-size: 16px; color: #555; line-height: 1.5; max-width: 300px; }
         .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #0057B8;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
+            border: 4px solid #f3f3f3; border-top: 4px solid #0057B8;
+            border-radius: 50%; width: 40px; height: 40px;
+            animation: spin 1s linear infinite; margin-bottom: 20px;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Game Overlay Specifics */
-        #game-area {
-            display: none;
-            margin-top: 20px;
-            background: #f9f9f9;
-            padding: 10px;
-            border-radius: 10px;
-            border: 1px solid #ddd;
-            position: relative; 
-        }
+        /* Closed Store Overlay */
+        #closed-overlay { position: fixed; z-index: 10000; }
+        #closed-overlay h2 { color: #d32f2f; font-size: 24px; margin-bottom: 10px; }
+        #closed-overlay p { font-size: 16px; color: #555; margin-bottom: 20px; max-width: 320px; }
+        .overlay-actions { display: flex; gap: 10px; width: 100%; }
 
-        canvas {
-            background-color: #fff;
-            border: 4px solid #333; 
-            display: block;
-            margin: 0 auto;
-            touch-action: none; 
-        }
-        
+        /* Game Area */
+        #game-area { display: none; margin-top: 20px; background: #f9f9f9; padding: 10px; border-radius: 10px; border: 1px solid #ddd; position: relative; }
+        canvas { background-color: #fff; border: 4px solid #333; display: block; margin: 0 auto; touch-action: none; }
         #game-overlay h2 { color: #0057B8; font-size: 32px; margin-bottom: 10px; }
-        #game-overlay p { font-size: 18px; margin-bottom: 20px; color: #555; }
-
         .score-board { margin-bottom: 5px; font-weight: bold; color: #0057B8; font-size: 16px; display: flex; justify-content: space-between; padding: 0 10px; }
         .game-instructions { font-size: 12px; color: #777; margin-bottom: 10px; font-style: italic; }
 
         /* --- FOOTER --- */
-        footer {
-            margin-top: auto;
-            padding: 30px 20px;
-            font-size: 12px;
-            color: #777;
-            text-align: center;
-            line-height: 1.6;
-        }
+        footer { margin-top: auto; padding: 30px 20px; font-size: 12px; color: #777; text-align: center; line-height: 1.6; }
         footer strong { color: #0057B8; }
     </style>
 </head>
@@ -216,18 +197,37 @@
         <p>Please note: You may need to sign in to your Google account to leave a review.</p>
     </div>
 
+    <div id="closed-overlay" class="overlay-base hidden">
+        <h2>We are currently closed</h2>
+        <p id="closed-msg">Our store hours have ended for the day.</p>
+        <div class="overlay-actions">
+            <button onclick="closeOverlay('closed-overlay')" class="btn btn-secondary">Cancel</button>
+            <a href="tel:4794395471" class="btn btn-call" style="width:auto; flex-grow:1;">Call Anyway</a>
+        </div>
+    </div>
+
     <header>
         <img src="attlogo.png" alt="AT&T Logo">
-        <h1>Fayetteville</h1>
+        <h1>Fayetteville Mall</h1>
     </header>
 
     <div class="container" id="mainContainer">
         <p class="welcome-text">
-            Welcome to your local Fayetteville store portal. Explore our exclusive location deals or let us know how we did today.
+            Welcome to your local Fayetteville Mall store portal.
         </p>
 
+        <button id="callBtn" class="btn btn-call">
+            Call Store <span id="hours-badge" class="status-badge">Loading...</span>
+        </button>
+
+        <a href="AT&TFayetteville Mall.vcf" download="ATT_Fayetteville_Mall.vcf" class="btn btn-contact link-anim">
+            Save to Contacts 📇
+        </a>
+
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
         <a href="https://www.att.com/stores/arkansas/fayetteville/146068" class="btn btn-primary link-delay">
-            Explore Fayetteville Deals
+            Explore Fayetteville Mall Deals
         </a>
 
         <a href="https://search.google.com/local/writereview?placeid=ChIJ84Inr4tryYcRQUkKOVeSnF8" id="googleBtn" class="btn btn-secondary">
@@ -246,9 +246,7 @@
                 <span>High Score: <span id="highScore">0</span></span>
             </div>
             <div class="game-instructions">Swipe to steer. Collect the energy bolts!</div>
-            
             <canvas id="snakeCanvas" width="300" height="300"></canvas>
-
             <div id="game-overlay" class="overlay-base hidden" style="position: absolute; border-radius: 10px;">
                 <h2>GAME OVER</h2>
                 <p>Final Score: <span id="final-score">0</span></p>
@@ -258,65 +256,80 @@
     </div>
 
     <footer>
-        &copy; 2025 Fayetteville Store Location.<br>
-        Built by <strong>Parker Thompson</strong> - Your Local Fayetteville Sales Consultant.
+        &copy; 2025 Fayetteville Mall Store Location.<br>
+        Built by <strong>Parker Thompson</strong> - Your Local Fayetteville Mall Sales Consultant.
     </footer>
 
     <script>
-        // --- 1. PAGE & BUTTON LOGIC ---
+        // --- STORE HOURS CONFIGURATION (24 Hour Clock) ---
+        // Mon-Sat 11am-8pm (1100-2000), Sun 11am-6pm (1100-1800)
+        const storeSchedule = {
+            0: { open: 1100, close: 1800 }, // Sunday
+            1: { open: 1100, close: 2000 }, // Monday
+            2: { open: 1100, close: 2000 }, // Tuesday
+            3: { open: 1100, close: 2000 }, // Wednesday
+            4: { open: 1100, close: 2000 }, // Thursday
+            5: { open: 1100, close: 2000 }, // Friday
+            6: { open: 1100, close: 2000 }  // Saturday
+        };
+
+        // --- 1. MAIN PAGE LOGIC ---
         window.addEventListener("load", function () {
             const loader = document.getElementById("preloader");
             const container = document.getElementById("mainContainer");
             
-            // A. STANDARD DELAY (For the Deals Link)
-            const delayLinks = document.querySelectorAll('.link-delay');
-            delayLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    this.classList.remove('btn-animate');
-                    void this.offsetWidth; 
-                    this.classList.add('btn-animate');
-                    const targetUrl = this.href;
-                    setTimeout(function() { window.location.href = targetUrl; }, 500);
-                });
-            });
+            // Initialize Animations
+            setupButtonAnimations();
+            
+            // Initialize Store Logic
+            checkStoreStatus();
 
-            // B. GOOGLE BUTTON LOGIC (Animation + Overlay + 2.5s Delay)
+            // Google Review Logic
             const googleBtn = document.getElementById('googleBtn');
             const redirectOverlay = document.getElementById('redirect-overlay');
-            
             googleBtn.addEventListener('click', function(e) {
                 e.preventDefault();
-                
-                // 1. Jelly Animation
-                this.classList.remove('btn-animate');
-                void this.offsetWidth; 
-                this.classList.add('btn-animate');
-
-                // 2. Show Overlay
+                playJelly(this);
                 redirectOverlay.classList.remove('hidden');
-
-                // 3. Wait 2.5 Seconds then Redirect
-                const targetUrl = this.href;
                 setTimeout(function() {
-                    window.location.href = targetUrl;
-                    // Optional: Hide overlay after redirect starts so back button works cleanly
+                    window.location.href = googleBtn.href;
                     setTimeout(() => redirectOverlay.classList.add('hidden'), 1000);
                 }, 2500);
             });
 
-            // C. SNAKE BUTTON ANIMATION
-            const gameBtn = document.querySelector('.btn-game');
-            gameBtn.addEventListener('click', function() {
-                this.classList.remove('btn-animate');
-                void this.offsetWidth; 
-                this.classList.add('btn-animate');
+            // Call Button Logic
+            const callBtn = document.getElementById('callBtn');
+            callBtn.addEventListener('click', function(e) {
+                playJelly(this);
+                if(isStoreOpen()) {
+                    // If open, call immediately
+                    window.location.href = "tel:4794395471";
+                } else {
+                    // If closed, show warning
+                    document.getElementById('closed-overlay').classList.remove('hidden');
+                }
             });
 
-            // D. HIGH SCORE & PRELOADER
+            // Standard Delay Links
+            const delayLinks = document.querySelectorAll('.link-delay');
+            delayLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    playJelly(this);
+                    setTimeout(() => { window.location.href = this.href; }, 500);
+                });
+            });
+
+            // Game Button
+            document.querySelector('.btn-game').addEventListener('click', function() {
+                playJelly(this);
+            });
+
+            // High Score
             const savedScore = localStorage.getItem('attSnakeHighScore');
             if(savedScore) document.getElementById('highScore').innerText = savedScore;
 
+            // Fade Loader
             setTimeout(function() {
                 loader.classList.add("loader-hidden");
                 setTimeout(() => {
@@ -325,6 +338,71 @@
                 }, 500);
             }, 4200); 
         });
+
+        // --- HELPER FUNCTIONS ---
+        
+        function playJelly(element) {
+            element.classList.remove('btn-animate');
+            void element.offsetWidth; 
+            element.classList.add('btn-animate');
+        }
+
+        function setupButtonAnimations() {
+            // Generic animation handler for contact/other buttons
+            const animLinks = document.querySelectorAll('.link-anim');
+            animLinks.forEach(link => {
+                link.addEventListener('click', function() { playJelly(this); });
+            });
+        }
+
+        function closeOverlay(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        // --- STORE TIMING LOGIC ---
+        function getCentralTime() {
+            // Create date object for current time in Fayetteville (Central Time)
+            const d = new Date();
+            return new Date(d.toLocaleString("en-US", {timeZone: "America/Chicago"}));
+        }
+
+        function isStoreOpen() {
+            const now = getCentralTime();
+            const day = now.getDay(); // 0 = Sunday
+            const currentMilitaryTime = (now.getHours() * 100) + now.getMinutes();
+            
+            const todayHours = storeSchedule[day];
+            
+            return (currentMilitaryTime >= todayHours.open && currentMilitaryTime < todayHours.close);
+        }
+
+        function checkStoreStatus() {
+            const now = getCentralTime();
+            const day = now.getDay();
+            const todayHours = storeSchedule[day];
+            const badge = document.getElementById('hours-badge');
+            
+            // Format display hours (e.g., 1000 -> 10:00 AM)
+            const formatTime = (num) => {
+                let hour = Math.floor(num / 100);
+                let ampm = hour >= 12 ? 'PM' : 'AM';
+                let displayHour = hour % 12;
+                displayHour = displayHour ? displayHour : 12; 
+                return displayHour + ampm;
+            };
+
+            const openStr = formatTime(todayHours.open);
+            const closeStr = formatTime(todayHours.close);
+
+            if (isStoreOpen()) {
+                badge.innerText = `Open Now (${openStr} - ${closeStr})`;
+                badge.style.background = "rgba(255,255,255,0.3)";
+            } else {
+                badge.innerText = "Closed Now";
+                badge.style.background = "rgba(0,0,0,0.3)";
+                document.getElementById('closed-msg').innerText = `We are currently closed. Our hours today are ${openStr} to ${closeStr}. (Hours may vary on holidays)`;
+            }
+        }
 
         // --- 2. SNAKE ENGINE ---
         const canvas = document.getElementById("snakeCanvas");
@@ -360,10 +438,8 @@
             score = 0;
             snakeLength = 3; 
             document.getElementById('score').innerText = score;
-            
             headX = Math.floor(TILE_COUNT / 2) * GRID_SIZE;
             headY = Math.floor(TILE_COUNT / 2) * GRID_SIZE;
-            
             path = [];
             for(let i=0; i < snakeLength * (GRID_SIZE/SPEED); i++) {
                 path.push({x: headX, y: headY + i}); 
@@ -437,7 +513,6 @@
             headX += velX;
             headY += velY;
             path.unshift({ x: headX, y: headY });
-            
             const desiredPathLength = snakeLength * (GRID_SIZE / SPEED);
             if (path.length > desiredPathLength) path.pop();
 
