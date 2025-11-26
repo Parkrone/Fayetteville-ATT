@@ -32,7 +32,7 @@
             --game-area-bg: #f9f9f9;
             --border-color: #ddd;
             
-            /* Preloader is ALWAYS white to match the GIF background */
+            /* Preloader Background (White for Light Mode) */
             --preloader-bg: #ffffff; 
         }
 
@@ -58,8 +58,8 @@
                 --game-area-bg: #2c2c2c;
                 --border-color: #444;
                 
-                /* Force white background in Dark Mode for the GIF */
-                --preloader-bg: #ffffff; 
+                /* Preloader Background (Navy for Dark Mode) */
+                --preloader-bg: #001e43; 
             }
         }
 
@@ -92,7 +92,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: var(--preloader-bg);
+            background-color: var(--preloader-bg); /* Uses Variable */
             z-index: 9999;
             display: flex;
             justify-content: center;
@@ -104,6 +104,8 @@
             /* Scaled up 30% (approx 295px) */
             width: 295px; 
             height: auto;
+            /* Optional: Adds rounded corners to the GIF so it looks like a card on Navy bg */
+            border-radius: 8px; 
         }
         
         .loader-hidden { opacity: 0; visibility: hidden; }
@@ -390,7 +392,7 @@
 
     <footer>
         &copy; 2025 Fayetteville Mall Store Location.<br>
-        Built by <a href="https://www.instagram.com/parkerthomps0n/" target="_blank">Parker Thompson</a> - Your Local Fayetteville Mall Sales Consultant.
+        Built by <a href="https://parkrone.github.io/Parker-Design-Lab/" target="_blank">Parker Thompson</a> - Your Local Fayetteville Mall Sales Consultant.
     </footer>
 
     <script>
