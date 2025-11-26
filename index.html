@@ -12,7 +12,7 @@
     <style>
         /* --- CSS VARIABLES (Color Themes) --- */
         :root {
-            /* Light Mode (Default) */
+            /* Light Mode */
             --bg-color: #f2f2f2;
             --container-bg: #ffffff;
             --text-color: #333333;
@@ -31,12 +31,14 @@
             --footer-text: #777;
             --game-area-bg: #f9f9f9;
             --border-color: #ddd;
-            
-            /* Preloader is ALWAYS white to match the GIF background */
             --preloader-bg: #ffffff; 
+            
+            /* Button Colors */
+            --btn-gray-bg: #333333;
+            --btn-gray-hover: #000000;
         }
 
-        /* Dark Mode Override (Auto-Detected) */
+        /* Dark Mode */
         @media (prefers-color-scheme: dark) {
             :root {
                 --bg-color: #121212;
@@ -57,139 +59,42 @@
                 --footer-text: #999;
                 --game-area-bg: #2c2c2c;
                 --border-color: #444;
-                
-                /* Reverted: Preloader stays WHITE in Dark Mode to blend with the GIF */
                 --preloader-bg: #ffffff; 
+                
+                --btn-gray-bg: #444444;
+                --btn-gray-hover: #555555;
             }
         }
 
-        /* --- CSS RESET & BASICS --- */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            user-select: none; 
-            -webkit-user-select: none;
-            touch-action: manipulation;
-        }
-
-        body {
-            font-family: 'Open Sans', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            overflow-x: hidden;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
+        /* --- RESET & BASICS --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+        body { font-family: 'Open Sans', sans-serif; background-color: var(--bg-color); color: var(--text-color); display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; transition: background-color 0.3s ease, color 0.3s ease; }
 
         /* --- PRELOADER --- */
-        #preloader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--preloader-bg);
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 0.5s ease, visibility 0.5s;
-        }
-        
-        #preloader img { 
-            /* Scaled up another 15% (approx 340px) */
-            width: 340px; 
-            height: auto;
-        }
-        
+        #preloader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--preloader-bg); z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.5s ease, visibility 0.5s; }
+        #preloader img { width: 340px; height: auto; }
         .loader-hidden { opacity: 0; visibility: hidden; }
 
         /* --- HEADER --- */
-        header {
-            width: 100%;
-            background-color: var(--container-bg);
-            padding: 15px 0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 30px;
-            transition: background-color 0.3s ease;
-        }
+        header { width: 100%; background-color: var(--container-bg); padding: 15px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 30px; transition: background-color 0.3s ease; }
         header img { height: 40px; width: auto; }
-        header h1 { 
-            font-size: 24px; 
-            font-weight: 700; 
-            color: var(--heading-color); 
-            letter-spacing: -0.5px; 
-        }
+        header h1 { font-size: 24px; font-weight: 700; color: var(--heading-color); letter-spacing: -0.5px; }
 
         /* --- CONTAINER --- */
-        .container {
-            width: 90%;
-            max-width: 500px;
-            background: var(--container-bg);
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            text-align: center;
-            opacity: 0; 
-            transform: translateY(20px);
-            transition: opacity 0.8s ease, transform 0.8s ease, background-color 0.3s ease;
-            margin-bottom: 20px;
-        }
+        .container { width: 90%; max-width: 500px; background: var(--container-bg); padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease, background-color 0.3s ease; margin-bottom: 20px; }
         .content-visible { opacity: 1; transform: translateY(0); }
         .welcome-text { margin-bottom: 25px; font-size: 16px; color: var(--subtext-color); line-height: 1.5; }
 
-        /* --- BUTTON GROUPS --- */
-        .button-group {
-            display: flex;
-            gap: 10px; 
-            margin-bottom: 15px;
-        }
+        /* --- BUTTONS --- */
+        .button-group { display: flex; gap: 10px; margin-bottom: 15px; }
+        .button-group .btn { margin-bottom: 0; flex: 1; font-size: 16px; padding: 14px 10px; }
+
+        .btn { display: flex; justify-content: center; align-items: center; width: 100%; padding: 16px 20px; margin-bottom: 15px; text-decoration: none; border-radius: 30px; font-weight: 600; font-size: 18px; transition: background-color 0.3s ease, transform 0.1s ease, border-color 0.3s; border: 2px solid transparent; cursor: pointer; transform-origin: center; line-height: 1.2; }
         
-        .button-group .btn {
-            margin-bottom: 0; 
-            flex: 1; 
-            font-size: 16px; 
-            padding: 14px 10px;
-        }
-
-        /* --- BUTTONS & ANIMATIONS --- */
-        .btn {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            padding: 16px 20px;
-            margin-bottom: 15px;
-            text-decoration: none;
-            border-radius: 30px;
-            font-weight: 600;
-            font-size: 18px;
-            transition: background-color 0.3s ease, transform 0.1s ease, border-color 0.3s;
-            border: 2px solid transparent;
-            cursor: pointer;
-            transform-origin: center;
-            line-height: 1.2;
-        }
-
-        @keyframes jellyPop {
-            0%   { transform: scale(1); }
-            30%  { transform: scale(0.90); } 
-            50%  { transform: scale(1.05); } 
-            70%  { transform: scale(0.98); } 
-            100% { transform: scale(1); }
-        }
+        @keyframes jellyPop { 0% { transform: scale(1); } 30% { transform: scale(0.90); } 50% { transform: scale(1.05); } 70% { transform: scale(0.98); } 100% { transform: scale(1); } }
         .btn-animate { animation: jellyPop 0.4s ease-out forwards; }
 
-        /* Colors */
-        .btn-primary { background-color: var(--att-blue); color: white; } 
+        .btn-primary { background-color: var(--att-blue); color: white; }
         .btn-primary:hover { background-color: var(--att-blue-hover); }
         
         .btn-secondary { background-color: var(--btn-sec-bg); color: var(--btn-sec-text); border: 2px solid var(--btn-sec-border); }
@@ -198,20 +103,16 @@
         .btn-game { background-color: #ff7900; color: white; border: none; font-size: 15px;}
         .btn-game:hover { background-color: #e66c00; }
 
-        .btn-call { background-color: #34c759; color: white; } 
-        .btn-call:hover { background-color: #2db14e; }
+        /* Both Call and Contact are now Gray */
+        .btn-contact, .btn-call { background-color: var(--btn-gray-bg); color: white; } 
+        .btn-contact:hover, .btn-call:hover { background-color: var(--btn-gray-hover); }
 
-        .btn-contact { background-color: #333; color: white; } 
-        .btn-contact:hover { background-color: #000; }
-        
-        @media (prefers-color-scheme: dark) {
-            .btn-contact { background-color: #444; border: 1px solid #666;}
-            .btn-contact:hover { background-color: #555; }
-        }
-
-        /* Status Indicator */
+        /* --- STATUS BADGE & PULSING DOT --- */
         .status-badge {
-            display: block; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
             font-size: 13px; 
             font-weight: 700;
             margin-top: 5px;
@@ -219,69 +120,44 @@
             letter-spacing: 0.3px;
         }
 
-        /* --- OVERLAYS --- */
-        .overlay-base {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--overlay-bg); 
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            border-radius: 10px;
-            z-index: 20;
-            padding: 25px;
-            text-align: center;
+        /* The Dot */
+        .pulsing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            position: relative;
         }
-        
+
+        /* Green State */
+        .dot-open { background-color: #2ecc71; box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); animation: pulse-green 2s infinite; }
+        @keyframes pulse-green { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(46, 204, 113, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); } }
+
+        /* Red State */
+        .dot-closed { background-color: #e74c3c; box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); animation: pulse-red 2s infinite; }
+        @keyframes pulse-red { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(231, 76, 60, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); } }
+
+        /* --- OVERLAYS --- */
+        .overlay-base { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--overlay-bg); display: flex; flex-direction: column; justify-content: center; align-items: center; border-radius: 10px; z-index: 20; padding: 25px; text-align: center; }
         .hidden { display: none !important; }
 
-        /* Redirect Overlay */
         #redirect-overlay { position: fixed; z-index: 10000; }
         #redirect-overlay h2 { color: var(--att-blue); font-size: 24px; margin-bottom: 15px; }
         #redirect-overlay p { font-size: 16px; color: var(--subtext-color); line-height: 1.5; max-width: 300px; }
-        .spinner {
-            border: 4px solid var(--bg-color); border-top: 4px solid var(--att-blue);
-            border-radius: 50%; width: 40px; height: 40px;
-            animation: spin 1s linear infinite; margin-bottom: 20px;
-        }
+        .spinner { border: 4px solid var(--bg-color); border-top: 4px solid var(--att-blue); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Generic Action Overlay */
         .action-overlay { position: fixed; z-index: 10000; }
         .action-overlay h2 { color: var(--heading-color); font-size: 22px; margin-bottom: 10px; }
         .action-overlay p { font-size: 16px; color: var(--subtext-color); margin-bottom: 20px; max-width: 320px; line-height: 1.4; }
         
-        /* Contact Card Preview Box */
-        .contact-preview-box {
-            background: var(--preview-box-bg);
-            border: 1px solid var(--preview-box-border);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            width: 100%;
-            max-width: 300px;
-            text-align: left;
-        }
+        .contact-preview-box { background: var(--preview-box-bg); border: 1px solid var(--preview-box-border); border-radius: 8px; padding: 15px; margin-bottom: 15px; width: 100%; max-width: 300px; text-align: left; }
         .contact-preview-box strong { color: var(--att-blue); display: block; margin-bottom: 5px; font-size: 17px; }
         .contact-preview-box span { display: block; font-size: 15px; color: var(--preview-text); margin-bottom: 4px; }
-
         .overlay-actions { display: flex; gap: 10px; width: 100%; margin-top: 10px; }
 
-        /* Game Area */
-        #game-area { 
-            display: none; 
-            margin-top: 20px; 
-            background: var(--game-area-bg); 
-            padding: 10px; 
-            border-radius: 10px; 
-            border: 1px solid var(--border-color); 
-            position: relative; 
-        }
-        /* Canvas stays white for snake visibility */
+        /* --- GAME AREA --- */
+        #game-area { display: none; margin-top: 20px; background: var(--game-area-bg); padding: 10px; border-radius: 10px; border: 1px solid var(--border-color); position: relative; }
         canvas { background-color: #fff; border: 4px solid #333; display: block; margin: 0 auto; touch-action: none; }
         #game-overlay h2 { color: var(--att-blue); font-size: 32px; margin-bottom: 10px; }
         .score-board { margin-bottom: 5px; font-weight: bold; color: var(--att-blue); font-size: 16px; display: flex; justify-content: space-between; padding: 0 10px; }
@@ -317,14 +193,12 @@
     <div id="contact-overlay" class="overlay-base action-overlay hidden">
         <h2>Save Store Contact</h2>
         <p>You are about to download our contact card. Please open the file after downloading to add us to your address book.</p>
-        
         <div class="contact-preview-box">
             <strong>AT&T Fayetteville Mall</strong>
             <span>📍 4201 N Shiloh Dr</span>
             <span>📞 (479) 439-5471</span>
             <span>🌐 Store Website</span>
         </div>
-
         <div class="overlay-actions">
             <button onclick="closeOverlay('contact-overlay')" class="btn btn-secondary">Cancel</button>
             <a href="AT&TFayetteville Mall.vcf" download="ATT_Fayetteville_Mall.vcf" class="btn btn-primary" style="width:auto; flex-grow:1;">Download</a>
@@ -336,7 +210,6 @@
             <source srcset="attlogo-Dark-Mode.png" media="(prefers-color-scheme: dark)">
             <img src="attlogo.png" alt="AT&T Logo">
         </picture>
-        
         <h1>Fayetteville Mall</h1>
     </header>
 
@@ -349,7 +222,10 @@
             <button id="callBtn" class="btn btn-call">
                 <div style="text-align:center;">
                     Call Store
-                    <span id="hours-badge" class="status-badge">Loading...</span>
+                    <span id="hours-badge" class="status-badge">
+                        <span id="status-dot" class="pulsing-dot dot-closed"></span>
+                        Loading...
+                    </span>
                 </div>
             </button>
 
@@ -395,37 +271,31 @@
     </footer>
 
     <script>
-        // --- STORE HOURS CONFIGURATION (24 Hour Clock) ---
+        // --- STORE HOURS ---
         const storeSchedule = {
-            0: { open: 1100, close: 1800 }, // Sunday
-            1: { open: 1100, close: 2000 }, // Monday
-            2: { open: 1100, close: 2000 }, // Tuesday
-            3: { open: 1100, close: 2000 }, // Wednesday
-            4: { open: 1100, close: 2000 }, // Thursday
-            5: { open: 1100, close: 2000 }, // Friday
-            6: { open: 1100, close: 2000 }  // Saturday
+            0: { open: 1100, close: 1800 }, 
+            1: { open: 1100, close: 2000 }, 
+            2: { open: 1100, close: 2000 }, 
+            3: { open: 1100, close: 2000 }, 
+            4: { open: 1100, close: 2000 }, 
+            5: { open: 1100, close: 2000 }, 
+            6: { open: 1100, close: 2000 }  
         };
 
-        // --- 1. MAIN PAGE LOGIC ---
+        // --- MAIN PAGE LOGIC ---
         window.addEventListener("load", function () {
             const loader = document.getElementById("preloader");
             const container = document.getElementById("mainContainer");
             
-            // Initialize Store Logic
             checkStoreStatus();
 
-            // --- BUTTON EVENT LISTENERS ---
-
-            // A. Contact Button Logic (New Overlay)
-            const contactBtn = document.getElementById('contactBtn');
-            contactBtn.addEventListener('click', function(e) {
+            // Buttons
+            document.getElementById('contactBtn').addEventListener('click', function() {
                 playJelly(this);
                 document.getElementById('contact-overlay').classList.remove('hidden');
             });
 
-            // B. Call Button Logic
-            const callBtn = document.getElementById('callBtn');
-            callBtn.addEventListener('click', function(e) {
+            document.getElementById('callBtn').addEventListener('click', function() {
                 playJelly(this);
                 if(isStoreOpen()) {
                     window.location.href = "tel:4794395471";
@@ -434,22 +304,18 @@
                 }
             });
 
-            // C. Google Review Logic
             const googleBtn = document.getElementById('googleBtn');
-            const redirectOverlay = document.getElementById('redirect-overlay');
             googleBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 playJelly(this);
-                redirectOverlay.classList.remove('hidden');
+                document.getElementById('redirect-overlay').classList.remove('hidden');
                 setTimeout(function() {
                     window.location.href = googleBtn.href;
-                    setTimeout(() => redirectOverlay.classList.add('hidden'), 1000);
+                    setTimeout(() => document.getElementById('redirect-overlay').classList.add('hidden'), 1000);
                 }, 2500);
             });
 
-            // D. Standard Delay Links (Deals)
-            const delayLinks = document.querySelectorAll('.link-delay');
-            delayLinks.forEach(link => {
+            document.querySelectorAll('.link-delay').forEach(link => {
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
                     playJelly(this);
@@ -457,16 +323,13 @@
                 });
             });
 
-            // Game Button
             document.querySelector('.btn-game').addEventListener('click', function() {
                 playJelly(this);
             });
 
-            // High Score
             const savedScore = localStorage.getItem('attSnakeHighScore');
             if(savedScore) document.getElementById('highScore').innerText = savedScore;
 
-            // Fade Loader
             setTimeout(function() {
                 loader.classList.add("loader-hidden");
                 setTimeout(() => {
@@ -476,8 +339,6 @@
             }, 4200); 
         });
 
-        // --- HELPER FUNCTIONS ---
-        
         function playJelly(element) {
             element.classList.remove('btn-animate');
             void element.offsetWidth; 
@@ -488,7 +349,7 @@
             document.getElementById(id).classList.add('hidden');
         }
 
-        // --- STORE TIMING LOGIC ---
+        // --- TIME & STATUS LOGIC ---
         function getCentralTime() {
             const d = new Date();
             return new Date(d.toLocaleString("en-US", {timeZone: "America/Chicago"}));
@@ -507,6 +368,7 @@
             const day = now.getDay();
             const todayHours = storeSchedule[day];
             const badge = document.getElementById('hours-badge');
+            const dot = document.getElementById('status-dot');
             
             const formatTime = (num) => {
                 let hour = Math.floor(num / 100);
@@ -520,20 +382,28 @@
             const closeStr = formatTime(todayHours.close);
 
             if (isStoreOpen()) {
-                badge.innerText = `Open (${openStr} - ${closeStr})`;
+                // OPEN STATE
+                dot.className = "pulsing-dot dot-open"; // Green Dot
+                badge.innerHTML = ""; // Clear loading text
+                badge.appendChild(dot); // Add dot back
+                badge.append(` Open (${openStr} - ${closeStr})`); // Add text
             } else {
-                badge.innerText = "Closed Now";
+                // CLOSED STATE
+                dot.className = "pulsing-dot dot-closed"; // Red Dot
+                badge.innerHTML = "";
+                badge.appendChild(dot);
+                badge.append(" Closed Now");
                 document.getElementById('closed-msg').innerText = `We are currently closed. Our hours today are ${openStr} to ${closeStr}. (Hours may vary on holidays)`;
             }
         }
 
-        // --- 2. SNAKE ENGINE ---
+        // --- GAME ENGINE (UPDATED WITH FPS CAP) ---
         const canvas = document.getElementById("snakeCanvas");
         const ctx = canvas.getContext("2d");
         const snakeImg = new Image(); snakeImg.src = 'phone.png';
         const foodImg = new Image(); foodImg.src = 'bolt.png';
         const GRID_SIZE = 20; 
-        const SPEED = 1; 
+        const SPEED = 2; // Speed in pixels per update cycle
         const TILE_COUNT = canvas.width / GRID_SIZE;
 
         let animationId;
@@ -543,6 +413,11 @@
         let snakeLength = 3; 
         let headX = 0, headY = 0, velX = 0, velY = 0, nextVelX = 0, nextVelY = 0;
         let food = { x: 0, y: 0 };
+
+        // FPS Control
+        let lastTime = 0;
+        const targetFPS = 60; // Lock to 60 FPS
+        const frameInterval = 1000 / targetFPS;
 
         function toggleGame() {
             const gameArea = document.getElementById('game-area');
@@ -589,7 +464,8 @@
                     drawCountdownText("GO!");
                     setTimeout(() => {
                         gameRunning = true;
-                        gameLoop();
+                        lastTime = 0; // Reset time tracker
+                        requestAnimationFrame(gameLoop);
                     }, 500);
                 }
             }, 1000);
@@ -617,32 +493,53 @@
             food.y = Math.floor(Math.random() * TILE_COUNT) * GRID_SIZE;
         }
 
-        function gameLoop() {
+        // --- UPDATED GAME LOOP ---
+        function gameLoop(timestamp) {
             if (!gameRunning) return;
-            update();
-            draw();
+
+            // If this is the first frame, set lastTime
+            if (!lastTime) lastTime = timestamp;
+
+            // Calculate how much time passed since last frame
+            const deltaTime = timestamp - lastTime;
+
+            // Only update if enough time has passed (throttling to 60fps)
+            if (deltaTime >= frameInterval) {
+                update();
+                draw();
+                // Adjust lastTime to account for processing time, keeping sync
+                lastTime = timestamp - (deltaTime % frameInterval);
+            }
+
             animationId = requestAnimationFrame(gameLoop);
         }
 
         function update() {
+            // Turn Logic (Grid Locking)
             if (headX % GRID_SIZE === 0 && headY % GRID_SIZE === 0) {
                 if (nextVelX !== 0 || nextVelY !== 0) {
+                    // Prevent 180 turns
                     if (velX === 0 && nextVelY !== -velY || velY === 0 && nextVelX !== -velX) {
                         velX = nextVelX;
                         velY = nextVelY;
                     }
                 }
             }
+            
             headX += velX;
             headY += velY;
             path.unshift({ x: headX, y: headY });
+            
             const desiredPathLength = snakeLength * (GRID_SIZE / SPEED);
             if (path.length > desiredPathLength) path.pop();
 
+            // Wall Collision
             if (headX < 0 || headX >= canvas.width || headY < 0 || headY >= canvas.height) {
                 triggerGameOver();
                 return;
             }
+            
+            // Self Collision (Skip head)
             let skipHead = GRID_SIZE / SPEED * 2;
             for (let i = skipHead; i < path.length; i++) {
                 if (path[i].x === headX && path[i].y === headY) {
@@ -650,9 +547,11 @@
                     return;
                 }
             }
+            
+            // Eat Food
             let dist = Math.hypot(headX - food.x, headY - food.y);
             if (dist < SPEED) {
-                headX = food.x; headY = food.y;
+                headX = food.x; headY = food.y; // Snap to food
                 score++;
                 document.getElementById('score').innerText = score;
                 snakeLength++; 
@@ -664,12 +563,15 @@
             ctx.fillStyle = "#fff";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(foodImg, food.x, food.y, GRID_SIZE, GRID_SIZE);
+            
             const step = GRID_SIZE / SPEED;
             for (let i = 0; i < path.length; i += step) {
                 let idx = Math.floor(i);
                 if (idx >= path.length) break;
                 let segment = path[idx];
                 let angle = 0;
+                
+                // Determine rotation
                 if (i === 0) {
                     if (velX > 0) angle = Math.PI / 2;
                     else if (velX < 0) angle = -Math.PI / 2;
