@@ -32,7 +32,7 @@
             --game-area-bg: #f9f9f9;
             --border-color: #ddd;
             
-            /* Preloader Background (White for Light Mode) */
+            /* Preloader is ALWAYS white to match the GIF background */
             --preloader-bg: #ffffff; 
         }
 
@@ -58,8 +58,8 @@
                 --game-area-bg: #2c2c2c;
                 --border-color: #444;
                 
-                /* Preloader Background (Navy for Dark Mode) */
-                --preloader-bg: #001e43; 
+                /* Reverted: Preloader stays WHITE in Dark Mode to blend with the GIF */
+                --preloader-bg: #ffffff; 
             }
         }
 
@@ -92,7 +92,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: var(--preloader-bg); /* Uses Variable */
+            background-color: var(--preloader-bg);
             z-index: 9999;
             display: flex;
             justify-content: center;
@@ -101,11 +101,9 @@
         }
         
         #preloader img { 
-            /* Scaled up 30% (approx 295px) */
-            width: 295px; 
+            /* Scaled up another 15% (approx 340px) */
+            width: 340px; 
             height: auto;
-            /* Optional: Adds rounded corners to the GIF so it looks like a card on Navy bg */
-            border-radius: 8px; 
         }
         
         .loader-hidden { opacity: 0; visibility: hidden; }
@@ -283,6 +281,7 @@
             border: 1px solid var(--border-color); 
             position: relative; 
         }
+        /* Canvas stays white for snake visibility */
         canvas { background-color: #fff; border: 4px solid #333; display: block; margin: 0 auto; touch-action: none; }
         #game-overlay h2 { color: var(--att-blue); font-size: 32px; margin-bottom: 10px; }
         .score-board { margin-bottom: 5px; font-weight: bold; color: var(--att-blue); font-size: 16px; display: flex; justify-content: space-between; padding: 0 10px; }
