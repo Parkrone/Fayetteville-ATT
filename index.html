@@ -10,6 +10,54 @@
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
+        /* --- CSS VARIABLES (Color Themes) --- */
+        :root {
+            /* Light Mode (Default) */
+            --bg-color: #f2f2f2;
+            --container-bg: #ffffff;
+            --text-color: #333333;
+            --heading-color: #000000;
+            --subtext-color: #444444;
+            --att-blue: #0057B8;
+            --att-blue-hover: #004694;
+            --btn-sec-bg: #ffffff;
+            --btn-sec-border: #0057B8;
+            --btn-sec-text: #0057B8;
+            --btn-sec-hover: #f0f8ff;
+            --overlay-bg: rgba(255, 255, 255, 0.98);
+            --preview-box-bg: #f0f8ff;
+            --preview-box-border: #0057B8;
+            --preview-text: #444;
+            --footer-text: #777;
+            --game-area-bg: #f9f9f9;
+            --border-color: #ddd;
+        }
+
+        /* Dark Mode Override (Auto-Detected) */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #121212;
+                --container-bg: #1e1e1e;
+                --text-color: #e0e0e0;
+                --heading-color: #ffffff;
+                --subtext-color: #cccccc;
+                /* Keeping AT&T blue, but ensuring it pops */
+                --att-blue: #0057B8; 
+                --att-blue-hover: #0069d9;
+                --btn-sec-bg: #2c2c2c;
+                --btn-sec-border: #4da3ff;
+                --btn-sec-text: #4da3ff;
+                --btn-sec-hover: #333333;
+                --overlay-bg: rgba(30, 30, 30, 0.98);
+                --preview-box-bg: #2a2a2a;
+                --preview-box-border: #4da3ff;
+                --preview-text: #cccccc;
+                --footer-text: #999;
+                --game-area-bg: #2c2c2c;
+                --border-color: #444;
+            }
+        }
+
         /* --- CSS RESET & BASICS --- */
         * {
             box-sizing: border-box;
@@ -22,13 +70,14 @@
 
         body {
             font-family: 'Open Sans', sans-serif;
-            background-color: #f2f2f2;
-            color: #333;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
             overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         /* --- PRELOADER --- */
@@ -38,7 +87,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #ffffff;
+            background-color: var(--container-bg);
             z-index: 9999;
             display: flex;
             justify-content: center;
@@ -51,7 +100,7 @@
         /* --- HEADER --- */
         header {
             width: 100%;
-            background-color: #fff;
+            background-color: var(--container-bg);
             padding: 15px 0;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             display: flex;
@@ -59,26 +108,32 @@
             align-items: center;
             gap: 10px;
             margin-bottom: 30px;
+            transition: background-color 0.3s ease;
         }
         header img { height: 40px; width: auto; }
-        header h1 { font-size: 24px; font-weight: 700; color: #000; letter-spacing: -0.5px; }
+        header h1 { 
+            font-size: 24px; 
+            font-weight: 700; 
+            color: var(--heading-color); 
+            letter-spacing: -0.5px; 
+        }
 
         /* --- CONTAINER --- */
         .container {
             width: 90%;
             max-width: 500px;
-            background: white;
+            background: var(--container-bg);
             padding: 30px;
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             text-align: center;
             opacity: 0; 
             transform: translateY(20px);
-            transition: opacity 0.8s ease, transform 0.8s ease;
+            transition: opacity 0.8s ease, transform 0.8s ease, background-color 0.3s ease;
             margin-bottom: 20px;
         }
         .content-visible { opacity: 1; transform: translateY(0); }
-        .welcome-text { margin-bottom: 25px; font-size: 16px; color: #444; line-height: 1.5; }
+        .welcome-text { margin-bottom: 25px; font-size: 16px; color: var(--subtext-color); line-height: 1.5; }
 
         /* --- BUTTON GROUPS --- */
         .button-group {
@@ -90,7 +145,6 @@
         .button-group .btn {
             margin-bottom: 0; 
             flex: 1; 
-            /* INCREASED FONT SIZE for readability */
             font-size: 16px; 
             padding: 14px 10px;
         }
@@ -106,9 +160,8 @@
             text-decoration: none;
             border-radius: 30px;
             font-weight: 600;
-            /* INCREASED MAIN BUTTON FONT SIZE */
             font-size: 18px;
-            transition: background-color 0.3s ease, transform 0.1s ease;
+            transition: background-color 0.3s ease, transform 0.1s ease, border-color 0.3s;
             border: 2px solid transparent;
             cursor: pointer;
             transform-origin: center;
@@ -125,11 +178,11 @@
         .btn-animate { animation: jellyPop 0.4s ease-out forwards; }
 
         /* Colors */
-        .btn-primary { background-color: #0057B8; color: white; } 
-        .btn-primary:hover { background-color: #004694; }
+        .btn-primary { background-color: var(--att-blue); color: white; } 
+        .btn-primary:hover { background-color: var(--att-blue-hover); }
         
-        .btn-secondary { background-color: #fff; color: #0057B8; border: 2px solid #0057B8; }
-        .btn-secondary:hover { background-color: #f0f8ff; }
+        .btn-secondary { background-color: var(--btn-sec-bg); color: var(--btn-sec-text); border: 2px solid var(--btn-sec-border); }
+        .btn-secondary:hover { background-color: var(--btn-sec-hover); }
         
         .btn-game { background-color: #ff7900; color: white; border: none; font-size: 15px;}
         .btn-game:hover { background-color: #e66c00; }
@@ -139,11 +192,15 @@
 
         .btn-contact { background-color: #333; color: white; } 
         .btn-contact:hover { background-color: #000; }
+        /* Adjustment for dark mode contact button visibility if needed */
+        @media (prefers-color-scheme: dark) {
+            .btn-contact { background-color: #444; border: 1px solid #666;}
+            .btn-contact:hover { background-color: #555; }
+        }
 
-        /* Status Indicator for Store Hours */
+        /* Status Indicator */
         .status-badge {
             display: block; 
-            /* INCREASED SIZE AND WEIGHT for readability */
             font-size: 13px; 
             font-weight: 700;
             margin-top: 5px;
@@ -158,7 +215,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(255, 255, 255, 0.98); 
+            background-color: var(--overlay-bg); 
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -173,24 +230,24 @@
 
         /* Redirect Overlay */
         #redirect-overlay { position: fixed; z-index: 10000; }
-        #redirect-overlay h2 { color: #0057B8; font-size: 24px; margin-bottom: 15px; }
-        #redirect-overlay p { font-size: 16px; color: #555; line-height: 1.5; max-width: 300px; }
+        #redirect-overlay h2 { color: var(--att-blue); font-size: 24px; margin-bottom: 15px; }
+        #redirect-overlay p { font-size: 16px; color: var(--subtext-color); line-height: 1.5; max-width: 300px; }
         .spinner {
-            border: 4px solid #f3f3f3; border-top: 4px solid #0057B8;
+            border: 4px solid var(--bg-color); border-top: 4px solid var(--att-blue);
             border-radius: 50%; width: 40px; height: 40px;
             animation: spin 1s linear infinite; margin-bottom: 20px;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Generic Action Overlay (Used for Contact & Closed) */
+        /* Generic Action Overlay */
         .action-overlay { position: fixed; z-index: 10000; }
-        .action-overlay h2 { color: #333; font-size: 22px; margin-bottom: 10px; }
-        .action-overlay p { font-size: 16px; color: #555; margin-bottom: 20px; max-width: 320px; line-height: 1.4; }
+        .action-overlay h2 { color: var(--heading-color); font-size: 22px; margin-bottom: 10px; }
+        .action-overlay p { font-size: 16px; color: var(--subtext-color); margin-bottom: 20px; max-width: 320px; line-height: 1.4; }
         
         /* Contact Card Preview Box */
         .contact-preview-box {
-            background: #f0f8ff;
-            border: 1px solid #0057B8;
+            background: var(--preview-box-bg);
+            border: 1px solid var(--preview-box-border);
             border-radius: 8px;
             padding: 15px;
             margin-bottom: 15px;
@@ -198,23 +255,31 @@
             max-width: 300px;
             text-align: left;
         }
-        .contact-preview-box strong { color: #0057B8; display: block; margin-bottom: 5px; font-size: 17px; }
-        .contact-preview-box span { display: block; font-size: 15px; color: #444; margin-bottom: 4px; }
+        .contact-preview-box strong { color: var(--att-blue); display: block; margin-bottom: 5px; font-size: 17px; }
+        .contact-preview-box span { display: block; font-size: 15px; color: var(--preview-text); margin-bottom: 4px; }
 
         .overlay-actions { display: flex; gap: 10px; width: 100%; margin-top: 10px; }
 
         /* Game Area */
-        #game-area { display: none; margin-top: 20px; background: #f9f9f9; padding: 10px; border-radius: 10px; border: 1px solid #ddd; position: relative; }
+        #game-area { 
+            display: none; 
+            margin-top: 20px; 
+            background: var(--game-area-bg); 
+            padding: 10px; 
+            border-radius: 10px; 
+            border: 1px solid var(--border-color); 
+            position: relative; 
+        }
+        /* Keep canvas white for high contrast gameplay */
         canvas { background-color: #fff; border: 4px solid #333; display: block; margin: 0 auto; touch-action: none; }
-        #game-overlay h2 { color: #0057B8; font-size: 32px; margin-bottom: 10px; }
-        .score-board { margin-bottom: 5px; font-weight: bold; color: #0057B8; font-size: 16px; display: flex; justify-content: space-between; padding: 0 10px; }
-        .game-instructions { font-size: 12px; color: #777; margin-bottom: 10px; font-style: italic; }
+        #game-overlay h2 { color: var(--att-blue); font-size: 32px; margin-bottom: 10px; }
+        .score-board { margin-bottom: 5px; font-weight: bold; color: var(--att-blue); font-size: 16px; display: flex; justify-content: space-between; padding: 0 10px; }
+        .game-instructions { font-size: 12px; color: var(--subtext-color); margin-bottom: 10px; font-style: italic; }
 
         /* --- FOOTER --- */
-        footer { margin-top: auto; padding: 30px 20px; font-size: 13px; color: #777; text-align: center; line-height: 1.6; }
-        /* Footer Link Styling */
-        footer a { color: #0057B8; text-decoration: none; font-weight: 700; transition: color 0.2s;}
-        footer a:hover { color: #00387a; text-decoration: underline; }
+        footer { margin-top: auto; padding: 30px 20px; font-size: 13px; color: var(--footer-text); text-align: center; line-height: 1.6; }
+        footer a { color: var(--att-blue); text-decoration: none; font-weight: 700; transition: color 0.2s;}
+        footer a:hover { color: var(--att-blue-hover); text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -256,7 +321,11 @@
     </div>
 
     <header>
-        <img src="attlogo.png" alt="AT&T Logo">
+        <picture>
+            <source srcset="attlogo-Dark-Mode.png" media="(prefers-color-scheme: dark)">
+            <img src="attlogo.png" alt="AT&T Logo">
+        </picture>
+        
         <h1>Fayetteville Mall</h1>
     </header>
 
@@ -278,7 +347,7 @@
             </button>
         </div>
 
-        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0;">
 
         <a href="https://www.att.com/stores/arkansas/fayetteville/146068" class="btn btn-primary link-delay">
             Explore Fayetteville Mall Deals
@@ -288,7 +357,7 @@
             Review us on Google
         </a>
 
-        <p style="margin: 15px 0; color: #999; font-size: 14px;">— OR —</p>
+        <p style="margin: 15px 0; color: var(--subtext-color); font-size: 14px;">— OR —</p>
 
         <button onclick="toggleGame()" class="btn btn-game">
             Play AT&T Snake While You Wait 🐍
@@ -311,7 +380,7 @@
 
     <footer>
         &copy; 2025 Fayetteville Mall Store Location.<br>
-        Built by <a href="https://parkrone.github.io/Parker-Design-Lab/" target="_blank">Parker Thompson</a> - Your Local Fayetteville Mall Sales Consultant.
+        Built by <a href="https://www.instagram.com/parkerthomps0n/" target="_blank">Parker Thompson</a> - Your Local Fayetteville Mall Sales Consultant.
     </footer>
 
     <script>
