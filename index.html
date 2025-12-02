@@ -83,21 +83,24 @@
         /* 1. Ice Cube Border (Image Overlay) */
         #ice-border {
             position: fixed; 
-            top: 0; left: 0; 
-            width: 100%; height: 100%; 
-            pointer-events: none; /* Important: Allows clicking buttons THROUGH the image */
-            z-index: 9000;
+            /* "Zoom in" to 110% to push thick edges off-screen */
+            width: 110%; 
+            height: 110%; 
+            left: -5%; 
+            top: -5%;
+            
+            pointer-events: none; /* Allows clicking through */
+            z-index: 9000; /* High, but below header/overlays */
             display: none; /* Toggled by JS */
             
-            /* Uses your custom ice image */
             background-image: url('ice-border.png'); 
-            background-size: 100% 100%; /* Stretches to fill screen */
+            background-size: 100% 100%; 
             background-position: center;
             background-repeat: no-repeat;
             
-            /* Optional: Adds a slight blue tint to blend with the site */
-            mix-blend-mode: screen; 
-            opacity: 0.9;
+            /* Semi-transparent as requested */
+            opacity: 0.5; 
+            mix-blend-mode: screen; /* Helps blend white ice into background */
         }
 
         /* 2. Precipitation Layer */
@@ -130,7 +133,8 @@
             margin-bottom: 30px; 
             transition: background-color 0.3s ease;
             position: relative; 
-            z-index: 20;
+            /* Z-Index 9001 places it ABOVE the ice border (9000) */
+            z-index: 9001; 
         }
         
         .logo-link { display: flex; align-items: center; text-decoration: none; cursor: pointer; transition: opacity 0.2s ease; }
@@ -191,16 +195,17 @@
         @keyframes pulse-red { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(231, 76, 60, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); } }
 
         /* --- OVERLAYS --- */
-        .overlay-base { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--overlay-bg); display: flex; flex-direction: column; justify-content: center; align-items: center; border-radius: 10px; z-index: 20; padding: 25px; text-align: center; }
+        /* High Z-Index (10000) ensures overlays cover the ice border (9000) */
+        .overlay-base { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--overlay-bg); display: flex; flex-direction: column; justify-content: center; align-items: center; border-radius: 10px; z-index: 10000; padding: 25px; text-align: center; }
         .hidden { display: none !important; }
 
-        #redirect-overlay { position: fixed; z-index: 10000; }
+        #redirect-overlay { position: fixed; }
         #redirect-overlay h2 { color: var(--att-blue); font-size: 24px; margin-bottom: 15px; }
         #redirect-overlay p { font-size: 16px; color: var(--subtext-color); line-height: 1.5; max-width: 300px; }
         .spinner { border: 4px solid var(--bg-color); border-top: 4px solid var(--att-blue); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        .action-overlay { position: fixed; z-index: 10000; }
+        .action-overlay { position: fixed; }
         .action-overlay h2 { color: var(--heading-color); font-size: 22px; margin-bottom: 10px; }
         .action-overlay p { font-size: 16px; color: var(--subtext-color); margin-bottom: 20px; max-width: 320px; line-height: 1.4; }
         
@@ -383,7 +388,7 @@
                 document.getElementById('ice-border').style.display = 'block';
             }
 
-            // 2. WEATHER ANIMATIONS & ICONS
+            // 2. WEATHER ANIMATIONS
             if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) {
                 iconEl.innerText = "🌧️";
                 startPrecipitation('rain');
