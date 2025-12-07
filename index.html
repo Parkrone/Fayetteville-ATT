@@ -34,6 +34,16 @@
             --preloader-bg: #ffffff; 
             --btn-gray-bg: #333333;
             --btn-gray-hover: #000000;
+            
+            /* Music Player */
+            --player-bg: #f8f9fa;
+            --player-border: #e9ecef;
+            --track-name: #000;
+            --artist-name: #666;
+            
+            /* Spotify Brand */
+            --spotify-green: #1DB954;
+            --spotify-hover: #1ed760;
         }
 
         /* Dark Mode */
@@ -60,6 +70,11 @@
                 --preloader-bg: #ffffff; 
                 --btn-gray-bg: #444444;
                 --btn-gray-hover: #555555;
+                
+                --player-bg: #252525;
+                --player-border: #333;
+                --track-name: #fff;
+                --artist-name: #aaa;
             }
         }
 
@@ -80,36 +95,31 @@
 
         /* --- WEATHER & ICE EFFECTS --- */
         
-        /* 1. Ice Cube Border (Image Overlay) */
+        /* Ice Cube Border (Image Overlay) */
         #ice-border {
             position: fixed; 
-            /* "Zoom in" to 110% to push thick edges off-screen */
-            width: 110%; 
+            width: 110%; /* Zoomed in to push thick edges off screen */
             height: 110%; 
             left: -5%; 
             top: -5%;
-            
-            pointer-events: none; /* Allows clicking through */
-            z-index: 9000; /* High, but below header/overlays */
-            display: none; /* Toggled by JS */
+            pointer-events: none; 
+            z-index: 9000; /* Below header */
+            display: none; 
             
             background-image: url('ice-border.png'); 
             background-size: 100% 100%; 
             background-position: center;
             background-repeat: no-repeat;
             
-            /* Semi-transparent as requested */
-            opacity: 0.5; 
-            mix-blend-mode: screen; /* Helps blend white ice into background */
+            opacity: 0.5; /* Semi-transparent */
+            mix-blend-mode: screen; 
         }
 
-        /* 2. Precipitation Layer */
         #weather-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: hidden; }
         .rain { position: absolute; width: 2px; height: 15px; background: rgba(120, 160, 255, 0.6); top: -20px; animation: fall linear infinite; }
         .snow { position: absolute; width: 6px; height: 6px; background: white; border-radius: 50%; top: -10px; box-shadow: 0 0 5px white; animation: fall linear infinite; }
         @keyframes fall { to { transform: translateY(110vh); } }
-
-        /* 3. Fog Layer */
+        
         #fog-container { position: fixed; bottom: 0; left: 0; width: 100%; height: 300px; pointer-events: none; z-index: 5; display: none; background: linear-gradient(to top, rgba(200,200,200,0.4) 0%, transparent 100%); overflow: hidden; }
         .fog-cloud { position: absolute; bottom: 0; width: 200%; height: 100%; background: url('https://raw.githubusercontent.com/danielstuart14/CSS_FOG_ANIMATION/master/fog1.png') repeat-x; background-size: contain; animation: drift 60s linear infinite; opacity: 0.5; }
         .fog-cloud.two { animation-duration: 40s; animation-direction: reverse; opacity: 0.3; }
@@ -120,73 +130,43 @@
         #preloader img { width: 340px; height: auto; }
         .loader-hidden { opacity: 0; visibility: hidden; }
 
-        /* --- HEADER & WEATHER WIDGET --- */
+        /* --- HEADER --- */
         header { 
-            width: 100%; 
-            background-color: var(--container-bg); 
-            padding: 15px 0; 
+            width: 100%; background-color: var(--container-bg); padding: 15px 0; 
             box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            gap: 10px; 
-            margin-bottom: 30px; 
-            transition: background-color 0.3s ease;
-            position: relative; 
-            /* Z-Index 9001 places it ABOVE the ice border (9000) */
-            z-index: 9001; 
+            display: flex; justify-content: center; align-items: center; gap: 10px; 
+            margin-bottom: 30px; transition: background-color 0.3s ease; 
+            position: relative; z-index: 9001; /* Above Ice Border */
         }
-        
         .logo-link { display: flex; align-items: center; text-decoration: none; cursor: pointer; transition: opacity 0.2s ease; }
         .logo-link:hover { opacity: 0.8; }
-        
         header img { height: 40px; width: auto; }
         header h1 { font-size: 24px; font-weight: 700; color: var(--heading-color); letter-spacing: -0.5px; }
-
+        
         #weather-widget { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 5px; font-size: 14px; font-weight: 600; color: var(--text-color); }
         #weather-icon { font-size: 20px; }
 
         /* --- CONTAINER --- */
-        .container { 
-            width: 90%; 
-            max-width: 500px; 
-            background: var(--container-bg); 
-            padding: 30px; 
-            border-radius: 8px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
-            text-align: center; 
-            opacity: 0; 
-            transform: translateY(20px); 
-            transition: opacity 0.8s ease, transform 0.8s ease, background-color 0.3s ease; 
-            margin-bottom: 20px; 
-            position: relative; 
-            z-index: 10; 
-        }
+        .container { width: 90%; max-width: 500px; background: var(--container-bg); padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease, background-color 0.3s ease; margin-bottom: 20px; position: relative; z-index: 10; }
         .content-visible { opacity: 1; transform: translateY(0); }
         .welcome-text { margin-bottom: 25px; font-size: 16px; color: var(--subtext-color); line-height: 1.5; }
 
         /* --- BUTTONS --- */
         .button-group { display: flex; gap: 10px; margin-bottom: 15px; }
         .button-group .btn { margin-bottom: 0; flex: 1; font-size: 16px; padding: 14px 10px; }
-
         .btn { display: flex; justify-content: center; align-items: center; width: 100%; padding: 16px 20px; margin-bottom: 15px; text-decoration: none; border-radius: 30px; font-weight: 600; font-size: 18px; transition: background-color 0.3s ease, transform 0.1s ease, border-color 0.3s; border: 2px solid transparent; cursor: pointer; transform-origin: center; line-height: 1.2; }
-        
         @keyframes jellyPop { 0% { transform: scale(1); } 30% { transform: scale(0.90); } 50% { transform: scale(1.05); } 70% { transform: scale(0.98); } 100% { transform: scale(1); } }
         .btn-animate { animation: jellyPop 0.4s ease-out forwards; }
-
         .btn-primary { background-color: var(--att-blue); color: white; }
         .btn-primary:hover { background-color: var(--att-blue-hover); }
-        
         .btn-secondary { background-color: var(--btn-sec-bg); color: var(--btn-sec-text); border: 2px solid var(--btn-sec-border); }
         .btn-secondary:hover { background-color: var(--btn-sec-hover); }
-        
         .btn-game { background-color: #ff7900; color: white; border: none; font-size: 15px;}
         .btn-game:hover { background-color: #e66c00; }
-
         .btn-contact, .btn-call { background-color: var(--btn-gray-bg); color: white; } 
         .btn-contact:hover, .btn-call:hover { background-color: var(--btn-gray-hover); }
-
-        /* --- STATUS BADGE --- */
+        @media (prefers-color-scheme: dark) { .btn-contact { background-color: #444; border: 1px solid #666;} .btn-contact:hover { background-color: #555; } }
+        
         .status-badge { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; font-weight: 700; margin-top: 5px; opacity: 1; letter-spacing: 0.3px; }
         .pulsing-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; position: relative; }
         .dot-open { background-color: #2ecc71; box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); animation: pulse-green 2s infinite; }
@@ -195,24 +175,39 @@
         @keyframes pulse-red { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(231, 76, 60, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); } }
 
         /* --- OVERLAYS --- */
-        /* High Z-Index (10000) ensures overlays cover the ice border (9000) */
         .overlay-base { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--overlay-bg); display: flex; flex-direction: column; justify-content: center; align-items: center; border-radius: 10px; z-index: 10000; padding: 25px; text-align: center; }
         .hidden { display: none !important; }
-
         #redirect-overlay { position: fixed; }
         #redirect-overlay h2 { color: var(--att-blue); font-size: 24px; margin-bottom: 15px; }
         #redirect-overlay p { font-size: 16px; color: var(--subtext-color); line-height: 1.5; max-width: 300px; }
         .spinner { border: 4px solid var(--bg-color); border-top: 4px solid var(--att-blue); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
         .action-overlay { position: fixed; }
         .action-overlay h2 { color: var(--heading-color); font-size: 22px; margin-bottom: 10px; }
         .action-overlay p { font-size: 16px; color: var(--subtext-color); margin-bottom: 20px; max-width: 320px; line-height: 1.4; }
-        
         .contact-preview-box { background: var(--preview-box-bg); border: 1px solid var(--preview-box-border); border-radius: 8px; padding: 15px; margin-bottom: 15px; width: 100%; max-width: 300px; text-align: left; }
         .contact-preview-box strong { color: var(--att-blue); display: block; margin-bottom: 5px; font-size: 17px; }
         .contact-preview-box span { display: block; font-size: 15px; color: var(--preview-text); margin-bottom: 4px; }
         .overlay-actions { display: flex; gap: 10px; width: 100%; margin-top: 10px; }
+
+        /* --- MUSIC PLAYER WIDGET --- */
+        #music-section {
+            width: 100%; margin-top: 20px; background-color: var(--player-bg);
+            border: 1px solid var(--player-border); border-radius: 12px; padding: 15px;
+            display: none; text-align: left; transition: all 0.3s ease;
+        }
+        .music-header { display: flex; align-items: center; gap: 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--att-blue); font-weight: 700; margin-bottom: 10px; }
+        .equalizer-bar { width: 3px; height: 10px; background: var(--att-blue); animation: equalize 1s infinite; }
+        .eq-2 { animation-delay: 0.2s; } .eq-3 { animation-delay: 0.4s; }
+        @keyframes equalize { 0% { height: 6px; } 50% { height: 14px; } 100% { height: 6px; } }
+        .track-info { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .album-art { width: 50px; height: 50px; border-radius: 6px; background: #ddd; object-fit: cover; flex-shrink: 0; }
+        .song-details { flex-grow: 1; overflow: hidden; }
+        .song-title { display: block; font-size: 15px; font-weight: 700; color: var(--track-name); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .artist-name { display: block; font-size: 13px; color: var(--artist-name); }
+        .music-actions { display: flex; gap: 8px; }
+        .btn-music-action { flex: 1; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--container-bg); color: var(--text-color); font-size: 12px; font-weight: 600; text-align: center; text-decoration: none; cursor: pointer; transition: background 0.2s; }
+        .btn-music-action:hover { background: var(--btn-sec-hover); }
 
         /* --- GAME AREA --- */
         #game-area { display: none; margin-top: 20px; background: var(--game-area-bg); padding: 10px; border-radius: 10px; border: 1px solid var(--border-color); position: relative; }
@@ -231,21 +226,15 @@
 
     <div id="ice-border"></div>
     <div id="weather-container"></div>
-    <div id="fog-container">
-        <div class="fog-cloud"></div>
-        <div class="fog-cloud two"></div>
-    </div>
+    <div id="fog-container"><div class="fog-cloud"></div><div class="fog-cloud two"></div></div>
 
-    <div id="preloader">
-        <img src="att.gif" alt="Loading...">
-    </div>
+    <div id="preloader"><img src="att.gif" alt="Loading..."></div>
 
     <div id="redirect-overlay" class="overlay-base hidden">
         <div class="spinner"></div>
         <h2>Heading to Google...</h2>
         <p>Please note: You may need to sign in to your Google account to leave a review.</p>
     </div>
-
     <div id="closed-overlay" class="overlay-base action-overlay hidden">
         <h2 style="color: #d32f2f;">We are currently closed</h2>
         <p id="closed-msg">Our store hours have ended for the day.</p>
@@ -254,10 +243,9 @@
             <a href="tel:4794395471" class="btn btn-call" style="width:auto; flex-grow:1;">Call Anyway</a>
         </div>
     </div>
-
     <div id="contact-overlay" class="overlay-base action-overlay hidden">
         <h2>Save Store Contact</h2>
-        <p>You are about to download our contact card. Please open the file after downloading to add us to your address book.</p>
+        <p>You are about to download our contact card. Please open the file after downloading.</p>
         <div class="contact-preview-box">
             <strong>AT&T Fayetteville Mall</strong>
             <span>📍 4201 N Shiloh Dr</span>
@@ -278,7 +266,6 @@
             </picture>
         </a>
         <h1>Fayetteville Mall</h1>
-        
         <div id="weather-widget">
             <span id="weather-icon"></span>
             <span id="weather-temp"></span>
@@ -292,35 +279,42 @@
 
         <div class="button-group">
             <button id="callBtn" class="btn btn-call">
-                <div style="text-align:center;">
-                    Call Store
-                    <span id="hours-badge" class="status-badge">
-                        <span id="status-dot" class="pulsing-dot dot-closed"></span>
-                        Loading...
-                    </span>
-                </div>
+                <div style="text-align:center;">Call Store <span id="hours-badge" class="status-badge"><span id="status-dot" class="pulsing-dot dot-closed"></span> Loading...</span></div>
             </button>
-
-            <button id="contactBtn" class="btn btn-contact">
-                Save Contact 📇
-            </button>
+            <button id="contactBtn" class="btn btn-contact">Save Contact 📇</button>
         </div>
 
         <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0;">
 
-        <a href="https://www.att.com/stores/arkansas/fayetteville/146068" class="btn btn-primary link-delay">
-            Explore Fayetteville Mall Deals
-        </a>
+        <div id="music-section">
+            <div class="music-header">
+                <div class="equalizer-bar"></div><div class="equalizer-bar eq-2"></div><div class="equalizer-bar eq-3"></div>
+                <span>Now Playing in Store</span>
+            </div>
+            
+            <div class="track-info">
+                <img src="" alt="Album" class="album-art" id="track-art">
+                <div class="song-details">
+                    <span class="song-title" id="track-title">Loading...</span>
+                    <span class="artist-name" id="track-artist">Loading...</span>
+                </div>
+            </div>
 
-        <a href="https://search.google.com/local/writereview?placeid=ChIJ84Inr4tryYcRQUkKOVeSnF8" id="googleBtn" class="btn btn-secondary">
-            Review us on Google
-        </a>
+            <div class="music-actions">
+                <a href="#" class="btn-music-action" id="odesli-link" target="_blank">Open Song 🎵</a>
+            </div>
+        </div>
+        
+        <div id="no-music-msg" style="display:none; text-align:center; color:var(--subtext-color); margin: 20px 0;">Nothing in the air right now 🎵</div>
+
+        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0;">
+
+        <a href="https://www.att.com/stores/arkansas/fayetteville/146068" class="btn btn-primary link-delay">Explore Fayetteville Mall Deals</a>
+        <a href="https://search.google.com/local/writereview?placeid=ChIJ84Inr4tryYcRQUkKOVeSnF8" id="googleBtn" class="btn btn-secondary">Review us on Google</a>
 
         <p style="margin: 15px 0; color: var(--subtext-color); font-size: 14px;">— OR —</p>
 
-        <button onclick="toggleGame()" class="btn btn-game">
-            Play AT&T Snake While You Wait 🐍
-        </button>
+        <button onclick="toggleGame()" class="btn btn-game">Play AT&T Snake While You Wait 🐍</button>
 
         <div id="game-area">
             <div class="score-board">
@@ -338,425 +332,103 @@
     </div>
 
     <footer>
-        &copy; 2025 Fayetteville Mall Store Location.<br>
+        © 2025 Fayetteville Mall Store Location.<br>
         Built by <a href="https://parkrone.github.io/Parker-Design-Lab/" target="_blank">Parker Thompson</a> - Your Local Fayetteville Mall Sales Consultant.
     </footer>
 
     <script>
-        // --- STORE HOURS (UPDATED SUNDAY) ---
-        const storeSchedule = {
-            0: { open: 1200, close: 1800 }, // Sunday: 12pm - 6pm
-            1: { open: 1100, close: 2000 }, 
-            2: { open: 1100, close: 2000 }, 
-            3: { open: 1100, close: 2000 }, 
-            4: { open: 1100, close: 2000 }, 
-            5: { open: 1100, close: 2000 }, 
-            6: { open: 1100, close: 2000 }  
-        };
+        const storeSchedule = { 0: { open: 1200, close: 1800 }, 1: { open: 1100, close: 2000 }, 2: { open: 1100, close: 2000 }, 3: { open: 1100, close: 2000 }, 4: { open: 1100, close: 2000 }, 5: { open: 1100, close: 2000 }, 6: { open: 1100, close: 2000 } };
 
-        // --- WEATHER LOGIC ---
-        async function fetchWeather() {
-            try {
-                // Fayetteville, AR Coordinates
-                const lat = 36.0822;
-                const lon = -94.1719;
-                const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&temperature_unit=fahrenheit`;
+        // --- LAST.FM CONFIGURATION ---
+        const LASTFM_USER = 'ATTFayetteville'; 
+        const LASTFM_API_KEY = 'f7020f441263b35598d85540e23c950c';
 
-                const response = await fetch(url);
-                const data = await response.json();
-                
-                if (data.current) {
-                    const temp = Math.round(data.current.temperature_2m);
-                    const code = data.current.weather_code;
-                    
-                    updateWeatherUI(temp, code);
-                }
-            } catch (error) {
-                console.log("Weather load failed:", error);
-                document.getElementById('weather-widget').style.display = 'none';
-            }
-        }
-
-        function updateWeatherUI(temp, code) {
-            const tempEl = document.getElementById('weather-temp');
-            const iconEl = document.getElementById('weather-icon');
-            
-            tempEl.innerText = `${temp}°F`;
-
-            // 1. FREEZING EFFECT (<= 32F)
-            if (temp <= 32) {
-                document.getElementById('ice-border').style.display = 'block';
-            }
-
-            // 2. WEATHER ANIMATIONS
-            if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) {
-                iconEl.innerText = "🌧️";
-                startPrecipitation('rain');
-            } 
-            else if ([71, 73, 75, 77, 85, 86].includes(code)) {
-                iconEl.innerText = "❄️";
-                startPrecipitation('snow');
-            }
-            else if ([45, 48].includes(code)) {
-                iconEl.innerText = "🌫️";
-                document.getElementById('fog-container').style.display = 'block';
-            }
-            else if (code <= 3) {
-                iconEl.innerText = code === 0 ? "☀️" : "☁️";
-            }
-            else if ([95, 96, 99].includes(code)) {
-                iconEl.innerText = "⛈️";
-                startPrecipitation('rain'); 
-            }
-        }
-
-        function startPrecipitation(type) {
-            const container = document.getElementById('weather-container');
-            const count = 50; 
-
-            for (let i = 0; i < count; i++) {
-                const p = document.createElement('div');
-                p.classList.add(type);
-                p.style.left = Math.random() * 100 + 'vw';
-                p.style.animationDuration = (Math.random() * 1 + 0.5) + 's';
-                p.style.animationDelay = Math.random() * 2 + 's';
-                container.appendChild(p);
-            }
-        }
-
-        // --- MAIN PAGE LOGIC ---
         window.addEventListener("load", function () {
             const loader = document.getElementById("preloader");
             const container = document.getElementById("mainContainer");
             
             checkStoreStatus();
-            fetchWeather(); // Load Weather
+            fetchWeather();
+            
+            if(isStoreOpen()) {
+                fetchNowPlaying();
+                // Check for song updates every 30 seconds
+                setInterval(fetchNowPlaying, 30000);
+            }
 
-            // Buttons
-            document.getElementById('contactBtn').addEventListener('click', function() {
-                playJelly(this);
-                document.getElementById('contact-overlay').classList.remove('hidden');
-            });
-
-            document.getElementById('callBtn').addEventListener('click', function() {
-                playJelly(this);
-                if(isStoreOpen()) {
-                    window.location.href = "tel:4794395471";
-                } else {
-                    document.getElementById('closed-overlay').classList.remove('hidden');
-                }
-            });
-
-            const googleBtn = document.getElementById('googleBtn');
-            googleBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                playJelly(this);
-                document.getElementById('redirect-overlay').classList.remove('hidden');
-                setTimeout(function() {
-                    window.location.href = googleBtn.href;
-                    setTimeout(() => document.getElementById('redirect-overlay').classList.add('hidden'), 1000);
-                }, 2500);
-            });
-
-            document.querySelectorAll('.link-delay').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    playJelly(this);
-                    setTimeout(() => { window.location.href = this.href; }, 500);
-                });
-            });
-
-            document.querySelector('.btn-game').addEventListener('click', function() {
-                playJelly(this);
-            });
+            document.getElementById('contactBtn').addEventListener('click', function() { playJelly(this); document.getElementById('contact-overlay').classList.remove('hidden'); });
+            document.getElementById('callBtn').addEventListener('click', function() { playJelly(this); if(isStoreOpen()) { window.location.href = "tel:4794395471"; } else { document.getElementById('closed-overlay').classList.remove('hidden'); } });
+            document.getElementById('googleBtn').addEventListener('click', function(e) { e.preventDefault(); playJelly(this); document.getElementById('redirect-overlay').classList.remove('hidden'); setTimeout(function() { window.location.href = document.getElementById('googleBtn').href; setTimeout(() => document.getElementById('redirect-overlay').classList.add('hidden'), 1000); }, 2500); });
+            document.querySelectorAll('.link-delay').forEach(link => { link.addEventListener('click', function(e) { e.preventDefault(); playJelly(this); setTimeout(() => { window.location.href = this.href; }, 500); }); });
+            document.querySelector('.btn-game').addEventListener('click', function() { playJelly(this); });
 
             const savedScore = localStorage.getItem('attSnakeHighScore');
             if(savedScore) document.getElementById('highScore').innerText = savedScore;
 
-            setTimeout(function() {
-                loader.classList.add("loader-hidden");
-                setTimeout(() => {
-                    container.classList.add("content-visible");
-                    loader.parentNode.removeChild(loader);
-                }, 500);
-            }, 4200); 
+            setTimeout(function() { loader.classList.add("loader-hidden"); setTimeout(() => { container.classList.add("content-visible"); loader.parentNode.removeChild(loader); }, 500); }, 4200); 
         });
 
-        function playJelly(element) {
-            element.classList.remove('btn-animate');
-            void element.offsetWidth; 
-            element.classList.add('btn-animate');
-        }
+        // --- LAST.FM FETCH LOGIC ---
+        async function fetchNowPlaying() {
+            if (LASTFM_USER === 'YOUR_LASTFM_USERNAME') return; 
 
-        function closeOverlay(id) {
-            document.getElementById(id).classList.add('hidden');
-        }
-
-        // --- TIME & STATUS LOGIC ---
-        function getCentralTime() {
-            const d = new Date();
-            return new Date(d.toLocaleString("en-US", {timeZone: "America/Chicago"}));
-        }
-
-        function isStoreOpen() {
-            const now = getCentralTime();
-            const day = now.getDay(); 
-            const currentMilitaryTime = (now.getHours() * 100) + now.getMinutes();
-            const todayHours = storeSchedule[day];
-            return (currentMilitaryTime >= todayHours.open && currentMilitaryTime < todayHours.close);
-        }
-
-        function checkStoreStatus() {
-            const now = getCentralTime();
-            const day = now.getDay();
-            const todayHours = storeSchedule[day];
-            const badge = document.getElementById('hours-badge');
-            const dot = document.getElementById('status-dot');
+            const url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${LASTFM_USER}&api_key=${LASTFM_API_KEY}&format=json&limit=1`;
             
-            const formatTime = (num) => {
-                let hour = Math.floor(num / 100);
-                let ampm = hour >= 12 ? 'PM' : 'AM';
-                let displayHour = hour % 12;
-                displayHour = displayHour ? displayHour : 12; 
-                return displayHour + ampm;
-            };
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                const track = data.recenttracks.track[0];
+                
+                // Check if currently playing (Last.fm attribute @attr.nowplaying)
+                const isPlaying = track['@attr'] && track['@attr'].nowplaying === 'true';
 
-            const openStr = formatTime(todayHours.open);
-            const closeStr = formatTime(todayHours.close);
-
-            if (isStoreOpen()) {
-                dot.className = "pulsing-dot dot-open"; 
-                badge.innerHTML = ""; 
-                badge.appendChild(dot); 
-                badge.append(` Open (${openStr} - ${closeStr})`); 
-            } else {
-                dot.className = "pulsing-dot dot-closed"; 
-                badge.innerHTML = "";
-                badge.appendChild(dot);
-                badge.append(" Closed Now");
-                document.getElementById('closed-msg').innerText = `We are currently closed. Our hours today are ${openStr} to ${closeStr}. (Hours may vary on holidays)`;
+                if (isPlaying) {
+                    document.getElementById('music-section').style.display = 'block';
+                    document.getElementById('no-music-msg').style.display = 'none';
+                    
+                    document.getElementById('track-title').innerText = track.name;
+                    document.getElementById('track-artist').innerText = track.artist['#text'];
+                    // Last.fm gives small, medium, large, extralarge images. Index 2 is large.
+                    document.getElementById('track-art').src = track.image[2]['#text'] || 'https://i.scdn.co/image/ab67616d0000b273b5f9e28219c169fd4b9e8379'; 
+                    
+                    // Generate Odesli Search Link
+                    const searchBuffer = `${track.artist['#text']} ${track.name}`;
+                    const odesliUrl = `https://song.link/search?q=${encodeURIComponent(searchBuffer)}`;
+                    document.getElementById('odesli-link').href = odesliUrl;
+                } else {
+                    // Not playing anything right now
+                    document.getElementById('music-section').style.display = 'none';
+                    document.getElementById('no-music-msg').style.display = 'block';
+                }
+            } catch (error) {
+                console.log("Music fetch error:", error);
+                document.getElementById('music-section').style.display = 'none';
             }
         }
 
-        // --- GAME ENGINE (60 FPS) ---
-        const canvas = document.getElementById("snakeCanvas");
-        const ctx = canvas.getContext("2d");
-        const snakeImg = new Image(); snakeImg.src = 'phone.png';
-        const foodImg = new Image(); foodImg.src = 'bolt.png';
-        const GRID_SIZE = 20; 
-        const SPEED = 2; 
-        const TILE_COUNT = canvas.width / GRID_SIZE;
-
-        let animationId;
-        let gameRunning = false;
-        let score = 0;
-        let path = []; 
-        let snakeLength = 3; 
-        let headX = 0, headY = 0, velX = 0, velY = 0, nextVelX = 0, nextVelY = 0;
-        let food = { x: 0, y: 0 };
-
-        let lastTime = 0;
-        const targetFPS = 60;
-        const frameInterval = 1000 / targetFPS;
-
-        function toggleGame() {
-            const gameArea = document.getElementById('game-area');
-            if (gameArea.style.display === 'block') {
-                gameArea.style.display = 'none';
-                stopGame();
-            } else {
-                gameArea.style.display = 'block';
-                setTimeout(initGame, 100); 
-            }
-        }
-
-        function initGame() {
-            stopGame();
-            document.getElementById('game-overlay').classList.add('hidden');
-            score = 0;
-            snakeLength = 3; 
-            document.getElementById('score').innerText = score;
-            headX = Math.floor(TILE_COUNT / 2) * GRID_SIZE;
-            headY = Math.floor(TILE_COUNT / 2) * GRID_SIZE;
-            path = [];
-            for(let i=0; i < snakeLength * (GRID_SIZE/SPEED); i++) {
-                path.push({x: headX, y: headY + i}); 
-            }
-            velX = 0; velY = -SPEED; nextVelX = 0; nextVelY = -SPEED;
-            spawnFood();
-            startCountdown();
-        }
-        
+        function playJelly(element) { element.classList.remove('btn-animate'); void element.offsetWidth; element.classList.add('btn-animate'); }
+        function closeOverlay(id) { document.getElementById(id).classList.add('hidden'); }
+        function getCentralTime() { const d = new Date(); return new Date(d.toLocaleString("en-US", {timeZone: "America/Chicago"})); }
+        function isStoreOpen() { const now = getCentralTime(); const day = now.getDay(); const currentMilitaryTime = (now.getHours() * 100) + now.getMinutes(); const todayHours = storeSchedule[day]; return (currentMilitaryTime >= todayHours.open && currentMilitaryTime < todayHours.close); }
+        function checkStoreStatus() { const now = getCentralTime(); const day = now.getDay(); const todayHours = storeSchedule[day]; const badge = document.getElementById('hours-badge'); const dot = document.getElementById('status-dot'); const formatTime = (num) => { let hour = Math.floor(num / 100); let ampm = hour >= 12 ? 'PM' : 'AM'; let displayHour = hour % 12; displayHour = displayHour ? displayHour : 12; return displayHour + ampm; }; const openStr = formatTime(todayHours.open); const closeStr = formatTime(todayHours.close); if (isStoreOpen()) { dot.className = "pulsing-dot dot-open"; badge.innerHTML = ""; badge.appendChild(dot); badge.append(` Open (${openStr} - ${closeStr})`); } else { dot.className = "pulsing-dot dot-closed"; badge.innerHTML = ""; badge.appendChild(dot); badge.append(" Closed Now"); document.getElementById('closed-msg').innerText = `We are currently closed. Our hours today are ${openStr} to ${closeStr}. (Hours may vary on holidays)`; } }
+        async function fetchWeather() { try { const lat = 36.0822; const lon = -94.1719; const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&temperature_unit=fahrenheit`; const response = await fetch(url); const data = await response.json(); if (data.current) { updateWeatherUI(Math.round(data.current.temperature_2m), data.current.weather_code); } } catch (error) { console.log("Weather error:", error); document.getElementById('weather-widget').style.display = 'none'; } }
+        function updateWeatherUI(temp, code) { document.getElementById('weather-temp').innerText = `${temp}°F`; if (temp <= 32) document.getElementById('ice-border').style.display = 'block'; const iconEl = document.getElementById('weather-icon'); if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) { iconEl.innerText = "🌧️"; startPrecipitation('rain'); } else if ([71, 73, 75, 77, 85, 86].includes(code)) { iconEl.innerText = "❄️"; startPrecipitation('snow'); } else if ([45, 48].includes(code)) { iconEl.innerText = "🌫️"; document.getElementById('fog-container').style.display = 'block'; } else if (code <= 3) { iconEl.innerText = code === 0 ? "☀️" : "☁️"; } else if ([95, 96, 99].includes(code)) { iconEl.innerText = "⛈️"; startPrecipitation('rain'); } }
+        function startPrecipitation(type) { const container = document.getElementById('weather-container'); for (let i = 0; i < 50; i++) { const p = document.createElement('div'); p.classList.add(type); p.style.left = Math.random() * 100 + 'vw'; p.style.animationDuration = (Math.random() * 1 + 0.5) + 's'; p.style.animationDelay = Math.random() * 2 + 's'; container.appendChild(p); } }
+        const canvas = document.getElementById("snakeCanvas"); const ctx = canvas.getContext("2d"); const snakeImg = new Image(); snakeImg.src = 'phone.png'; const foodImg = new Image(); foodImg.src = 'bolt.png'; const GRID_SIZE = 20; const SPEED = 2; const TILE_COUNT = canvas.width / GRID_SIZE; let animationId; let gameRunning = false; let score = 0; let path = []; let snakeLength = 3; let headX = 0, headY = 0, velX = 0, velY = 0, nextVelX = 0, nextVelY = 0; let food = { x: 0, y: 0 }; let lastTime = 0; const targetFPS = 60; const frameInterval = 1000 / targetFPS;
+        function toggleGame() { const g = document.getElementById('game-area'); if(g.style.display==='block'){g.style.display='none'; stopGame();}else{g.style.display='block'; setTimeout(initGame,100);} }
+        function initGame() { stopGame(); document.getElementById('game-overlay').classList.add('hidden'); score = 0; snakeLength = 3; document.getElementById('score').innerText = score; headX = Math.floor(TILE_COUNT/2)*GRID_SIZE; headY = Math.floor(TILE_COUNT/2)*GRID_SIZE; path=[]; for(let i=0; i<snakeLength*(GRID_SIZE/SPEED); i++){path.push({x:headX, y:headY+i});} velX=0; velY=-SPEED; nextVelX=0; nextVelY=-SPEED; spawnFood(); startCountdown(); }
         function restartGame() { initGame(); }
-
-        function startCountdown() {
-            let count = 3;
-            draw(); 
-            drawCountdownText(count);
-            let countTimer = setInterval(() => {
-                count--;
-                if(count > 0) {
-                    draw(); 
-                    drawCountdownText(count);
-                } else {
-                    clearInterval(countTimer);
-                    draw();
-                    drawCountdownText("GO!");
-                    setTimeout(() => {
-                        gameRunning = true;
-                        lastTime = 0;
-                        requestAnimationFrame(gameLoop);
-                    }, 500);
-                }
-            }, 1000);
-        }
-
-        function drawCountdownText(text) {
-            ctx.save();
-            ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "#0057B8"; 
-            ctx.font = "bold 80px 'Open Sans', sans-serif";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillText(text, canvas.width/2, canvas.height/2);
-            ctx.restore();
-        }
-
-        function stopGame() {
-            gameRunning = false;
-            cancelAnimationFrame(animationId);
-        }
-
-        function spawnFood() {
-            food.x = Math.floor(Math.random() * TILE_COUNT) * GRID_SIZE;
-            food.y = Math.floor(Math.random() * TILE_COUNT) * GRID_SIZE;
-        }
-
-        function gameLoop(timestamp) {
-            if (!gameRunning) return;
-            if (!lastTime) lastTime = timestamp;
-            const deltaTime = timestamp - lastTime;
-            if (deltaTime >= frameInterval) {
-                update();
-                draw();
-                lastTime = timestamp - (deltaTime % frameInterval);
-            }
-            animationId = requestAnimationFrame(gameLoop);
-        }
-
-        function update() {
-            if (headX % GRID_SIZE === 0 && headY % GRID_SIZE === 0) {
-                if (nextVelX !== 0 || nextVelY !== 0) {
-                    if (velX === 0 && nextVelY !== -velY || velY === 0 && nextVelX !== -velX) {
-                        velX = nextVelX;
-                        velY = nextVelY;
-                    }
-                }
-            }
-            headX += velX;
-            headY += velY;
-            path.unshift({ x: headX, y: headY });
-            const desiredPathLength = snakeLength * (GRID_SIZE / SPEED);
-            if (path.length > desiredPathLength) path.pop();
-
-            if (headX < 0 || headX >= canvas.width || headY < 0 || headY >= canvas.height) {
-                triggerGameOver();
-                return;
-            }
-            let skipHead = GRID_SIZE / SPEED * 2;
-            for (let i = skipHead; i < path.length; i++) {
-                if (path[i].x === headX && path[i].y === headY) {
-                    triggerGameOver();
-                    return;
-                }
-            }
-            let dist = Math.hypot(headX - food.x, headY - food.y);
-            if (dist < SPEED) {
-                headX = food.x; headY = food.y;
-                score++;
-                document.getElementById('score').innerText = score;
-                snakeLength++; 
-                spawnFood();
-            }
-        }
-
-        function draw() {
-            ctx.fillStyle = "#fff";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(foodImg, food.x, food.y, GRID_SIZE, GRID_SIZE);
-            const step = GRID_SIZE / SPEED;
-            for (let i = 0; i < path.length; i += step) {
-                let idx = Math.floor(i);
-                if (idx >= path.length) break;
-                let segment = path[idx];
-                let angle = 0;
-                if (i === 0) {
-                    if (velX > 0) angle = Math.PI / 2;
-                    else if (velX < 0) angle = -Math.PI / 2;
-                    else if (velY > 0) angle = Math.PI;
-                    else if (velY < 0) angle = 0;
-                } else {
-                    let nextIdx = Math.max(0, idx - step);
-                    let nextSeg = path[nextIdx];
-                    let dx = nextSeg.x - segment.x;
-                    let dy = nextSeg.y - segment.y;
-                    if (dx > 0) angle = Math.PI / 2;
-                    else if (dx < 0) angle = -Math.PI / 2;
-                    else if (dy > 0) angle = Math.PI;
-                    else if (dy < 0) angle = 0;
-                }
-                drawRotatedImage(snakeImg, segment.x, segment.y, angle);
-            }
-        }
-
-        function drawRotatedImage(img, x, y, angle) {
-            ctx.save();
-            ctx.translate(x + GRID_SIZE/2, y + GRID_SIZE/2);
-            ctx.rotate(angle);
-            ctx.drawImage(img, -GRID_SIZE/2, -GRID_SIZE/2, GRID_SIZE, GRID_SIZE);
-            ctx.restore();
-        }
-
-        function triggerGameOver() {
-            gameRunning = false;
-            let currentHigh = parseInt(localStorage.getItem('attSnakeHighScore')) || 0;
-            if(score > currentHigh) {
-                localStorage.setItem('attSnakeHighScore', score);
-                document.getElementById('highScore').innerText = score;
-            }
-            document.getElementById('final-score').innerText = score;
-            document.getElementById('game-overlay').classList.remove('hidden');
-        }
-
-        let touchStartX = 0, touchStartY = 0;
-        canvas.addEventListener('touchstart', e => {
-            touchStartX = e.changedTouches[0].screenX;
-            touchStartY = e.changedTouches[0].screenY;
-        }, {passive: false});
-        canvas.addEventListener('touchend', e => {
-            if (!gameRunning) return;
-            let dx = e.changedTouches[0].screenX - touchStartX;
-            let dy = e.changedTouches[0].screenY - touchStartY;
-            handleInput(dx, dy);
-        }, {passive: false});
-        document.addEventListener('keydown', e => {
-            if (!gameRunning) return;
-            if (e.keyCode === 37) handleInput(-1, 0);
-            if (e.keyCode === 38) handleInput(0, -1);
-            if (e.keyCode === 39) handleInput(1, 0);
-            if (e.keyCode === 40) handleInput(0, 1);
-        });
-        function handleInput(dx, dy) {
-            if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
-            if (Math.abs(dx) > Math.abs(dy)) {
-                if (dx > 0) { nextVelX = SPEED; nextVelY = 0; }
-                else        { nextVelX = -SPEED; nextVelY = 0; }
-            } else {
-                if (dy > 0) { nextVelX = 0; nextVelY = SPEED; }
-                else        { nextVelX = 0; nextVelY = -SPEED; }
-            }
-        }
+        function startCountdown() { let count=3; draw(); drawCountdownText(count); let t=setInterval(()=>{count--; if(count>0){draw(); drawCountdownText(count);}else{clearInterval(t); draw(); drawCountdownText("GO!"); setTimeout(()=>{gameRunning=true; lastTime=0; requestAnimationFrame(gameLoop);},500);}},1000); }
+        function drawCountdownText(t) { ctx.save(); ctx.fillStyle="rgba(255,255,255,0.7)"; ctx.fillRect(0,0,canvas.width,canvas.height); ctx.fillStyle="#0057B8"; ctx.font="bold 80px 'Open Sans'"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(t,canvas.width/2,canvas.height/2); ctx.restore(); }
+        function stopGame() { gameRunning=false; cancelAnimationFrame(animationId); }
+        function spawnFood() { food.x = Math.floor(Math.random()*TILE_COUNT)*GRID_SIZE; food.y = Math.floor(Math.random()*TILE_COUNT)*GRID_SIZE; }
+        function gameLoop(t) { if(!gameRunning) return; if(!lastTime) lastTime=t; const dt=t-lastTime; if(dt>=frameInterval){update(); draw(); lastTime=t-(dt%frameInterval);} animationId=requestAnimationFrame(gameLoop); }
+        function update() { if(headX%GRID_SIZE===0 && headY%GRID_SIZE===0){if(nextVelX!==0||nextVelY!==0){if(velX===0&&nextVelY!==-velY||velY===0&&nextVelX!==-velX){velX=nextVelX; velY=nextVelY;}}} headX+=velX; headY+=velY; path.unshift({x:headX, y:headY}); if(path.length>snakeLength*(GRID_SIZE/SPEED)) path.pop(); if(headX<0||headX>=canvas.width||headY<0||headY>=canvas.height){triggerGameOver(); return;} let skip=GRID_SIZE/SPEED*2; for(let i=skip; i<path.length; i++){if(path[i].x===headX && path[i].y===headY){triggerGameOver(); return;}} if(Math.hypot(headX-food.x, headY-food.y)<SPEED){headX=food.x; headY=food.y; score++; document.getElementById('score').innerText=score; snakeLength++; spawnFood();} }
+        function draw() { ctx.fillStyle="#fff"; ctx.fillRect(0,0,canvas.width,canvas.height); ctx.drawImage(foodImg,food.x,food.y,GRID_SIZE,GRID_SIZE); const step=GRID_SIZE/SPEED; for(let i=0; i<path.length; i+=step){let idx=Math.floor(i); if(idx>=path.length) break; let seg=path[idx]; let ang=0; if(i===0){if(velX>0) ang=Math.PI/2; else if(velX<0) ang=-Math.PI/2; else if(velY>0) ang=Math.PI; else ang=0;}else{let n=Math.max(0,idx-step); let ns=path[n]; let dx=ns.x-seg.x; let dy=ns.y-seg.y; if(dx>0) ang=Math.PI/2; else if(dx<0) ang=-Math.PI/2; else if(dy>0) ang=Math.PI; else ang=0;} drawRotatedImage(snakeImg,seg.x,seg.y,ang);} }
+        function drawRotatedImage(img,x,y,ang){ ctx.save(); ctx.translate(x+GRID_SIZE/2,y+GRID_SIZE/2); ctx.rotate(ang); ctx.drawImage(img,-GRID_SIZE/2,-GRID_SIZE/2,GRID_SIZE,GRID_SIZE); ctx.restore(); }
+        function triggerGameOver() { gameRunning=false; let h=parseInt(localStorage.getItem('attSnakeHighScore'))||0; if(score>h){localStorage.setItem('attSnakeHighScore',score); document.getElementById('highScore').innerText=score;} document.getElementById('final-score').innerText=score; document.getElementById('game-overlay').classList.remove('hidden'); }
+        let tsX=0, tsY=0; canvas.addEventListener('touchstart', e=>{tsX=e.changedTouches[0].screenX; tsY=e.changedTouches[0].screenY;}, {passive:false}); canvas.addEventListener('touchend', e=>{if(!gameRunning)return; let dx=e.changedTouches[0].screenX-tsX; let dy=e.changedTouches[0].screenY-tsY; handleInput(dx,dy);}, {passive:false}); document.addEventListener('keydown', e=>{if(!gameRunning)return; if(e.keyCode===37)handleInput(-1,0); if(e.keyCode===38)handleInput(0,-1); if(e.keyCode===39)handleInput(1,0); if(e.keyCode===40)handleInput(0,1);}); function handleInput(dx,dy) { if(Math.abs(dx)<10 && Math.abs(dy)<10)return; if(Math.abs(dx)>Math.abs(dy)){if(dx>0){nextVelX=SPEED; nextVelY=0;}else{nextVelX=-SPEED; nextVelY=0;}}else{if(dy>0){nextVelX=0; nextVelY=SPEED;}else{nextVelX=0; nextVelY=-SPEED;}} }
     </script>
 </body>
 </html>
