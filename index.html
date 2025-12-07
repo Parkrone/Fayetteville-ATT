@@ -41,9 +41,9 @@
             --track-name: #000;
             --artist-name: #666;
             
-            /* Spotify Brand */
-            --spotify-green: #1DB954;
-            --spotify-hover: #1ed760;
+            /* Last.fm Brand Color */
+            --lastfm-red: #d51007;
+            --lastfm-hover: #b00d06;
         }
 
         /* Dark Mode */
@@ -94,32 +94,16 @@
         }
 
         /* --- WEATHER & ICE EFFECTS --- */
-        
-        /* Ice Cube Border (Image Overlay) */
         #ice-border {
-            position: fixed; 
-            width: 110%; /* Zoomed in to push thick edges off screen */
-            height: 110%; 
-            left: -5%; 
-            top: -5%;
-            pointer-events: none; 
-            z-index: 9000; /* Below header */
-            display: none; 
-            
-            background-image: url('ice-border.png'); 
-            background-size: 100% 100%; 
-            background-position: center;
-            background-repeat: no-repeat;
-            
-            opacity: 0.5; /* Semi-transparent */
-            mix-blend-mode: screen; 
+            position: fixed; width: 110%; height: 110%; left: -5%; top: -5%;
+            pointer-events: none; z-index: 9000; display: none;
+            background-image: url('ice-border.png'); background-size: 100% 100%; 
+            background-position: center; background-repeat: no-repeat; opacity: 0.5; mix-blend-mode: screen; 
         }
-
         #weather-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: hidden; }
         .rain { position: absolute; width: 2px; height: 15px; background: rgba(120, 160, 255, 0.6); top: -20px; animation: fall linear infinite; }
         .snow { position: absolute; width: 6px; height: 6px; background: white; border-radius: 50%; top: -10px; box-shadow: 0 0 5px white; animation: fall linear infinite; }
         @keyframes fall { to { transform: translateY(110vh); } }
-        
         #fog-container { position: fixed; bottom: 0; left: 0; width: 100%; height: 300px; pointer-events: none; z-index: 5; display: none; background: linear-gradient(to top, rgba(200,200,200,0.4) 0%, transparent 100%); overflow: hidden; }
         .fog-cloud { position: absolute; bottom: 0; width: 200%; height: 100%; background: url('https://raw.githubusercontent.com/danielstuart14/CSS_FOG_ANIMATION/master/fog1.png') repeat-x; background-size: contain; animation: drift 60s linear infinite; opacity: 0.5; }
         .fog-cloud.two { animation-duration: 40s; animation-direction: reverse; opacity: 0.3; }
@@ -131,18 +115,11 @@
         .loader-hidden { opacity: 0; visibility: hidden; }
 
         /* --- HEADER --- */
-        header { 
-            width: 100%; background-color: var(--container-bg); padding: 15px 0; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
-            display: flex; justify-content: center; align-items: center; gap: 10px; 
-            margin-bottom: 30px; transition: background-color 0.3s ease; 
-            position: relative; z-index: 9001; /* Above Ice Border */
-        }
+        header { width: 100%; background-color: var(--container-bg); padding: 15px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 30px; transition: background-color 0.3s ease; position: relative; z-index: 9001; }
         .logo-link { display: flex; align-items: center; text-decoration: none; cursor: pointer; transition: opacity 0.2s ease; }
         .logo-link:hover { opacity: 0.8; }
         header img { height: 40px; width: auto; }
         header h1 { font-size: 24px; font-weight: 700; color: var(--heading-color); letter-spacing: -0.5px; }
-        
         #weather-widget { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 5px; font-size: 14px; font-weight: 600; color: var(--text-color); }
         #weather-icon { font-size: 20px; }
 
@@ -206,8 +183,16 @@
         .song-title { display: block; font-size: 15px; font-weight: 700; color: var(--track-name); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .artist-name { display: block; font-size: 13px; color: var(--artist-name); }
         .music-actions { display: flex; gap: 8px; }
-        .btn-music-action { flex: 1; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--container-bg); color: var(--text-color); font-size: 12px; font-weight: 600; text-align: center; text-decoration: none; cursor: pointer; transition: background 0.2s; }
-        .btn-music-action:hover { background: var(--btn-sec-hover); }
+        
+        /* Updated Music Button Style */
+        .btn-music-action { 
+            flex: 1; padding: 8px; border-radius: 6px; 
+            border: none;
+            background: var(--lastfm-red);
+            color: white; 
+            font-size: 12px; font-weight: 600; text-align: center; text-decoration: none; cursor: pointer; transition: background 0.2s; 
+        }
+        .btn-music-action:hover { background: var(--lastfm-hover); }
 
         /* --- GAME AREA --- */
         #game-area { display: none; margin-top: 20px; background: var(--game-area-bg); padding: 10px; border-radius: 10px; border: 1px solid var(--border-color); position: relative; }
@@ -301,12 +286,10 @@
             </div>
 
             <div class="music-actions">
-                <a href="#" class="btn-music-action" id="odesli-link" target="_blank">Open Song 🎵</a>
+                <a href="#" class="btn-music-action" id="lastfm-link" target="_blank">View on Last.fm 🎵</a>
             </div>
         </div>
         
-        <div id="no-music-msg" style="display:none; text-align:center; color:var(--subtext-color); margin: 20px 0;">Nothing in the air right now 🎵</div>
-
         <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0;">
 
         <a href="https://www.att.com/stores/arkansas/fayetteville/146068" class="btn btn-primary link-delay">Explore Fayetteville Mall Deals</a>
@@ -352,7 +335,6 @@
             
             if(isStoreOpen()) {
                 fetchNowPlaying();
-                // Check for song updates every 30 seconds
                 setInterval(fetchNowPlaying, 30000);
             }
 
@@ -378,28 +360,21 @@
                 const response = await fetch(url);
                 const data = await response.json();
                 
-                const track = data.recenttracks.track[0];
-                
-                // Check if currently playing (Last.fm attribute @attr.nowplaying)
-                const isPlaying = track['@attr'] && track['@attr'].nowplaying === 'true';
+                if (data.recenttracks && data.recenttracks.track && data.recenttracks.track.length > 0) {
+                    const track = data.recenttracks.track[0];
+                    const isPlaying = track['@attr'] && track['@attr'].nowplaying === 'true';
 
-                if (isPlaying) {
-                    document.getElementById('music-section').style.display = 'block';
-                    document.getElementById('no-music-msg').style.display = 'none';
-                    
-                    document.getElementById('track-title').innerText = track.name;
-                    document.getElementById('track-artist').innerText = track.artist['#text'];
-                    // Last.fm gives small, medium, large, extralarge images. Index 2 is large.
-                    document.getElementById('track-art').src = track.image[2]['#text'] || 'https://i.scdn.co/image/ab67616d0000b273b5f9e28219c169fd4b9e8379'; 
-                    
-                    // Generate Odesli Search Link
-                    const searchBuffer = `${track.artist['#text']} ${track.name}`;
-                    const odesliUrl = `https://song.link/search?q=${encodeURIComponent(searchBuffer)}`;
-                    document.getElementById('odesli-link').href = odesliUrl;
-                } else {
-                    // Not playing anything right now
-                    document.getElementById('music-section').style.display = 'none';
-                    document.getElementById('no-music-msg').style.display = 'block';
+                    if (isPlaying) {
+                        document.getElementById('music-section').style.display = 'block';
+                        document.getElementById('track-title').innerText = track.name;
+                        document.getElementById('track-artist').innerText = track.artist['#text'];
+                        document.getElementById('track-art').src = track.image[2]['#text'] || 'https://i.scdn.co/image/ab67616d0000b273b5f9e28219c169fd4b9e8379'; 
+                        
+                        // Link directly to the Last.fm song page
+                        document.getElementById('lastfm-link').href = track.url;
+                    } else {
+                        document.getElementById('music-section').style.display = 'none';
+                    }
                 }
             } catch (error) {
                 console.log("Music fetch error:", error);
