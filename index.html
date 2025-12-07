@@ -40,10 +40,6 @@
             --player-border: #e9ecef;
             --track-name: #000;
             --artist-name: #666;
-            
-            /* Last.fm Brand Color */
-            --lastfm-red: #d51007;
-            --lastfm-hover: #b00d06;
         }
 
         /* Dark Mode */
@@ -94,16 +90,28 @@
         }
 
         /* --- WEATHER & ICE EFFECTS --- */
+        
+        /* Ice Cube Border */
         #ice-border {
-            position: fixed; width: 110%; height: 110%; left: -5%; top: -5%;
-            pointer-events: none; z-index: 9000; display: none;
-            background-image: url('ice-border.png'); background-size: 100% 100%; 
-            background-position: center; background-repeat: no-repeat; opacity: 0.5; mix-blend-mode: screen; 
+            position: fixed; 
+            width: 110%; height: 110%; 
+            left: -5%; top: -5%;
+            pointer-events: none; 
+            z-index: 9000; 
+            display: none; 
+            background-image: url('ice-border.png'); 
+            background-size: 100% 100%; 
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.5; 
+            mix-blend-mode: screen; 
         }
+
         #weather-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: hidden; }
         .rain { position: absolute; width: 2px; height: 15px; background: rgba(120, 160, 255, 0.6); top: -20px; animation: fall linear infinite; }
         .snow { position: absolute; width: 6px; height: 6px; background: white; border-radius: 50%; top: -10px; box-shadow: 0 0 5px white; animation: fall linear infinite; }
         @keyframes fall { to { transform: translateY(110vh); } }
+        
         #fog-container { position: fixed; bottom: 0; left: 0; width: 100%; height: 300px; pointer-events: none; z-index: 5; display: none; background: linear-gradient(to top, rgba(200,200,200,0.4) 0%, transparent 100%); overflow: hidden; }
         .fog-cloud { position: absolute; bottom: 0; width: 200%; height: 100%; background: url('https://raw.githubusercontent.com/danielstuart14/CSS_FOG_ANIMATION/master/fog1.png') repeat-x; background-size: contain; animation: drift 60s linear infinite; opacity: 0.5; }
         .fog-cloud.two { animation-duration: 40s; animation-direction: reverse; opacity: 0.3; }
@@ -114,12 +122,20 @@
         #preloader img { width: 340px; height: auto; }
         .loader-hidden { opacity: 0; visibility: hidden; }
 
-        /* --- HEADER --- */
-        header { width: 100%; background-color: var(--container-bg); padding: 15px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 30px; transition: background-color 0.3s ease; position: relative; z-index: 9001; }
+        /* --- HEADER & WEATHER WIDGET --- */
+        header { 
+            width: 100%; background-color: var(--container-bg); padding: 15px 0; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            display: flex; justify-content: center; align-items: center; gap: 10px; 
+            margin-bottom: 30px; transition: background-color 0.3s ease; 
+            position: relative; 
+            z-index: 9001; 
+        }
         .logo-link { display: flex; align-items: center; text-decoration: none; cursor: pointer; transition: opacity 0.2s ease; }
         .logo-link:hover { opacity: 0.8; }
         header img { height: 40px; width: auto; }
         header h1 { font-size: 24px; font-weight: 700; color: var(--heading-color); letter-spacing: -0.5px; }
+        
         #weather-widget { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 5px; font-size: 14px; font-weight: 600; color: var(--text-color); }
         #weather-icon { font-size: 20px; }
 
@@ -157,6 +173,10 @@
         #redirect-overlay { position: fixed; }
         #redirect-overlay h2 { color: var(--att-blue); font-size: 24px; margin-bottom: 15px; }
         #redirect-overlay p { font-size: 16px; color: var(--subtext-color); line-height: 1.5; max-width: 300px; }
+        
+        /* Last.fm Loader Styling */
+        #lastfm-loader-img { width: 80px; height: auto; margin-bottom: 20px; }
+        
         .spinner { border: 4px solid var(--bg-color); border-top: 4px solid var(--att-blue); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .action-overlay { position: fixed; }
@@ -186,13 +206,17 @@
         
         /* Updated Music Button Style */
         .btn-music-action { 
-            flex: 1; padding: 8px; border-radius: 6px; 
-            border: none;
-            background: var(--lastfm-red);
+            flex: 1; padding: 14px 20px; border-radius: 30px; 
+            border: 2px solid transparent;
+            background: var(--att-blue);
             color: white; 
-            font-size: 12px; font-weight: 600; text-align: center; text-decoration: none; cursor: pointer; transition: background 0.2s; 
+            font-size: 16px; font-weight: 600; text-align: center; text-decoration: none; cursor: pointer; transition: background 0.2s; 
+            display: flex; justify-content: center; align-items: center; gap: 8px;
         }
-        .btn-music-action:hover { background: var(--lastfm-hover); }
+        .btn-music-action:hover { background: var(--att-blue-hover); }
+        
+        /* Small icon inside button */
+        .lastfm-btn-icon { height: 20px; width: auto; filter: brightness(0) invert(1); }
 
         /* --- GAME AREA --- */
         #game-area { display: none; margin-top: 20px; background: var(--game-area-bg); padding: 10px; border-radius: 10px; border: 1px solid var(--border-color); position: relative; }
@@ -220,6 +244,13 @@
         <h2>Heading to Google...</h2>
         <p>Please note: You may need to sign in to your Google account to leave a review.</p>
     </div>
+    
+    <div id="lastfm-overlay" class="overlay-base hidden">
+        <img src="lastfm-loader.gif" id="lastfm-loader-img" alt="Last.fm Loading">
+        <h2>Opening Last.fm...</h2>
+        <p>Redirecting you to the song page.</p>
+    </div>
+
     <div id="closed-overlay" class="overlay-base action-overlay hidden">
         <h2 style="color: #d32f2f;">We are currently closed</h2>
         <p id="closed-msg">Our store hours have ended for the day.</p>
@@ -286,7 +317,10 @@
             </div>
 
             <div class="music-actions">
-                <a href="#" class="btn-music-action" id="lastfm-link" target="_blank">View on Last.fm 🎵</a>
+                <a href="#" class="btn-music-action" id="lastfm-link">
+                    <img src="lastfm-icon.png" class="lastfm-btn-icon" alt="">
+                    View song on Last.fm
+                </a>
             </div>
         </div>
         
@@ -322,7 +356,6 @@
     <script>
         const storeSchedule = { 0: { open: 1200, close: 1800 }, 1: { open: 1100, close: 2000 }, 2: { open: 1100, close: 2000 }, 3: { open: 1100, close: 2000 }, 4: { open: 1100, close: 2000 }, 5: { open: 1100, close: 2000 }, 6: { open: 1100, close: 2000 } };
 
-        // --- LAST.FM CONFIGURATION ---
         const LASTFM_USER = 'ATTFayetteville'; 
         const LASTFM_API_KEY = 'f7020f441263b35598d85540e23c950c';
 
@@ -343,6 +376,24 @@
             document.getElementById('googleBtn').addEventListener('click', function(e) { e.preventDefault(); playJelly(this); document.getElementById('redirect-overlay').classList.remove('hidden'); setTimeout(function() { window.location.href = document.getElementById('googleBtn').href; setTimeout(() => document.getElementById('redirect-overlay').classList.add('hidden'), 1000); }, 2500); });
             document.querySelectorAll('.link-delay').forEach(link => { link.addEventListener('click', function(e) { e.preventDefault(); playJelly(this); setTimeout(() => { window.location.href = this.href; }, 500); }); });
             document.querySelector('.btn-game').addEventListener('click', function() { playJelly(this); });
+            
+            // --- NEW LAST.FM BUTTON HANDLER ---
+            const lastFmBtn = document.getElementById('lastfm-link');
+            const lastFmOverlay = document.getElementById('lastfm-overlay');
+            
+            lastFmBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetUrl = this.href;
+                if(targetUrl === '#' || targetUrl === '') return;
+                
+                playJelly(this);
+                lastFmOverlay.classList.remove('hidden');
+                
+                setTimeout(function() {
+                    window.location.href = targetUrl;
+                    setTimeout(() => lastFmOverlay.classList.add('hidden'), 1000);
+                }, 2500); // 2.5s delay to see GIF
+            });
 
             const savedScore = localStorage.getItem('attSnakeHighScore');
             if(savedScore) document.getElementById('highScore').innerText = savedScore;
@@ -353,7 +404,6 @@
         // --- LAST.FM FETCH LOGIC ---
         async function fetchNowPlaying() {
             if (LASTFM_USER === 'YOUR_LASTFM_USERNAME') return; 
-
             const url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${LASTFM_USER}&api_key=${LASTFM_API_KEY}&format=json&limit=1`;
             
             try {
@@ -388,7 +438,16 @@
         function isStoreOpen() { const now = getCentralTime(); const day = now.getDay(); const currentMilitaryTime = (now.getHours() * 100) + now.getMinutes(); const todayHours = storeSchedule[day]; return (currentMilitaryTime >= todayHours.open && currentMilitaryTime < todayHours.close); }
         function checkStoreStatus() { const now = getCentralTime(); const day = now.getDay(); const todayHours = storeSchedule[day]; const badge = document.getElementById('hours-badge'); const dot = document.getElementById('status-dot'); const formatTime = (num) => { let hour = Math.floor(num / 100); let ampm = hour >= 12 ? 'PM' : 'AM'; let displayHour = hour % 12; displayHour = displayHour ? displayHour : 12; return displayHour + ampm; }; const openStr = formatTime(todayHours.open); const closeStr = formatTime(todayHours.close); if (isStoreOpen()) { dot.className = "pulsing-dot dot-open"; badge.innerHTML = ""; badge.appendChild(dot); badge.append(` Open (${openStr} - ${closeStr})`); } else { dot.className = "pulsing-dot dot-closed"; badge.innerHTML = ""; badge.appendChild(dot); badge.append(" Closed Now"); document.getElementById('closed-msg').innerText = `We are currently closed. Our hours today are ${openStr} to ${closeStr}. (Hours may vary on holidays)`; } }
         async function fetchWeather() { try { const lat = 36.0822; const lon = -94.1719; const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&temperature_unit=fahrenheit`; const response = await fetch(url); const data = await response.json(); if (data.current) { updateWeatherUI(Math.round(data.current.temperature_2m), data.current.weather_code); } } catch (error) { console.log("Weather error:", error); document.getElementById('weather-widget').style.display = 'none'; } }
-        function updateWeatherUI(temp, code) { document.getElementById('weather-temp').innerText = `${temp}°F`; if (temp <= 32) document.getElementById('ice-border').style.display = 'block'; const iconEl = document.getElementById('weather-icon'); if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) { iconEl.innerText = "🌧️"; startPrecipitation('rain'); } else if ([71, 73, 75, 77, 85, 86].includes(code)) { iconEl.innerText = "❄️"; startPrecipitation('snow'); } else if ([45, 48].includes(code)) { iconEl.innerText = "🌫️"; document.getElementById('fog-container').style.display = 'block'; } else if (code <= 3) { iconEl.innerText = code === 0 ? "☀️" : "☁️"; } else if ([95, 96, 99].includes(code)) { iconEl.innerText = "⛈️"; startPrecipitation('rain'); } }
+        function updateWeatherUI(temp, code) { 
+            document.getElementById('weather-temp').innerText = `${temp}°F`; 
+            if (temp <= 32) document.getElementById('ice-border').style.display = 'block'; 
+            const iconEl = document.getElementById('weather-icon'); 
+            if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) { iconEl.innerText = "🌧️"; startPrecipitation('rain'); } 
+            else if ([71, 73, 75, 77, 85, 86].includes(code)) { iconEl.innerText = "❄️"; startPrecipitation('snow'); } 
+            else if ([45, 48].includes(code)) { iconEl.innerText = "🌫️"; document.getElementById('fog-container').style.display = 'block'; } 
+            else if (code <= 3) { iconEl.innerText = code === 0 ? "☀️" : "☁️"; } 
+            else if ([95, 96, 99].includes(code)) { iconEl.innerText = "⛈️"; startPrecipitation('rain'); } 
+        }
         function startPrecipitation(type) { const container = document.getElementById('weather-container'); for (let i = 0; i < 50; i++) { const p = document.createElement('div'); p.classList.add(type); p.style.left = Math.random() * 100 + 'vw'; p.style.animationDuration = (Math.random() * 1 + 0.5) + 's'; p.style.animationDelay = Math.random() * 2 + 's'; container.appendChild(p); } }
         const canvas = document.getElementById("snakeCanvas"); const ctx = canvas.getContext("2d"); const snakeImg = new Image(); snakeImg.src = 'phone.png'; const foodImg = new Image(); foodImg.src = 'bolt.png'; const GRID_SIZE = 20; const SPEED = 2; const TILE_COUNT = canvas.width / GRID_SIZE; let animationId; let gameRunning = false; let score = 0; let path = []; let snakeLength = 3; let headX = 0, headY = 0, velX = 0, velY = 0, nextVelX = 0, nextVelY = 0; let food = { x: 0, y: 0 }; let lastTime = 0; const targetFPS = 60; const frameInterval = 1000 / targetFPS;
         function toggleGame() { const g = document.getElementById('game-area'); if(g.style.display==='block'){g.style.display='none'; stopGame();}else{g.style.display='block'; setTimeout(initGame,100);} }
