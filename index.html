@@ -13,9 +13,8 @@
         /* --- CSS VARIABLES --- */
         :root {
             /* Light Mode */
-            /* Note: Background color is fallback behind video */
-            --bg-color: #f2f2f2; 
-            --container-bg: rgba(255, 255, 255, 0.95); /* Slight transparency for cool effect */
+            --bg-color: #f2f2f2;
+            --container-bg: rgba(255, 255, 255, 0.95);
             --text-color: #333333;
             --heading-color: #000000;
             --subtext-color: #444444;
@@ -29,7 +28,7 @@
             --preview-box-bg: #f0f8ff;
             --preview-box-border: #0057B8;
             --preview-text: #444;
-            --footer-text: #ddd; /* Lighter footer text to show on dark video */
+            --footer-text: #ddd;
             --game-area-bg: #f9f9f9;
             --border-color: #ddd;
             --preloader-bg: #ffffff; 
@@ -92,32 +91,18 @@
 
         /* --- BACKGROUND VIDEO --- */
         #bg-video {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover; /* Ensures it zooms to fit any screen size (21:9 phones, etc) */
-            z-index: 0; /* Behind weather (1), Fog (5), Content (10) */
-            filter: brightness(0.7); /* Slightly darken video so text pops */
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover; z-index: 0; filter: brightness(0.7);
         }
 
         /* --- WEATHER & ICE EFFECTS --- */
         #ice-border {
-            position: fixed; 
-            width: 110%; height: 110%; 
-            left: -5%; top: -5%;
-            pointer-events: none; 
-            z-index: 9000; 
-            display: none; 
-            background-image: url('ice-border.png'); 
-            background-size: 100% 100%; 
-            background-position: center;
-            background-repeat: no-repeat;
-            opacity: 0.5; 
-            mix-blend-mode: screen; 
+            position: fixed; width: 110%; height: 110%; left: -5%; top: -5%;
+            pointer-events: none; z-index: 9000; display: none;
+            background-image: url('ice-border.png'); background-size: 100% 100%; 
+            background-position: center; background-repeat: no-repeat; 
+            opacity: 0.5; mix-blend-mode: screen; 
         }
-
         #weather-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: hidden; }
         .rain { position: absolute; width: 2px; height: 15px; background: rgba(120, 160, 255, 0.6); top: -20px; animation: fall linear infinite; }
         .snow { position: absolute; width: 6px; height: 6px; background: white; border-radius: 50%; top: -10px; box-shadow: 0 0 5px white; animation: fall linear infinite; }
@@ -133,14 +118,13 @@
         #preloader img { width: 340px; height: auto; }
         .loader-hidden { opacity: 0; visibility: hidden; }
 
-        /* --- HEADER & WEATHER WIDGET --- */
+        /* --- HEADER --- */
         header { 
             width: 100%; background-color: var(--container-bg); padding: 15px 0; 
             box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
             display: flex; justify-content: center; align-items: center; gap: 10px; 
             margin-bottom: 30px; transition: background-color 0.3s ease; 
-            position: relative; 
-            z-index: 9001; 
+            position: relative; z-index: 9001; 
         }
         .logo-link { display: flex; align-items: center; text-decoration: none; cursor: pointer; transition: opacity 0.2s ease; }
         .logo-link:hover { opacity: 0.8; }
@@ -435,7 +419,7 @@
                         document.getElementById('track-artist').innerText = track.artist['#text'];
                         document.getElementById('track-art').src = track.image[2]['#text'] || 'https://i.scdn.co/image/ab67616d0000b273b5f9e28219c169fd4b9e8379'; 
                         
-                        // Link directly to the Last.fm song page
+                        // Updated to Last.fm Link
                         document.getElementById('lastfm-link').href = track.url;
                     } else {
                         document.getElementById('music-section').style.display = 'none';
