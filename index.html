@@ -45,9 +45,8 @@
             --spotify-green: #1DB954;
             --spotify-hover: #1ed760;
 
-            /* Skeleton Loader Colors */
-            --skeleton-base: #e0e0e0;
-            --skeleton-highlight: #f5f5f5;
+            /* Skeleton & Particles */
+            --particle-color: rgba(0, 87, 184, 0.4); /* AT&T Blue tint */
         }
 
         /* Dark Mode */
@@ -79,31 +78,23 @@
                 --player-border: #333;
                 --track-name: #fff;
                 --artist-name: #aaa;
-
-                /* Skeleton Colors Dark */
-                --skeleton-base: #333333;
-                --skeleton-highlight: #444444;
+                
+                --particle-color: rgba(77, 163, 255, 0.3); /* Lighter blue for dark mode */
             }
         }
 
         /* --- SKELETON LOADER ANIMATION --- */
         .skeleton {
-            background: linear-gradient(90deg, var(--skeleton-base) 25%, var(--skeleton-highlight) 50%, var(--skeleton-base) 75%);
+            background: linear-gradient(90deg, var(--border-color) 25%, var(--bg-color) 50%, var(--border-color) 75%);
             background-size: 200% 100%;
             animation: shimmer 1.5s infinite;
             border-radius: 4px;
-            color: transparent !important; /* Hide text while loading */
+            color: transparent !important; 
             user-select: none;
             cursor: default;
         }
-        /* Specific tweaks for skeleton elements to ensure they have height */
         .skeleton-text { min-height: 1em; display: inline-block; width: 100%; }
-        .skeleton-img { min-height: 100%; min-width: 100%; opacity: 0.5; }
-
-        @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
         /* --- RESET & BASICS --- */
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
@@ -120,11 +111,54 @@
             position: relative; 
         }
 
-        /* --- BACKGROUND VIDEO --- */
+        /* --- BACKGROUND VIDEO & SKELETON --- */
+        
+        /* The Actual Video */
         #bg-video {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            object-fit: cover; z-index: 0; filter: brightness(0.7);
+            object-fit: cover; 
+            z-index: 0; 
+            filter: brightness(0.7);
+            
+            /* Start hidden to allow fade-in */
+            opacity: 0; 
+            transition: opacity 1.5s ease-in-out;
         }
+        
+        /* The "PS5 Style" Particle Loader (Background Skeleton) */
+        #video-skeleton {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-color); /* Fallback color */
+            z-index: -1; /* Behind video */
+            overflow: hidden;
+        }
+
+        /* Floating Particles */
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--particle-color);
+            filter: blur(8px);
+            animation: float 10s infinite ease-in-out;
+            opacity: 0;
+        }
+
+        /* Generate random-looking movement */
+        @keyframes float {
+            0% { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
+            20% { opacity: 0.8; }
+            80% { opacity: 0.8; }
+            100% { transform: translateY(-100px) translateX(50px) scale(1.5); opacity: 0; }
+        }
+
+        /* Specific Particles (Positions & Delays) */
+        .p1 { width: 80px; height: 80px; top: 80%; left: 10%; animation-duration: 12s; animation-delay: 0s; }
+        .p2 { width: 120px; height: 120px; top: 60%; left: 80%; animation-duration: 15s; animation-delay: 1s; }
+        .p3 { width: 60px; height: 60px; top: 40%; left: 30%; animation-duration: 9s; animation-delay: 3s; }
+        .p4 { width: 90px; height: 90px; top: 20%; left: 60%; animation-duration: 14s; animation-delay: 2s; }
+        .p5 { width: 150px; height: 150px; top: 90%; left: 50%; animation-duration: 18s; animation-delay: 0.5s; }
+
 
         /* --- WEATHER & ICE EFFECTS --- */
         #ice-border {
@@ -149,7 +183,7 @@
         #preloader img { width: 340px; height: auto; }
         .loader-hidden { opacity: 0; visibility: hidden; }
 
-        /* --- HEADER --- */
+        /* --- HEADER & WEATHER WIDGET --- */
         header { 
             width: 100%; background-color: var(--container-bg); padding: 15px 0; 
             box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
@@ -200,7 +234,6 @@
         #redirect-overlay h2 { color: var(--att-blue); font-size: 24px; margin-bottom: 15px; }
         #redirect-overlay p { font-size: 16px; color: var(--subtext-color); line-height: 1.5; max-width: 300px; }
         
-        /* Last.fm Loader Styling */
         #lastfm-loader-img { width: 80px; height: auto; margin-bottom: 20px; }
         
         .spinner { border: 4px solid var(--bg-color); border-top: 4px solid var(--att-blue); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 20px; }
@@ -224,15 +257,12 @@
         .eq-2 { animation-delay: 0.2s; } .eq-3 { animation-delay: 0.4s; }
         @keyframes equalize { 0% { height: 6px; } 50% { height: 14px; } 100% { height: 6px; } }
         .track-info { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-        
         .album-art { width: 50px; height: 50px; border-radius: 6px; background: #ddd; object-fit: cover; flex-shrink: 0; }
-        
         .song-details { flex-grow: 1; overflow: hidden; }
         .song-title { display: block; font-size: 15px; font-weight: 700; color: var(--track-name); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px;}
         .artist-name { display: block; font-size: 13px; color: var(--artist-name); }
         .music-actions { display: flex; gap: 8px; }
         
-        /* Updated Music Button Style */
         .btn-music-action { 
             flex: 1; padding: 14px 20px; border-radius: 30px; 
             border: 2px solid transparent;
@@ -242,8 +272,6 @@
             display: flex; justify-content: center; align-items: center; gap: 8px;
         }
         .btn-music-action:hover { background: var(--att-blue-hover); }
-        
-        /* Small icon inside button */
         .lastfm-btn-icon { height: 20px; width: auto; filter: brightness(0) invert(1); }
 
         /* --- GAME AREA --- */
@@ -260,6 +288,14 @@
     </style>
 </head>
 <body>
+
+    <div id="video-skeleton">
+        <div class="particle p1"></div>
+        <div class="particle p2"></div>
+        <div class="particle p3"></div>
+        <div class="particle p4"></div>
+        <div class="particle p5"></div>
+    </div>
 
     <video autoplay muted loop playsinline id="bg-video">
         <source src="abstractbg.mp4" type="video/mp4">
@@ -393,10 +429,17 @@
         const LASTFM_USER = 'ATTFayetteville'; 
         const LASTFM_API_KEY = 'f7020f441263b35598d85540e23c950c';
 
-        // START PRELOADER TIMER IMMEDIATELY (Fix for Looping Issue)
+        // --- PRELOADER FIX (Runs timer immediately) ---
         document.addEventListener("DOMContentLoaded", function () {
             const loader = document.getElementById("preloader");
             const container = document.getElementById("mainContainer");
+            const video = document.getElementById("bg-video");
+
+            // Video Fade In
+            video.addEventListener('loadeddata', function() {
+                video.style.opacity = '1';
+                document.getElementById('video-skeleton').style.display = 'none';
+            });
 
             // Init Logic
             checkStoreStatus();
@@ -407,11 +450,11 @@
                 setInterval(fetchNowPlaying, 30000);
             }
 
-            // Buttons & Listeners
+            // Buttons
             document.getElementById('contactBtn').addEventListener('click', function() { playJelly(this); document.getElementById('contact-overlay').classList.remove('hidden'); });
             document.getElementById('callBtn').addEventListener('click', function() { playJelly(this); if(isStoreOpen()) { window.location.href = "tel:4794395471"; } else { document.getElementById('closed-overlay').classList.remove('hidden'); } });
             
-            // Last.fm & Redirects
+            // Last.fm Button
             const lastFmBtn = document.getElementById('lastfm-link');
             const lastFmOverlay = document.getElementById('lastfm-overlay');
             lastFmBtn.addEventListener('click', function(e) {
@@ -431,7 +474,7 @@
             const savedScore = localStorage.getItem('attSnakeHighScore');
             if(savedScore) document.getElementById('highScore').innerText = savedScore;
 
-            // FIXED: Timer runs independently of asset loading
+            // FADE OUT TIMER (Fixed)
             setTimeout(function() { 
                 loader.classList.add("loader-hidden"); 
                 setTimeout(() => { 
@@ -457,20 +500,17 @@
                     if (isPlaying) {
                         document.getElementById('music-section').style.display = 'block';
                         
-                        // Populate Text & Remove Skeletons
+                        // Remove Skeletons
                         const titleEl = document.getElementById('track-title');
                         titleEl.innerText = track.name;
-                        titleEl.classList.remove('skeleton');
-                        titleEl.classList.remove('skeleton-text');
-                        titleEl.style.width = 'auto'; // Reset width from skeleton
+                        titleEl.classList.remove('skeleton', 'skeleton-text');
+                        titleEl.style.width = 'auto';
 
                         const artistEl = document.getElementById('track-artist');
                         artistEl.innerText = track.artist['#text'];
-                        artistEl.classList.remove('skeleton');
-                        artistEl.classList.remove('skeleton-text');
+                        artistEl.classList.remove('skeleton', 'skeleton-text');
                         artistEl.style.width = 'auto'; 
 
-                        // Update Image (Skeleton removed via onload)
                         document.getElementById('track-art').src = track.image[2]['#text'] || 'https://i.scdn.co/image/ab67616d0000b273b5f9e28219c169fd4b9e8379'; 
                         
                         document.getElementById('lastfm-link').href = track.url;
@@ -492,13 +532,11 @@
         function checkStoreStatus() { 
             const now = getCentralTime(); const day = now.getDay(); const todayHours = storeSchedule[day]; 
             const badge = document.getElementById('hours-badge'); 
-            
             const formatTime = (num) => { let hour = Math.floor(num / 100); let ampm = hour >= 12 ? 'PM' : 'AM'; let displayHour = hour % 12; displayHour = displayHour ? displayHour : 12; return displayHour + ampm; }; 
             const openStr = formatTime(todayHours.open); const closeStr = formatTime(todayHours.close); 
             
-            // Clear Skeleton Class
-            badge.classList.remove('skeleton');
-            badge.classList.remove('skeleton-text');
+            // Remove Skeleton
+            badge.classList.remove('skeleton', 'skeleton-text');
             badge.style.width = 'auto';
 
             if (isStoreOpen()) { 
@@ -526,8 +564,8 @@
             const iconEl = document.getElementById('weather-icon');
 
             // Remove Skeletons
-            tempEl.classList.remove('skeleton'); tempEl.classList.remove('skeleton-text'); tempEl.style.width = 'auto';
-            iconEl.classList.remove('skeleton'); iconEl.classList.remove('skeleton-text'); iconEl.style.width = 'auto';
+            tempEl.classList.remove('skeleton', 'skeleton-text'); tempEl.style.width = 'auto';
+            iconEl.classList.remove('skeleton', 'skeleton-text'); iconEl.style.width = 'auto';
 
             tempEl.innerText = `${temp}°F`; 
             if (temp <= 32) document.getElementById('ice-border').style.display = 'block'; 
