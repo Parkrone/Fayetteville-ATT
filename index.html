@@ -44,9 +44,6 @@
             /* Spotify Brand */
             --spotify-green: #1DB954;
             --spotify-hover: #1ed760;
-
-            /* Skeleton & Particles */
-            --particle-color: rgba(0, 87, 184, 0.6); /* AT&T Blue */
         }
 
         /* Dark Mode */
@@ -78,8 +75,6 @@
                 --player-border: #333;
                 --track-name: #fff;
                 --artist-name: #aaa;
-                
-                --particle-color: rgba(77, 163, 255, 0.5); 
             }
         }
 
@@ -124,7 +119,7 @@
             transition: opacity 1.5s ease-in-out;
         }
         
-        /* PS5 Style Particle Container */
+        /* AT&T Globe Particle System */
         #video-skeleton {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -135,39 +130,50 @@
 
         .particle {
             position: absolute;
-            border-radius: 50%;
-            background: var(--particle-color);
+            background-image: url('AT&T_Globe.png');
+            background-size: contain;
+            background-repeat: no-repeat;
             opacity: 0;
-            animation: float 12s infinite ease-in-out;
+            animation: float 15s infinite linear;
         }
 
-        /* PS5 Drift Animation */
+        /* Drift + Rotate Animation */
         @keyframes float {
-            0% { transform: translate(0, 0) scale(0.8); opacity: 0; }
-            20% { opacity: 0.6; }
-            50% { transform: translate(30px, -50px) scale(1.1); opacity: 0.8; }
-            80% { opacity: 0.6; }
-            100% { transform: translate(-20px, -100px) scale(0.9); opacity: 0; }
+            0% { transform: translate(0, 0) rotate(0deg) scale(0.8); opacity: 0; }
+            20% { opacity: 0.3; } /* Kept low so it's subtle */
+            50% { transform: translate(40px, -60px) rotate(20deg) scale(1.0); opacity: 0.4; }
+            80% { opacity: 0.3; }
+            100% { transform: translate(-20px, -120px) rotate(40deg) scale(0.9); opacity: 0; }
         }
 
-        /* Varied Particles */
-        /* Large blurry bokeh (Background) */
-        .p1 { width: 100px; height: 100px; top: 20%; left: 10%; filter: blur(20px); animation-duration: 18s; animation-delay: 0s; }
-        .p2 { width: 150px; height: 150px; top: 80%; left: 80%; filter: blur(30px); animation-duration: 22s; animation-delay: 2s; }
-        .p3 { width: 80px; height: 80px; top: 50%; left: 50%; filter: blur(15px); animation-duration: 20s; animation-delay: 5s; }
+        /* Varied Particles (20 Total for density) */
+        /* Large, Blurrier (Background) */
+        .p1 { width: 140px; height: 140px; top: 10%; left: 5%; filter: blur(4px); animation-duration: 18s; animation-delay: 0s; }
+        .p2 { width: 180px; height: 180px; top: 60%; left: 85%; filter: blur(5px); animation-duration: 22s; animation-delay: 2s; }
+        .p3 { width: 120px; height: 120px; top: 40%; left: 15%; filter: blur(4px); animation-duration: 20s; animation-delay: 5s; }
+        .p4 { width: 160px; height: 160px; top: 80%; left: 40%; filter: blur(5px); animation-duration: 19s; animation-delay: 1s; }
+        .p5 { width: 130px; height: 130px; top: 20%; left: 70%; filter: blur(4px); animation-duration: 24s; animation-delay: 4s; }
+
+        /* Medium, Less Blur */
+        .p6 { width: 80px; height: 80px; top: 50%; left: 50%; filter: blur(3px); animation-duration: 14s; animation-delay: 1s; }
+        .p7 { width: 90px; height: 90px; top: 90%; left: 10%; filter: blur(2px); animation-duration: 16s; animation-delay: 3s; }
+        .p8 { width: 70px; height: 70px; top: 15%; left: 30%; filter: blur(2px); animation-duration: 13s; animation-delay: 0.5s; }
+        .p9 { width: 85px; height: 85px; top: 30%; left: 90%; filter: blur(3px); animation-duration: 15s; animation-delay: 6s; }
+        .p10 { width: 75px; height: 75px; top: 70%; left: 20%; filter: blur(2px); animation-duration: 17s; animation-delay: 2.5s; }
+
+        /* Small, Sharp (Foreground) */
+        .p11 { width: 40px; height: 40px; top: 35%; left: 80%; filter: blur(1px); animation-duration: 10s; animation-delay: 4s; }
+        .p12 { width: 30px; height: 30px; top: 75%; left: 60%; filter: blur(0px); animation-duration: 9s; animation-delay: 1.5s; }
+        .p13 { width: 50px; height: 50px; top: 5%; left: 50%; filter: blur(1px); animation-duration: 11s; animation-delay: 0.2s; }
+        .p14 { width: 35px; height: 35px; top: 55%; left: 5%; filter: blur(0px); animation-duration: 12s; animation-delay: 3.5s; }
+        .p15 { width: 45px; height: 45px; top: 85%; left: 95%; filter: blur(1px); animation-duration: 10s; animation-delay: 5.5s; }
         
-        /* Medium particles */
-        .p4 { width: 40px; height: 40px; top: 10%; left: 70%; filter: blur(8px); animation-duration: 14s; animation-delay: 1s; }
-        .p5 { width: 30px; height: 30px; top: 90%; left: 20%; filter: blur(6px); animation-duration: 16s; animation-delay: 3s; }
-        .p6 { width: 50px; height: 50px; top: 40%; left: 90%; filter: blur(10px); animation-duration: 12s; animation-delay: 0.5s; }
-        
-        /* Small sharp sparks (Foreground) */
-        .p7 { width: 8px; height: 8px; top: 30%; left: 30%; filter: blur(1px); animation-duration: 10s; animation-delay: 4s; }
-        .p8 { width: 12px; height: 12px; top: 70%; left: 60%; filter: blur(2px); animation-duration: 9s; animation-delay: 1.5s; }
-        .p9 { width: 6px; height: 6px; top: 15%; left: 15%; filter: blur(1px); animation-duration: 11s; animation-delay: 6s; }
-        .p10 { width: 10px; height: 10px; top: 85%; left: 40%; filter: blur(2px); animation-duration: 13s; animation-delay: 2.5s; }
-        .p11 { width: 5px; height: 5px; top: 60%; left: 10%; filter: blur(1px); animation-duration: 15s; animation-delay: 0.2s; }
-        .p12 { width: 15px; height: 15px; top: 25%; left: 85%; filter: blur(3px); animation-duration: 12s; animation-delay: 3.5s; }
+        /* Extra Fillers */
+        .p16 { width: 60px; height: 60px; top: 25%; left: 40%; filter: blur(2px); animation-duration: 14s; animation-delay: 7s; }
+        .p17 { width: 100px; height: 100px; top: 95%; left: 30%; filter: blur(4px); animation-duration: 20s; animation-delay: 2s; }
+        .p18 { width: 25px; height: 25px; top: 45%; left: 25%; filter: blur(0px); animation-duration: 8s; animation-delay: 0.5s; }
+        .p19 { width: 110px; height: 110px; top: 65%; left: 75%; filter: blur(3px); animation-duration: 18s; animation-delay: 4s; }
+        .p20 { width: 55px; height: 55px; top: 10%; left: 90%; filter: blur(1px); animation-duration: 13s; animation-delay: 1s; }
 
 
         /* --- WEATHER & ICE EFFECTS --- */
@@ -304,6 +310,9 @@
         <div class="particle p4"></div><div class="particle p5"></div><div class="particle p6"></div>
         <div class="particle p7"></div><div class="particle p8"></div><div class="particle p9"></div>
         <div class="particle p10"></div><div class="particle p11"></div><div class="particle p12"></div>
+        <div class="particle p13"></div><div class="particle p14"></div><div class="particle p15"></div>
+        <div class="particle p16"></div><div class="particle p17"></div><div class="particle p18"></div>
+        <div class="particle p19"></div><div class="particle p20"></div>
     </div>
 
     <video autoplay muted loop playsinline id="bg-video">
@@ -438,19 +447,16 @@
         const LASTFM_USER = 'ATTFayetteville'; 
         const LASTFM_API_KEY = 'f7020f441263b35598d85540e23c950c';
 
-        // --- PRELOADER TIMER (Runs Immediately) ---
         document.addEventListener("DOMContentLoaded", function () {
             const loader = document.getElementById("preloader");
             const container = document.getElementById("mainContainer");
             const video = document.getElementById("bg-video");
 
-            // Video Fade In
             video.addEventListener('loadeddata', function() {
                 video.style.opacity = '1';
                 document.getElementById('video-skeleton').style.display = 'none';
             });
 
-            // Init Logic
             checkStoreStatus();
             fetchWeather();
             
@@ -459,7 +465,6 @@
                 setInterval(fetchNowPlaying, 30000);
             }
 
-            // Buttons & Listeners
             document.getElementById('contactBtn').addEventListener('click', function() { playJelly(this); document.getElementById('contact-overlay').classList.remove('hidden'); });
             document.getElementById('callBtn').addEventListener('click', function() { playJelly(this); if(isStoreOpen()) { window.location.href = "tel:4794395471"; } else { document.getElementById('closed-overlay').classList.remove('hidden'); } });
             
@@ -482,7 +487,6 @@
             const savedScore = localStorage.getItem('attSnakeHighScore');
             if(savedScore) document.getElementById('highScore').innerText = savedScore;
 
-            // FADE OUT TIMER (Fixed)
             setTimeout(function() { 
                 loader.classList.add("loader-hidden"); 
                 setTimeout(() => { 
@@ -492,7 +496,6 @@
             }, 4200); 
         });
 
-        // --- LAST.FM FETCH LOGIC ---
         async function fetchNowPlaying() {
             if (LASTFM_USER === 'YOUR_LASTFM_USERNAME') return; 
             const url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${LASTFM_USER}&api_key=${LASTFM_API_KEY}&format=json&limit=1`;
@@ -508,7 +511,6 @@
                     if (isPlaying) {
                         document.getElementById('music-section').style.display = 'block';
                         
-                        // Remove Skeletons
                         const titleEl = document.getElementById('track-title');
                         titleEl.innerText = track.name;
                         titleEl.classList.remove('skeleton', 'skeleton-text');
@@ -543,7 +545,6 @@
             const formatTime = (num) => { let hour = Math.floor(num / 100); let ampm = hour >= 12 ? 'PM' : 'AM'; let displayHour = hour % 12; displayHour = displayHour ? displayHour : 12; return displayHour + ampm; }; 
             const openStr = formatTime(todayHours.open); const closeStr = formatTime(todayHours.close); 
             
-            // Remove Skeleton
             badge.classList.remove('skeleton', 'skeleton-text');
             badge.style.width = 'auto';
 
@@ -571,7 +572,6 @@
             const tempEl = document.getElementById('weather-temp');
             const iconEl = document.getElementById('weather-icon');
 
-            // Remove Skeletons
             tempEl.classList.remove('skeleton', 'skeleton-text'); tempEl.style.width = 'auto';
             iconEl.classList.remove('skeleton', 'skeleton-text'); iconEl.style.width = 'auto';
 
