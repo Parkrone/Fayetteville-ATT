@@ -28,7 +28,7 @@
             --preview-box-bg: #f0f8ff;
             --preview-box-border: #0057B8;
             --preview-text: #444;
-            --footer-text: #ddd;
+            --footer-text: #777;
             --game-area-bg: #f9f9f9;
             --border-color: #ddd;
             --preloader-bg: #ffffff; 
@@ -40,6 +40,14 @@
             --player-border: #e9ecef;
             --track-name: #000;
             --artist-name: #666;
+            
+            /* Spotify Brand */
+            --spotify-green: #1DB954;
+            --spotify-hover: #1ed760;
+
+            /* Skeleton Loader Colors */
+            --skeleton-base: #e0e0e0;
+            --skeleton-highlight: #f5f5f5;
         }
 
         /* Dark Mode */
@@ -71,7 +79,30 @@
                 --player-border: #333;
                 --track-name: #fff;
                 --artist-name: #aaa;
+
+                /* Skeleton Colors Dark */
+                --skeleton-base: #333333;
+                --skeleton-highlight: #444444;
             }
+        }
+
+        /* --- SKELETON LOADER ANIMATION --- */
+        .skeleton {
+            background: linear-gradient(90deg, var(--skeleton-base) 25%, var(--skeleton-highlight) 50%, var(--skeleton-base) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 4px;
+            color: transparent !important; /* Hide text while loading */
+            user-select: none;
+            cursor: default;
+        }
+        /* Specific tweaks for skeleton elements to ensure they have height */
+        .skeleton-text { min-height: 1em; display: inline-block; width: 100%; }
+        .skeleton-img { min-height: 100%; min-width: 100%; opacity: 0.5; }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
         }
 
         /* --- RESET & BASICS --- */
@@ -131,7 +162,7 @@
         header img { height: 40px; width: auto; }
         header h1 { font-size: 24px; font-weight: 700; color: var(--heading-color); letter-spacing: -0.5px; }
         
-        #weather-widget { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 5px; font-size: 14px; font-weight: 600; color: var(--text-color); }
+        #weather-widget { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 5px; font-size: 14px; font-weight: 600; color: var(--text-color); min-width: 60px; justify-content: flex-end;}
         #weather-icon { font-size: 20px; }
 
         /* --- CONTAINER --- */
@@ -155,7 +186,7 @@
         .btn-contact:hover, .btn-call:hover { background-color: var(--btn-gray-hover); }
         @media (prefers-color-scheme: dark) { .btn-contact { background-color: #444; border: 1px solid #666;} .btn-contact:hover { background-color: #555; } }
         
-        .status-badge { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; font-weight: 700; margin-top: 5px; opacity: 1; letter-spacing: 0.3px; }
+        .status-badge { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; font-weight: 700; margin-top: 5px; opacity: 1; letter-spacing: 0.3px; min-height: 20px;}
         .pulsing-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; position: relative; }
         .dot-open { background-color: #2ecc71; box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); animation: pulse-green 2s infinite; }
         @keyframes pulse-green { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(46, 204, 113, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); } }
@@ -193,9 +224,11 @@
         .eq-2 { animation-delay: 0.2s; } .eq-3 { animation-delay: 0.4s; }
         @keyframes equalize { 0% { height: 6px; } 50% { height: 14px; } 100% { height: 6px; } }
         .track-info { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        
         .album-art { width: 50px; height: 50px; border-radius: 6px; background: #ddd; object-fit: cover; flex-shrink: 0; }
+        
         .song-details { flex-grow: 1; overflow: hidden; }
-        .song-title { display: block; font-size: 15px; font-weight: 700; color: var(--track-name); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .song-title { display: block; font-size: 15px; font-weight: 700; color: var(--track-name); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px;}
         .artist-name { display: block; font-size: 13px; color: var(--artist-name); }
         .music-actions { display: flex; gap: 8px; }
         
@@ -282,8 +315,8 @@
         </a>
         <h1>Fayetteville Mall</h1>
         <div id="weather-widget">
-            <span id="weather-icon"></span>
-            <span id="weather-temp"></span>
+            <span id="weather-icon" class="skeleton skeleton-text" style="width: 25px; display:inline-block;"></span>
+            <span id="weather-temp" class="skeleton skeleton-text" style="width: 40px; margin-left: 5px; display:inline-block;"></span>
         </div>
     </header>
 
@@ -294,7 +327,7 @@
 
         <div class="button-group">
             <button id="callBtn" class="btn btn-call">
-                <div style="text-align:center;">Call Store <span id="hours-badge" class="status-badge"><span id="status-dot" class="pulsing-dot dot-closed"></span> Loading...</span></div>
+                <div style="text-align:center;">Call Store <span id="hours-badge" class="status-badge skeleton skeleton-text" style="width: 100px; margin-top: 5px;"></span></div>
             </button>
             <button id="contactBtn" class="btn btn-contact">Save Contact 📇</button>
         </div>
@@ -308,10 +341,12 @@
             </div>
             
             <div class="track-info">
-                <img src="" alt="Album" class="album-art" id="track-art">
+                <div class="album-art skeleton" id="track-art-wrapper">
+                   <img src="" alt="Album" class="album-art" id="track-art" style="display:none;" onload="this.style.display='block'; document.getElementById('track-art-wrapper').classList.remove('skeleton');">
+                </div>
                 <div class="song-details">
-                    <span class="song-title" id="track-title">Loading...</span>
-                    <span class="artist-name" id="track-artist">Loading...</span>
+                    <span class="song-title skeleton skeleton-text" id="track-title" style="width: 80%;"></span>
+                    <span class="artist-name skeleton skeleton-text" id="track-artist" style="width: 60%;"></span>
                 </div>
             </div>
 
@@ -358,10 +393,12 @@
         const LASTFM_USER = 'ATTFayetteville'; 
         const LASTFM_API_KEY = 'f7020f441263b35598d85540e23c950c';
 
-        window.addEventListener("load", function () {
+        // START PRELOADER TIMER IMMEDIATELY (Fix for Looping Issue)
+        document.addEventListener("DOMContentLoaded", function () {
             const loader = document.getElementById("preloader");
             const container = document.getElementById("mainContainer");
-            
+
+            // Init Logic
             checkStoreStatus();
             fetchWeather();
             
@@ -370,34 +407,38 @@
                 setInterval(fetchNowPlaying, 30000);
             }
 
+            // Buttons & Listeners
             document.getElementById('contactBtn').addEventListener('click', function() { playJelly(this); document.getElementById('contact-overlay').classList.remove('hidden'); });
             document.getElementById('callBtn').addEventListener('click', function() { playJelly(this); if(isStoreOpen()) { window.location.href = "tel:4794395471"; } else { document.getElementById('closed-overlay').classList.remove('hidden'); } });
-            document.getElementById('googleBtn').addEventListener('click', function(e) { e.preventDefault(); playJelly(this); document.getElementById('redirect-overlay').classList.remove('hidden'); setTimeout(function() { window.location.href = document.getElementById('googleBtn').href; setTimeout(() => document.getElementById('redirect-overlay').classList.add('hidden'), 1000); }, 2500); });
-            document.querySelectorAll('.link-delay').forEach(link => { link.addEventListener('click', function(e) { e.preventDefault(); playJelly(this); setTimeout(() => { window.location.href = this.href; }, 500); }); });
-            document.querySelector('.btn-game').addEventListener('click', function() { playJelly(this); });
             
-            // --- NEW LAST.FM BUTTON HANDLER ---
+            // Last.fm & Redirects
             const lastFmBtn = document.getElementById('lastfm-link');
             const lastFmOverlay = document.getElementById('lastfm-overlay');
-            
             lastFmBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 const targetUrl = this.href;
                 if(targetUrl === '#' || targetUrl === '') return;
-                
                 playJelly(this);
                 lastFmOverlay.classList.remove('hidden');
-                
-                setTimeout(function() {
-                    window.location.href = targetUrl;
-                    setTimeout(() => lastFmOverlay.classList.add('hidden'), 1000);
-                }, 2500); // 2.5s delay
+                setTimeout(function() { window.location.href = targetUrl; setTimeout(() => lastFmOverlay.classList.add('hidden'), 1000); }, 2500);
             });
+
+            const googleBtn = document.getElementById('googleBtn');
+            googleBtn.addEventListener('click', function(e) { e.preventDefault(); playJelly(this); document.getElementById('redirect-overlay').classList.remove('hidden'); setTimeout(function() { window.location.href = document.getElementById('googleBtn').href; setTimeout(() => document.getElementById('redirect-overlay').classList.add('hidden'), 1000); }, 2500); });
+            document.querySelectorAll('.link-delay').forEach(link => { link.addEventListener('click', function(e) { e.preventDefault(); playJelly(this); setTimeout(() => { window.location.href = this.href; }, 500); }); });
+            document.querySelector('.btn-game').addEventListener('click', function() { playJelly(this); });
 
             const savedScore = localStorage.getItem('attSnakeHighScore');
             if(savedScore) document.getElementById('highScore').innerText = savedScore;
 
-            setTimeout(function() { loader.classList.add("loader-hidden"); setTimeout(() => { container.classList.add("content-visible"); loader.parentNode.removeChild(loader); }, 500); }, 4200); 
+            // FIXED: Timer runs independently of asset loading
+            setTimeout(function() { 
+                loader.classList.add("loader-hidden"); 
+                setTimeout(() => { 
+                    container.classList.add("content-visible"); 
+                    loader.parentNode.removeChild(loader); 
+                }, 500); 
+            }, 4200); 
         });
 
         // --- LAST.FM FETCH LOGIC ---
@@ -415,11 +456,23 @@
 
                     if (isPlaying) {
                         document.getElementById('music-section').style.display = 'block';
-                        document.getElementById('track-title').innerText = track.name;
-                        document.getElementById('track-artist').innerText = track.artist['#text'];
+                        
+                        // Populate Text & Remove Skeletons
+                        const titleEl = document.getElementById('track-title');
+                        titleEl.innerText = track.name;
+                        titleEl.classList.remove('skeleton');
+                        titleEl.classList.remove('skeleton-text');
+                        titleEl.style.width = 'auto'; // Reset width from skeleton
+
+                        const artistEl = document.getElementById('track-artist');
+                        artistEl.innerText = track.artist['#text'];
+                        artistEl.classList.remove('skeleton');
+                        artistEl.classList.remove('skeleton-text');
+                        artistEl.style.width = 'auto'; 
+
+                        // Update Image (Skeleton removed via onload)
                         document.getElementById('track-art').src = track.image[2]['#text'] || 'https://i.scdn.co/image/ab67616d0000b273b5f9e28219c169fd4b9e8379'; 
                         
-                        // Updated to Last.fm Link
                         document.getElementById('lastfm-link').href = track.url;
                     } else {
                         document.getElementById('music-section').style.display = 'none';
@@ -435,18 +488,57 @@
         function closeOverlay(id) { document.getElementById(id).classList.add('hidden'); }
         function getCentralTime() { const d = new Date(); return new Date(d.toLocaleString("en-US", {timeZone: "America/Chicago"})); }
         function isStoreOpen() { const now = getCentralTime(); const day = now.getDay(); const currentMilitaryTime = (now.getHours() * 100) + now.getMinutes(); const todayHours = storeSchedule[day]; return (currentMilitaryTime >= todayHours.open && currentMilitaryTime < todayHours.close); }
-        function checkStoreStatus() { const now = getCentralTime(); const day = now.getDay(); const todayHours = storeSchedule[day]; const badge = document.getElementById('hours-badge'); const dot = document.getElementById('status-dot'); const formatTime = (num) => { let hour = Math.floor(num / 100); let ampm = hour >= 12 ? 'PM' : 'AM'; let displayHour = hour % 12; displayHour = displayHour ? displayHour : 12; return displayHour + ampm; }; const openStr = formatTime(todayHours.open); const closeStr = formatTime(todayHours.close); if (isStoreOpen()) { dot.className = "pulsing-dot dot-open"; badge.innerHTML = ""; badge.appendChild(dot); badge.append(` Open (${openStr} - ${closeStr})`); } else { dot.className = "pulsing-dot dot-closed"; badge.innerHTML = ""; badge.appendChild(dot); badge.append(" Closed Now"); document.getElementById('closed-msg').innerText = `We are currently closed. Our hours today are ${openStr} to ${closeStr}. (Hours may vary on holidays)`; } }
-        async function fetchWeather() { try { const lat = 36.0822; const lon = -94.1719; const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&temperature_unit=fahrenheit`; const response = await fetch(url); const data = await response.json(); if (data.current) { updateWeatherUI(Math.round(data.current.temperature_2m), data.current.weather_code); } } catch (error) { console.log("Weather error:", error); document.getElementById('weather-widget').style.display = 'none'; } }
+        
+        function checkStoreStatus() { 
+            const now = getCentralTime(); const day = now.getDay(); const todayHours = storeSchedule[day]; 
+            const badge = document.getElementById('hours-badge'); 
+            
+            const formatTime = (num) => { let hour = Math.floor(num / 100); let ampm = hour >= 12 ? 'PM' : 'AM'; let displayHour = hour % 12; displayHour = displayHour ? displayHour : 12; return displayHour + ampm; }; 
+            const openStr = formatTime(todayHours.open); const closeStr = formatTime(todayHours.close); 
+            
+            // Clear Skeleton Class
+            badge.classList.remove('skeleton');
+            badge.classList.remove('skeleton-text');
+            badge.style.width = 'auto';
+
+            if (isStoreOpen()) { 
+                badge.innerHTML = `<span id="status-dot" class="pulsing-dot dot-open"></span> Open (${openStr} - ${closeStr})`; 
+            } else { 
+                badge.innerHTML = `<span id="status-dot" class="pulsing-dot dot-closed"></span> Closed Now`; 
+                document.getElementById('closed-msg').innerText = `We are currently closed. Our hours today are ${openStr} to ${closeStr}. (Hours may vary on holidays)`; 
+            } 
+        }
+
+        async function fetchWeather() { 
+            try { 
+                const lat = 36.0822; const lon = -94.1719; 
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&temperature_unit=fahrenheit`; 
+                const response = await fetch(url); const data = await response.json(); 
+                if (data.current) { 
+                    updateWeatherUI(Math.round(data.current.temperature_2m), data.current.weather_code); 
+                } 
+            } catch (error) { 
+                console.log("Weather error:", error); document.getElementById('weather-widget').style.display = 'none'; 
+            } 
+        }
         function updateWeatherUI(temp, code) { 
-            document.getElementById('weather-temp').innerText = `${temp}°F`; 
+            const tempEl = document.getElementById('weather-temp');
+            const iconEl = document.getElementById('weather-icon');
+
+            // Remove Skeletons
+            tempEl.classList.remove('skeleton'); tempEl.classList.remove('skeleton-text'); tempEl.style.width = 'auto';
+            iconEl.classList.remove('skeleton'); iconEl.classList.remove('skeleton-text'); iconEl.style.width = 'auto';
+
+            tempEl.innerText = `${temp}°F`; 
             if (temp <= 32) document.getElementById('ice-border').style.display = 'block'; 
-            const iconEl = document.getElementById('weather-icon'); 
+            
             if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) { iconEl.innerText = "🌧️"; startPrecipitation('rain'); } 
             else if ([71, 73, 75, 77, 85, 86].includes(code)) { iconEl.innerText = "❄️"; startPrecipitation('snow'); } 
             else if ([45, 48].includes(code)) { iconEl.innerText = "🌫️"; document.getElementById('fog-container').style.display = 'block'; } 
             else if (code <= 3) { iconEl.innerText = code === 0 ? "☀️" : "☁️"; } 
             else if ([95, 96, 99].includes(code)) { iconEl.innerText = "⛈️"; startPrecipitation('rain'); } 
         }
+        
         function startPrecipitation(type) { const container = document.getElementById('weather-container'); for (let i = 0; i < 50; i++) { const p = document.createElement('div'); p.classList.add(type); p.style.left = Math.random() * 100 + 'vw'; p.style.animationDuration = (Math.random() * 1 + 0.5) + 's'; p.style.animationDelay = Math.random() * 2 + 's'; container.appendChild(p); } }
         const canvas = document.getElementById("snakeCanvas"); const ctx = canvas.getContext("2d"); const snakeImg = new Image(); snakeImg.src = 'phone.png'; const foodImg = new Image(); foodImg.src = 'bolt.png'; const GRID_SIZE = 20; const SPEED = 2; const TILE_COUNT = canvas.width / GRID_SIZE; let animationId; let gameRunning = false; let score = 0; let path = []; let snakeLength = 3; let headX = 0, headY = 0, velX = 0, velY = 0, nextVelX = 0, nextVelY = 0; let food = { x: 0, y: 0 }; let lastTime = 0; const targetFPS = 60; const frameInterval = 1000 / targetFPS;
         function toggleGame() { const g = document.getElementById('game-area'); if(g.style.display==='block'){g.style.display='none'; stopGame();}else{g.style.display='block'; setTimeout(initGame,100);} }
