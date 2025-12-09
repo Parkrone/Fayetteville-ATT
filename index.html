@@ -46,7 +46,7 @@
             --spotify-hover: #1ed760;
 
             /* Skeleton & Particles */
-            --particle-color: rgba(0, 87, 184, 0.4); /* AT&T Blue tint */
+            --particle-color: rgba(0, 87, 184, 0.6); /* AT&T Blue */
         }
 
         /* Dark Mode */
@@ -79,7 +79,7 @@
                 --track-name: #fff;
                 --artist-name: #aaa;
                 
-                --particle-color: rgba(77, 163, 255, 0.3); /* Lighter blue for dark mode */
+                --particle-color: rgba(77, 163, 255, 0.5); 
             }
         }
 
@@ -113,7 +113,6 @@
 
         /* --- BACKGROUND VIDEO & SKELETON --- */
         
-        /* The Actual Video */
         #bg-video {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             object-fit: cover; 
@@ -125,39 +124,50 @@
             transition: opacity 1.5s ease-in-out;
         }
         
-        /* The "PS5 Style" Particle Loader (Background Skeleton) */
+        /* PS5 Style Particle Container */
         #video-skeleton {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-color); /* Fallback color */
-            z-index: -1; /* Behind video */
+            background: var(--bg-color); 
+            z-index: -1; 
             overflow: hidden;
         }
 
-        /* Floating Particles */
         .particle {
             position: absolute;
             border-radius: 50%;
             background: var(--particle-color);
-            filter: blur(8px);
-            animation: float 10s infinite ease-in-out;
             opacity: 0;
+            animation: float 12s infinite ease-in-out;
         }
 
-        /* Generate random-looking movement */
+        /* PS5 Drift Animation */
         @keyframes float {
-            0% { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
-            20% { opacity: 0.8; }
-            80% { opacity: 0.8; }
-            100% { transform: translateY(-100px) translateX(50px) scale(1.5); opacity: 0; }
+            0% { transform: translate(0, 0) scale(0.8); opacity: 0; }
+            20% { opacity: 0.6; }
+            50% { transform: translate(30px, -50px) scale(1.1); opacity: 0.8; }
+            80% { opacity: 0.6; }
+            100% { transform: translate(-20px, -100px) scale(0.9); opacity: 0; }
         }
 
-        /* Specific Particles (Positions & Delays) */
-        .p1 { width: 80px; height: 80px; top: 80%; left: 10%; animation-duration: 12s; animation-delay: 0s; }
-        .p2 { width: 120px; height: 120px; top: 60%; left: 80%; animation-duration: 15s; animation-delay: 1s; }
-        .p3 { width: 60px; height: 60px; top: 40%; left: 30%; animation-duration: 9s; animation-delay: 3s; }
-        .p4 { width: 90px; height: 90px; top: 20%; left: 60%; animation-duration: 14s; animation-delay: 2s; }
-        .p5 { width: 150px; height: 150px; top: 90%; left: 50%; animation-duration: 18s; animation-delay: 0.5s; }
+        /* Varied Particles */
+        /* Large blurry bokeh (Background) */
+        .p1 { width: 100px; height: 100px; top: 20%; left: 10%; filter: blur(20px); animation-duration: 18s; animation-delay: 0s; }
+        .p2 { width: 150px; height: 150px; top: 80%; left: 80%; filter: blur(30px); animation-duration: 22s; animation-delay: 2s; }
+        .p3 { width: 80px; height: 80px; top: 50%; left: 50%; filter: blur(15px); animation-duration: 20s; animation-delay: 5s; }
+        
+        /* Medium particles */
+        .p4 { width: 40px; height: 40px; top: 10%; left: 70%; filter: blur(8px); animation-duration: 14s; animation-delay: 1s; }
+        .p5 { width: 30px; height: 30px; top: 90%; left: 20%; filter: blur(6px); animation-duration: 16s; animation-delay: 3s; }
+        .p6 { width: 50px; height: 50px; top: 40%; left: 90%; filter: blur(10px); animation-duration: 12s; animation-delay: 0.5s; }
+        
+        /* Small sharp sparks (Foreground) */
+        .p7 { width: 8px; height: 8px; top: 30%; left: 30%; filter: blur(1px); animation-duration: 10s; animation-delay: 4s; }
+        .p8 { width: 12px; height: 12px; top: 70%; left: 60%; filter: blur(2px); animation-duration: 9s; animation-delay: 1.5s; }
+        .p9 { width: 6px; height: 6px; top: 15%; left: 15%; filter: blur(1px); animation-duration: 11s; animation-delay: 6s; }
+        .p10 { width: 10px; height: 10px; top: 85%; left: 40%; filter: blur(2px); animation-duration: 13s; animation-delay: 2.5s; }
+        .p11 { width: 5px; height: 5px; top: 60%; left: 10%; filter: blur(1px); animation-duration: 15s; animation-delay: 0.2s; }
+        .p12 { width: 15px; height: 15px; top: 25%; left: 85%; filter: blur(3px); animation-duration: 12s; animation-delay: 3.5s; }
 
 
         /* --- WEATHER & ICE EFFECTS --- */
@@ -290,11 +300,10 @@
 <body>
 
     <div id="video-skeleton">
-        <div class="particle p1"></div>
-        <div class="particle p2"></div>
-        <div class="particle p3"></div>
-        <div class="particle p4"></div>
-        <div class="particle p5"></div>
+        <div class="particle p1"></div><div class="particle p2"></div><div class="particle p3"></div>
+        <div class="particle p4"></div><div class="particle p5"></div><div class="particle p6"></div>
+        <div class="particle p7"></div><div class="particle p8"></div><div class="particle p9"></div>
+        <div class="particle p10"></div><div class="particle p11"></div><div class="particle p12"></div>
     </div>
 
     <video autoplay muted loop playsinline id="bg-video">
@@ -429,7 +438,7 @@
         const LASTFM_USER = 'ATTFayetteville'; 
         const LASTFM_API_KEY = 'f7020f441263b35598d85540e23c950c';
 
-        // --- PRELOADER FIX (Runs timer immediately) ---
+        // --- PRELOADER TIMER (Runs Immediately) ---
         document.addEventListener("DOMContentLoaded", function () {
             const loader = document.getElementById("preloader");
             const container = document.getElementById("mainContainer");
@@ -450,11 +459,10 @@
                 setInterval(fetchNowPlaying, 30000);
             }
 
-            // Buttons
+            // Buttons & Listeners
             document.getElementById('contactBtn').addEventListener('click', function() { playJelly(this); document.getElementById('contact-overlay').classList.remove('hidden'); });
             document.getElementById('callBtn').addEventListener('click', function() { playJelly(this); if(isStoreOpen()) { window.location.href = "tel:4794395471"; } else { document.getElementById('closed-overlay').classList.remove('hidden'); } });
             
-            // Last.fm Button
             const lastFmBtn = document.getElementById('lastfm-link');
             const lastFmOverlay = document.getElementById('lastfm-overlay');
             lastFmBtn.addEventListener('click', function(e) {
