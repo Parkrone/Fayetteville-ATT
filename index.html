@@ -394,7 +394,7 @@
         <div id="video-overlay" style="position: relative; border-radius: 10px; overflow: hidden; max-width: 90%; width: 800px;">
             <button onclick="closeVideoOverlay()" class="video-close-btn" style="position: absolute; top: 10px; right: 10px; z-index: 10; background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; font-size: 20px;">&times;</button>
             <video id="purpose-video" controls style="width: 100%; display: block;">
-                <source src="The-Power-of-Connecting-People.mp4" type="video/mp4">
+                <source src="The-Power-of-Connecting-People.webm" type="video/webm">
                 Your browser does not support the video tag.
             </video>
         </div>
@@ -500,10 +500,10 @@
             // Video Fade In Logic
             function showVideo() {
                 video.style.opacity = '1';
-                document.getElementById('video-skeleton').style.opacity = '0'; // Fade out skeleton
-                setTimeout(() => document.getElementById('video-skeleton').style.display = 'none', 1000);
+                document.getElementById('video-skeleton').style.display = 'none';
             }
             
+            // Check if loaded, or wait
             if (video.readyState >= 3) {
                 showVideo();
             } else {
@@ -630,7 +630,6 @@
             const formatTime = (num) => { let hour = Math.floor(num / 100); let ampm = hour >= 12 ? 'PM' : 'AM'; let displayHour = hour % 12; displayHour = displayHour ? displayHour : 12; return displayHour + ampm; }; 
             const openStr = formatTime(todayHours.open); const closeStr = formatTime(todayHours.close); 
             
-            // Remove Skeleton
             badge.classList.remove('skeleton', 'skeleton-text');
             badge.style.width = 'auto';
 
@@ -658,7 +657,6 @@
             const tempEl = document.getElementById('weather-temp');
             const iconEl = document.getElementById('weather-icon');
 
-            // Remove Skeletons
             tempEl.classList.remove('skeleton', 'skeleton-text'); tempEl.style.width = 'auto';
             iconEl.classList.remove('skeleton', 'skeleton-text'); iconEl.style.width = 'auto';
 
