@@ -131,6 +131,7 @@
             background: var(--bg-color); 
             z-index: -1; 
             overflow: hidden;
+            transition: opacity 1s ease-out;
         }
 
         .particle {
@@ -345,7 +346,7 @@
     </div>
 
     <video autoplay muted loop playsinline id="bg-video">
-        <source src="abstractbg.webm" type="video/webm">
+        <source src="abstractbg.mp4" type="video/mp4">
     </video>
 
     <div id="ice-border"></div>
@@ -490,16 +491,27 @@
         const LASTFM_USER = 'ATTFayetteville'; 
         const LASTFM_API_KEY = 'f7020f441263b35598d85540e23c950c';
 
+        // --- PRELOADER TIMER (Runs Immediately) ---
         document.addEventListener("DOMContentLoaded", function () {
             const loader = document.getElementById("preloader");
             const container = document.getElementById("mainContainer");
             const video = document.getElementById("bg-video");
 
-            video.addEventListener('loadeddata', function() {
+            // Video Fade In Logic
+            function showVideo() {
                 video.style.opacity = '1';
-                document.getElementById('video-skeleton').style.display = 'none';
-            });
+                document.getElementById('video-skeleton').style.opacity = '0'; // Fade out skeleton
+                setTimeout(() => document.getElementById('video-skeleton').style.display = 'none', 1000);
+            }
+            
+            if (video.readyState >= 3) {
+                showVideo();
+            } else {
+                video.addEventListener('loadeddata', showVideo);
+                video.addEventListener('canplay', showVideo); 
+            }
 
+            // Init Logic
             checkStoreStatus();
             fetchWeather();
             
@@ -551,7 +563,7 @@
             const savedScore = localStorage.getItem('attSnakeHighScore');
             if(savedScore) document.getElementById('highScore').innerText = savedScore;
 
-            // FADE OUT TIMER
+            // FADE OUT TIMER (Fixed)
             setTimeout(function() { 
                 loader.classList.add("loader-hidden"); 
                 setTimeout(() => { 
@@ -618,6 +630,7 @@
             const formatTime = (num) => { let hour = Math.floor(num / 100); let ampm = hour >= 12 ? 'PM' : 'AM'; let displayHour = hour % 12; displayHour = displayHour ? displayHour : 12; return displayHour + ampm; }; 
             const openStr = formatTime(todayHours.open); const closeStr = formatTime(todayHours.close); 
             
+            // Remove Skeleton
             badge.classList.remove('skeleton', 'skeleton-text');
             badge.style.width = 'auto';
 
@@ -645,6 +658,7 @@
             const tempEl = document.getElementById('weather-temp');
             const iconEl = document.getElementById('weather-icon');
 
+            // Remove Skeletons
             tempEl.classList.remove('skeleton', 'skeleton-text'); tempEl.style.width = 'auto';
             iconEl.classList.remove('skeleton', 'skeleton-text'); iconEl.style.width = 'auto';
 
