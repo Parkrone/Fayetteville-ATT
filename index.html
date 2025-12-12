@@ -112,26 +112,21 @@
         }
 
         /* --- BACKGROUND VIDEO & SKELETON --- */
-        
         #bg-video {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             object-fit: cover; 
             z-index: 0; 
             filter: brightness(0.7);
-            
-            /* Start hidden to allow fade-in */
             opacity: 0; 
             transition: opacity 1.5s ease-in-out;
         }
         
-        /* PS5 Style Particle Container */
         #video-skeleton {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: var(--bg-color); 
             z-index: -1; 
             overflow: hidden;
-            transition: opacity 1s ease-out;
         }
 
         .particle {
@@ -143,7 +138,6 @@
             animation: float 15s infinite linear;
         }
 
-        /* Drift + Rotate Animation */
         @keyframes float {
             0% { transform: translate(0, 0) rotate(0deg) scale(0.8); opacity: 0; }
             20% { opacity: 0.3; } 
@@ -173,7 +167,6 @@
         .p18 { width: 25px; height: 25px; top: 45%; left: 25%; filter: blur(0px); animation-duration: 8s; animation-delay: 0.5s; }
         .p19 { width: 110px; height: 110px; top: 65%; left: 75%; filter: blur(3px); animation-duration: 18s; animation-delay: 4s; }
         .p20 { width: 55px; height: 55px; top: 10%; left: 90%; filter: blur(1px); animation-duration: 13s; animation-delay: 1s; }
-
 
         /* --- WEATHER & ICE EFFECTS --- */
         #ice-border {
@@ -223,8 +216,16 @@
         .button-group { display: flex; gap: 10px; margin-bottom: 15px; }
         .button-group .btn { margin-bottom: 0; flex: 1; font-size: 16px; padding: 14px 10px; }
         .btn { display: flex; justify-content: center; align-items: center; width: 100%; padding: 16px 20px; margin-bottom: 15px; text-decoration: none; border-radius: 30px; font-weight: 600; font-size: 18px; transition: background-color 0.3s ease, transform 0.1s ease, border-color 0.3s; border: 2px solid transparent; cursor: pointer; transform-origin: center; line-height: 1.2; }
-        @keyframes jellyPop { 0% { transform: scale(1); } 30% { transform: scale(0.90); } 50% { transform: scale(1.05); } 70% { transform: scale(0.98); } 100% { transform: scale(1); } }
+        
+        @keyframes jellyPop { 
+            0% { transform: scale(1); } 
+            30% { transform: scale(0.90); } 
+            50% { transform: scale(1.05); } 
+            70% { transform: scale(0.98); } 
+            100% { transform: scale(1); } 
+        }
         .btn-animate { animation: jellyPop 0.4s ease-out forwards; }
+
         .btn-primary { background-color: var(--att-blue); color: white; }
         .btn-primary:hover { background-color: var(--att-blue-hover); }
         .btn-secondary { background-color: var(--btn-sec-bg); color: var(--btn-sec-text); border: 2px solid var(--btn-sec-border); }
@@ -290,6 +291,8 @@
             font-size: 18px;
             cursor: pointer;
             z-index: 2;
+            transition: transform 0.1s ease;
+            transform-origin: center;
         }
 
         /* --- MUSIC PLAYER WIDGET --- */
@@ -503,7 +506,6 @@
                 document.getElementById('video-skeleton').style.display = 'none';
             }
             
-            // Check if loaded, or wait
             if (video.readyState >= 3) {
                 showVideo();
             } else {
@@ -520,9 +522,17 @@
                 setInterval(fetchNowPlaying, 30000);
             }
 
-            // Buttons & Listeners
-            document.getElementById('contactBtn').addEventListener('click', function() { playJelly(this); document.getElementById('contact-overlay').classList.remove('hidden'); });
-            document.getElementById('callBtn').addEventListener('click', function() { playJelly(this); if(isStoreOpen()) { window.location.href = "tel:4794395471"; } else { document.getElementById('closed-overlay').classList.remove('hidden'); } });
+            // Universal Bounce for all buttons
+            const allButtons = document.querySelectorAll('.btn, .video-close-btn');
+            allButtons.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    playJelly(this);
+                });
+            });
+
+            // Specific Button Logic
+            document.getElementById('contactBtn').addEventListener('click', function() { document.getElementById('contact-overlay').classList.remove('hidden'); });
+            document.getElementById('callBtn').addEventListener('click', function() { if(isStoreOpen()) { window.location.href = "tel:4794395471"; } else { document.getElementById('closed-overlay').classList.remove('hidden'); } });
             
             const lastFmBtn = document.getElementById('lastfm-link');
             const lastFmOverlay = document.getElementById('lastfm-overlay');
@@ -530,16 +540,14 @@
                 e.preventDefault();
                 const targetUrl = this.href;
                 if(targetUrl === '#' || targetUrl === '') return;
-                playJelly(this);
                 lastFmOverlay.classList.remove('hidden');
                 setTimeout(function() { window.open(targetUrl, '_blank'); setTimeout(() => lastFmOverlay.classList.add('hidden'), 1000); }, 2500);
             });
 
             const googleBtn = document.getElementById('googleBtn');
-            googleBtn.addEventListener('click', function(e) { e.preventDefault(); playJelly(this); document.getElementById('redirect-overlay').classList.remove('hidden'); setTimeout(function() { window.open(googleBtn.href, '_blank'); setTimeout(() => document.getElementById('redirect-overlay').classList.add('hidden'), 1000); }, 2500); });
+            googleBtn.addEventListener('click', function(e) { e.preventDefault(); document.getElementById('redirect-overlay').classList.remove('hidden'); setTimeout(function() { window.open(googleBtn.href, '_blank'); setTimeout(() => document.getElementById('redirect-overlay').classList.add('hidden'), 1000); }, 2500); });
             
-            document.querySelectorAll('.link-delay').forEach(link => { link.addEventListener('click', function(e) { e.preventDefault(); playJelly(this); setTimeout(() => { window.open(this.href, '_blank'); }, 500); }); });
-            document.querySelector('.btn-game').addEventListener('click', function() { playJelly(this); });
+            document.querySelectorAll('.link-delay').forEach(link => { link.addEventListener('click', function(e) { e.preventDefault(); setTimeout(() => { window.open(this.href, '_blank'); }, 500); }); });
 
             // Purpose Video Logic
             const purposeBtn = document.getElementById('purposeBtn');
@@ -547,13 +555,11 @@
             const purposeVideo = document.getElementById('purpose-video');
             
             purposeBtn.addEventListener('click', function() {
-                playJelly(this);
                 purposeOverlay.classList.remove('hidden');
                 purposeVideo.currentTime = 0;
                 purposeVideo.play();
             });
 
-            // Close on click outside video
             purposeOverlay.addEventListener('click', function(e) {
                 if (e.target === purposeOverlay) {
                     closeVideoOverlay();
@@ -563,7 +569,7 @@
             const savedScore = localStorage.getItem('attSnakeHighScore');
             if(savedScore) document.getElementById('highScore').innerText = savedScore;
 
-            // FADE OUT TIMER (Fixed)
+            // FADE OUT TIMER
             setTimeout(function() { 
                 loader.classList.add("loader-hidden"); 
                 setTimeout(() => { 
