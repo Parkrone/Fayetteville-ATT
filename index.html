@@ -2,9 +2,22 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AT&T Fayetteville Mall - Exclusive Deals & Reviews</title>
     
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0057B8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="att.png">
+
+    <link rel="icon" type="image/png" href="AT&T_Globe.png">
+
+    <meta property="og:title" content="AT&T Fayetteville Mall Store Portal">
+    <meta property="og:description" content="Check our store hours, exclusive deals, current music, and contact info directly.">
+    <meta property="og:image" content="Store-Pic.jpeg">
+    <meta property="og:url" content="https://your-github-url.com"> <meta property="og:type" content="website">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
@@ -127,6 +140,7 @@
             background: var(--bg-color); 
             z-index: -1; 
             overflow: hidden;
+            transition: opacity 1s ease-out;
         }
 
         .particle {
@@ -191,7 +205,7 @@
         #preloader img { width: 340px; height: auto; }
         .loader-hidden { opacity: 0; visibility: hidden; }
 
-        /* --- HEADER & WEATHER WIDGET --- */
+        /* --- HEADER --- */
         header { 
             width: 100%; background-color: var(--container-bg); padding: 15px 0; 
             box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
