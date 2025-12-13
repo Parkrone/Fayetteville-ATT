@@ -16,7 +16,7 @@
     <meta property="og:title" content="AT&T Fayetteville Mall Store Portal">
     <meta property="og:description" content="Check our store hours, exclusive deals, current music, and contact info directly.">
     <meta property="og:image" content="Store-Pic.jpeg">
-    <meta property="og:url" content="https://your-github-url.com"> <meta property="og:type" content="website">
+    <meta property="og:type" content="website">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -125,15 +125,19 @@
         }
 
         /* --- BACKGROUND VIDEO & SKELETON --- */
+        
         #bg-video {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             object-fit: cover; 
             z-index: 0; 
             filter: brightness(0.7);
+            
+            /* Start hidden to allow fade-in */
             opacity: 0; 
             transition: opacity 1.5s ease-in-out;
         }
         
+        /* PS5 Style Particle Container */
         #video-skeleton {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -152,6 +156,7 @@
             animation: float 15s infinite linear;
         }
 
+        /* Drift + Rotate Animation */
         @keyframes float {
             0% { transform: translate(0, 0) rotate(0deg) scale(0.8); opacity: 0; }
             20% { opacity: 0.3; } 
@@ -182,6 +187,7 @@
         .p19 { width: 110px; height: 110px; top: 65%; left: 75%; filter: blur(3px); animation-duration: 18s; animation-delay: 4s; }
         .p20 { width: 55px; height: 55px; top: 10%; left: 90%; filter: blur(1px); animation-duration: 13s; animation-delay: 1s; }
 
+
         /* --- WEATHER & ICE EFFECTS --- */
         #ice-border {
             position: fixed; width: 110%; height: 110%; left: -5%; top: -5%;
@@ -205,7 +211,7 @@
         #preloader img { width: 340px; height: auto; }
         .loader-hidden { opacity: 0; visibility: hidden; }
 
-        /* --- HEADER --- */
+        /* --- HEADER & WEATHER WIDGET --- */
         header { 
             width: 100%; background-color: var(--container-bg); padding: 15px 0; 
             box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
@@ -501,6 +507,20 @@
         © 2025 Fayetteville Mall Store Location.<br>
         Built by <a href="https://parkrone.github.io/Parker-Design-Lab/" target="_blank">Parker Thompson</a> - Your Local Fayetteville Mall Sales Consultant.
     </footer>
+
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('service-worker.js')
+            .then(registration => {
+              console.log('Service Worker registered with scope:', registration.scope);
+            })
+            .catch(error => {
+              console.log('Service Worker registration failed:', error);
+            });
+        });
+      }
+    </script>
 
     <script>
         const storeSchedule = { 0: { open: 1200, close: 1800 }, 1: { open: 1100, close: 2000 }, 2: { open: 1100, close: 2000 }, 3: { open: 1100, close: 2000 }, 4: { open: 1100, close: 2000 }, 5: { open: 1100, close: 2000 }, 6: { open: 1100, close: 2000 } };
