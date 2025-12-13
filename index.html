@@ -125,19 +125,15 @@
         }
 
         /* --- BACKGROUND VIDEO & SKELETON --- */
-        
         #bg-video {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             object-fit: cover; 
             z-index: 0; 
             filter: brightness(0.7);
-            
-            /* Start hidden to allow fade-in */
             opacity: 0; 
             transition: opacity 1.5s ease-in-out;
         }
         
-        /* PS5 Style Particle Container */
         #video-skeleton {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -156,7 +152,6 @@
             animation: float 15s infinite linear;
         }
 
-        /* Drift + Rotate Animation */
         @keyframes float {
             0% { transform: translate(0, 0) rotate(0deg) scale(0.8); opacity: 0; }
             20% { opacity: 0.3; } 
@@ -211,7 +206,7 @@
         #preloader img { width: 340px; height: auto; }
         .loader-hidden { opacity: 0; visibility: hidden; }
 
-        /* --- HEADER & WEATHER WIDGET --- */
+        /* --- HEADER & LAYOUT --- */
         header { 
             width: 100%; background-color: var(--container-bg); padding: 15px 0; 
             box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
@@ -224,8 +219,33 @@
         header img { height: 40px; width: auto; }
         header h1 { font-size: 24px; font-weight: 700; color: var(--heading-color); letter-spacing: -0.5px; }
         
-        #weather-widget { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 5px; font-size: 14px; font-weight: 600; color: var(--text-color); min-width: 60px; justify-content: flex-end;}
+        /* WEATHER WIDGET DEFAULT (Desktop) */
+        #weather-widget { 
+            position: absolute; right: 20px; top: 50%; transform: translateY(-50%); 
+            display: flex; align-items: center; gap: 5px; 
+            font-size: 14px; font-weight: 600; color: var(--text-color); 
+            min-width: 60px; justify-content: flex-end;
+        }
         #weather-icon { font-size: 20px; }
+
+        /* --- MOBILE LAYOUT ADJUSTMENTS --- */
+        @media (max-width: 600px) {
+            header {
+                flex-direction: column; 
+                gap: 5px;
+                padding-bottom: 10px;
+            }
+            #weather-widget {
+                position: static; 
+                transform: none; 
+                margin-top: 5px;
+                justify-content: center; 
+            }
+            header h1 {
+                font-size: 20px; 
+                text-align: center;
+            }
+        }
 
         /* --- CONTAINER --- */
         .container { width: 90%; max-width: 500px; background: var(--container-bg); padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease, background-color 0.3s ease; margin-bottom: 20px; position: relative; z-index: 10; }
@@ -283,44 +303,12 @@
         .overlay-actions { display: flex; gap: 10px; width: 100%; margin-top: 10px; }
         
         /* Video Overlay */
-        #video-overlay {
-            width: 90%; max-width: 800px;
-            padding: 0; 
-            background: #000; 
-            overflow: hidden;
-            display: flex; flex-direction: column;
-        }
-        
-        #video-overlay video {
-            width: 100%;
-            height: auto;
-            max-height: 70vh;
-            display: block;
-        }
-        
-        .video-close-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.5);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            font-size: 18px;
-            cursor: pointer;
-            z-index: 2;
-            transition: transform 0.1s ease;
-            transform-origin: center;
-        }
+        #video-overlay { width: 90%; max-width: 800px; padding: 0; background: #000; overflow: hidden; display: flex; flex-direction: column; }
+        #video-overlay video { width: 100%; height: auto; max-height: 70vh; display: block; }
+        .video-close-btn { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 18px; cursor: pointer; z-index: 2; transition: transform 0.1s ease; transform-origin: center; }
 
         /* --- MUSIC PLAYER WIDGET --- */
-        #music-section {
-            width: 100%; margin-top: 20px; background-color: var(--player-bg);
-            border: 1px solid var(--player-border); border-radius: 12px; padding: 15px;
-            display: none; text-align: left; transition: all 0.3s ease;
-        }
+        #music-section { width: 100%; margin-top: 20px; background-color: var(--player-bg); border: 1px solid var(--player-border); border-radius: 12px; padding: 15px; display: none; text-align: left; transition: all 0.3s ease; }
         .music-header { display: flex; align-items: center; gap: 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--att-blue); font-weight: 700; margin-bottom: 10px; }
         .equalizer-bar { width: 3px; height: 10px; background: var(--att-blue); animation: equalize 1s infinite; }
         .eq-2 { animation-delay: 0.2s; } .eq-3 { animation-delay: 0.4s; }
@@ -332,14 +320,7 @@
         .artist-name { display: block; font-size: 13px; color: var(--artist-name); }
         .music-actions { display: flex; gap: 8px; }
         
-        .btn-music-action { 
-            flex: 1; padding: 14px 20px; border-radius: 30px; 
-            border: 2px solid transparent;
-            background: var(--att-blue);
-            color: white; 
-            font-size: 16px; font-weight: 600; text-align: center; text-decoration: none; cursor: pointer; transition: background 0.2s; 
-            display: flex; justify-content: center; align-items: center; gap: 8px;
-        }
+        .btn-music-action { flex: 1; padding: 14px 20px; border-radius: 30px; border: 2px solid transparent; background: var(--att-blue); color: white; font-size: 16px; font-weight: 600; text-align: center; text-decoration: none; cursor: pointer; transition: background 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; }
         .btn-music-action:hover { background: var(--att-blue-hover); }
         .lastfm-btn-icon { height: 20px; width: auto; filter: brightness(0) invert(1); }
 
@@ -354,6 +335,8 @@
         footer { margin-top: auto; padding: 30px 20px; font-size: 13px; color: var(--footer-text); text-align: center; line-height: 1.6; z-index: 20; position: relative; }
         footer a { color: var(--att-blue); text-decoration: none; font-weight: 700; transition: color 0.2s;}
         footer a:hover { color: var(--att-blue-hover); text-decoration: underline; }
+        
+        #installAppBtn { display: none; }
     </style>
 </head>
 <body>
@@ -375,19 +358,24 @@
     <div id="ice-border"></div>
     <div id="weather-container"></div>
     <div id="fog-container"><div class="fog-cloud"></div><div class="fog-cloud two"></div></div>
-
     <div id="preloader"><img src="att.gif" alt="Loading..."></div>
 
-    <div id="redirect-overlay" class="overlay-base hidden">
-        <div class="spinner"></div>
-        <h2>Heading to Google...</h2>
-        <p>Please note: You may need to sign in to your Google account to leave a review.</p>
+    <div id="google-confirm-overlay" class="overlay-base action-overlay hidden">
+        <h2 style="color: var(--att-blue);">External Review</h2>
+        <p>You are about to be redirected to Google Maps to leave a review. You may need to sign in to your Google account.</p>
+        <div class="overlay-actions">
+            <button onclick="closeOverlay('google-confirm-overlay')" class="btn btn-secondary">Cancel</button>
+            <button onclick="confirmRedirect('google')" class="btn btn-primary" style="width:auto; flex-grow:1;">OKAY, PROCEED</button>
+        </div>
     </div>
-    
-    <div id="lastfm-overlay" class="overlay-base hidden">
-        <img src="lastfm-loader.gif" id="lastfm-loader-img" alt="Last.fm Loading">
-        <h2>Opening Last.fm...</h2>
-        <p>Redirecting you to the song page.</p>
+
+    <div id="lastfm-confirm-overlay" class="overlay-base action-overlay hidden">
+        <h2 style="color: var(--att-blue);">View Song Link</h2>
+        <p>This will open the song's page on Last.fm, where you can find links to Spotify and other platforms.</p>
+        <div class="overlay-actions">
+            <button onclick="closeOverlay('lastfm-confirm-overlay')" class="btn btn-secondary">Cancel</button>
+            <button onclick="confirmRedirect('lastfm')" class="btn btn-primary" style="width:auto; flex-grow:1;">OKAY, PROCEED</button>
+        </div>
     </div>
 
     <div id="closed-overlay" class="overlay-base action-overlay hidden">
@@ -398,25 +386,24 @@
             <a href="tel:4794395471" class="btn btn-call" style="width:auto; flex-grow:1;">Call Anyway</a>
         </div>
     </div>
+    
     <div id="contact-overlay" class="overlay-base action-overlay hidden">
         <h2>Save Store Contact</h2>
-        <p>You are about to download our contact card. Please open the file after downloading.</p>
         <div class="contact-preview-box">
             <strong>AT&T Fayetteville Mall</strong>
             <span>📍 4201 N Shiloh Dr</span>
             <span>📞 (479) 439-5471</span>
-            <span>🌐 Store Website</span>
         </div>
         <div class="overlay-actions">
             <button onclick="closeOverlay('contact-overlay')" class="btn btn-secondary">Cancel</button>
-            <a href="AT&TFayetteville Mall.vcf" download="ATT_Fayetteville_Mall.vcf" class="btn btn-primary" style="width:auto; flex-grow:1;">Download</a>
+            <a href="AT&TFayetteville Mall.vcf" download class="btn btn-primary">Download</a>
         </div>
     </div>
 
     <div id="purpose-video-overlay" class="overlay-base hidden" style="background: rgba(0,0,0,0.85);">
-        <div id="video-overlay" style="position: relative; border-radius: 10px; overflow: hidden; max-width: 90%; width: 800px;">
-            <button onclick="closeVideoOverlay()" class="video-close-btn" style="position: absolute; top: 10px; right: 10px; z-index: 10; background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; font-size: 20px;">&times;</button>
-            <video id="purpose-video" controls style="width: 100%; display: block;">
+        <div id="video-overlay">
+            <button onclick="closeVideoOverlay()" class="video-close-btn">&times;</button>
+            <video id="purpose-video" controls>
                 <source src="The-Power-of-Connecting-People.webm" type="video/webm">
                 Your browser does not support the video tag.
             </video>
@@ -424,12 +411,7 @@
     </div>
 
     <header>
-        <a href="index.html" class="logo-link" aria-label="Reload Page">
-            <picture>
-                <source srcset="attlogo-Dark-Mode.png" media="(prefers-color-scheme: dark)">
-                <img src="attlogo.png" alt="AT&T Logo">
-            </picture>
-        </a>
+        <a href="index.html" class="logo-link"><picture><source srcset="attlogo-Dark-Mode.png" media="(prefers-color-scheme: dark)"><img src="attlogo.png" alt="AT&T"></picture></a>
         <h1>Fayetteville Mall</h1>
         <div id="weather-widget">
             <span id="weather-icon" class="skeleton skeleton-text" style="width: 25px; display:inline-block;"></span>
@@ -438,61 +420,39 @@
     </header>
 
     <div class="container" id="mainContainer">
-        <p class="welcome-text">
-            Welcome to your local Fayetteville Mall store portal.
-        </p>
+        <p class="welcome-text">Welcome to your local Fayetteville Mall store portal.</p>
 
         <div class="button-group">
-            <button id="callBtn" class="btn btn-call">
-                <div style="text-align:center;">Call Store <span id="hours-badge" class="status-badge skeleton skeleton-text" style="width: 100px; margin-top: 5px;"></span></div>
-            </button>
+            <button id="callBtn" class="btn btn-call"><div style="text-align:center;">Call Store <span id="hours-badge" class="status-badge skeleton skeleton-text" style="width: 100px; margin-top: 5px;"></span></div></button>
             <button id="contactBtn" class="btn btn-contact">Save Contact 📇</button>
         </div>
+        
+        <button id="installAppBtn" class="btn btn-secondary" style="margin-bottom: 15px;">Install App 📲</button>
 
         <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0;">
 
         <div id="music-section">
-            <div class="music-header">
-                <div class="equalizer-bar"></div><div class="equalizer-bar eq-2"></div><div class="equalizer-bar eq-3"></div>
-                <span>Now Playing in Store</span>
-            </div>
-            
+            <div class="music-header"><div class="equalizer-bar"></div><div class="equalizer-bar eq-2"></div><div class="equalizer-bar eq-3"></div><span>Now Playing in Store</span></div>
             <div class="track-info">
-                <div class="album-art skeleton" id="track-art-wrapper">
-                   <img src="" alt="Album" class="album-art" id="track-art" style="display:none;" onload="this.style.display='block'; document.getElementById('track-art-wrapper').classList.remove('skeleton');">
-                </div>
-                <div class="song-details">
-                    <span class="song-title skeleton skeleton-text" id="track-title" style="width: 80%;"></span>
-                    <span class="artist-name skeleton skeleton-text" id="track-artist" style="width: 60%;"></span>
-                </div>
+                <div class="album-art skeleton" id="track-art-wrapper"><img src="" alt="Album" class="album-art" id="track-art" style="display:none;" onload="this.style.display='block'; document.getElementById('track-art-wrapper').classList.remove('skeleton');"></div>
+                <div class="song-details"><span class="song-title skeleton skeleton-text" id="track-title" style="width: 80%;"></span><span class="artist-name skeleton skeleton-text" id="track-artist" style="width: 60%;"></span></div>
             </div>
-
-            <div class="music-actions">
-                <a href="#" class="btn-music-action" id="lastfm-link">
-                    <img src="lastfm-icon.png" class="lastfm-btn-icon" alt="">
-                    View song on Last.fm
-                </a>
-            </div>
+            <div class="music-actions"><a href="#" class="btn-music-action" id="lastfm-link"> View song on Last.fm</a></div>
         </div>
         
         <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0;">
 
         <a href="https://www.att.com/stores/arkansas/fayetteville/146068" class="btn btn-primary link-delay" target="_blank">Explore Fayetteville Mall Deals</a>
-        <a href="https://search.google.com/local/writereview?placeid=ChIJ84Inr4tryYcRQUkKOVeSnF8" id="googleBtn" class="btn btn-secondary" target="_blank">Review us on Google</a>
+        <button id="googleReviewBtn" class="btn btn-secondary">Review us on Google</button>
 
-        <button id="purposeBtn" class="btn btn-secondary" style="margin-top: 15px;">
-            Our Purpose: Connecting People 🌎
-        </button>
+        <button id="purposeBtn" class="btn btn-secondary" style="margin-top: 15px;">Our Purpose: Connecting People 🌎</button>
 
         <p style="margin: 15px 0; color: var(--subtext-color); font-size: 14px;">— OR —</p>
 
         <button onclick="toggleGame()" class="btn btn-game">Play AT&T Snake While You Wait 🐍</button>
 
         <div id="game-area">
-            <div class="score-board">
-                <span>Score: <span id="score">0</span></span>
-                <span>High Score: <span id="highScore">0</span></span>
-            </div>
+            <div class="score-board"><span>Score: <span id="score">0</span></span><span>High Score: <span id="highScore">0</span></span></div>
             <div class="game-instructions">Swipe to steer. Collect the energy bolts!</div>
             <canvas id="snakeCanvas" width="300" height="300"></canvas>
             <div id="game-overlay" class="overlay-base hidden" style="position: absolute; border-radius: 10px;">
@@ -503,85 +463,103 @@
         </div>
     </div>
 
-    <footer>
-        © 2025 Fayetteville Mall Store Location.<br>
-        Built by <a href="https://parkrone.github.io/Parker-Design-Lab/" target="_blank">Parker Thompson</a> - Your Local Fayetteville Mall Sales Consultant.
-    </footer>
+    <footer>&copy; 2025 Fayetteville Mall Store Location.<br>Built by <a href="https://parkrone.github.io/Parker-Design-Lab/" target="_blank">Parker Thompson</a></footer>
 
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('service-worker.js')
-            .then(registration => {
-              console.log('Service Worker registered with scope:', registration.scope);
-            })
-            .catch(error => {
-              console.log('Service Worker registration failed:', error);
-            });
+          navigator.serviceWorker.register('./service-worker.js')
+            .then(reg => console.log('SW Registered'))
+            .catch(err => console.log('SW Registration failed:', err));
         });
       }
     </script>
 
     <script>
         const storeSchedule = { 0: { open: 1200, close: 1800 }, 1: { open: 1100, close: 2000 }, 2: { open: 1100, close: 2000 }, 3: { open: 1100, close: 2000 }, 4: { open: 1100, close: 2000 }, 5: { open: 1100, close: 2000 }, 6: { open: 1100, close: 2000 } };
-
         const LASTFM_USER = 'ATTFayetteville'; 
         const LASTFM_API_KEY = 'f7020f441263b35598d85540e23c950c';
+        
+        const GOOGLE_REVIEW_URL = "https://search.google.com/local/writereview?placeid=ChIJ84Inr4tryYcRQUkKOVeSnF8";
 
-        // --- PRELOADER TIMER (Runs Immediately) ---
+        // PWA Install Logic
+        let deferredPrompt;
+        const installBtn = document.getElementById('installAppBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault(); deferredPrompt = e; installBtn.style.display = 'flex';
+        });
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') console.log('User accepted install');
+                deferredPrompt = null; installBtn.style.display = 'none';
+            }
+        });
+
+        // --- NEW CONFIRMATION LOGIC ---
+        let pendingRedirectUrl = '';
+
+        document.getElementById('googleReviewBtn').addEventListener('click', function(e) {
+            playJelly(this);
+            pendingRedirectUrl = GOOGLE_REVIEW_URL;
+            document.getElementById('google-confirm-overlay').classList.remove('hidden');
+        });
+
+        document.getElementById('lastfm-link').addEventListener('click', function(e) {
+            playJelly(this);
+            e.preventDefault();
+            const targetUrl = this.href;
+            if (targetUrl && targetUrl !== '#') {
+                pendingRedirectUrl = targetUrl;
+                document.getElementById('lastfm-confirm-overlay').classList.remove('hidden');
+            }
+        });
+        
+        window.confirmRedirect = function(type) {
+            if (pendingRedirectUrl) {
+                // Open link in new tab instantly
+                window.open(pendingRedirectUrl, '_blank');
+                pendingRedirectUrl = '';
+            }
+            // Close the correct overlay
+            if (type === 'google') {
+                closeOverlay('google-confirm-overlay');
+            } else if (type === 'lastfm') {
+                closeOverlay('lastfm-confirm-overlay');
+            }
+        };
+        // --- END NEW CONFIRMATION LOGIC ---
+
         document.addEventListener("DOMContentLoaded", function () {
             const loader = document.getElementById("preloader");
             const container = document.getElementById("mainContainer");
             const video = document.getElementById("bg-video");
 
             // Video Fade In Logic
-            function showVideo() {
-                video.style.opacity = '1';
-                document.getElementById('video-skeleton').style.display = 'none';
-            }
-            
-            if (video.readyState >= 3) {
-                showVideo();
-            } else {
-                video.addEventListener('loadeddata', showVideo);
-                video.addEventListener('canplay', showVideo); 
-            }
+            function showVideo() { video.style.opacity = '1'; document.getElementById('video-skeleton').style.display = 'none'; }
+            if (video.readyState >= 3) { showVideo(); } else { video.addEventListener('loadeddata', showVideo); video.addEventListener('canplay', showVideo); }
 
-            // Init Logic
             checkStoreStatus();
             fetchWeather();
-            
-            if(isStoreOpen()) {
-                fetchNowPlaying();
-                setInterval(fetchNowPlaying, 30000);
-            }
+            if(isStoreOpen()) { fetchNowPlaying(); setInterval(fetchNowPlaying, 30000); }
 
             // Universal Bounce for all buttons
-            const allButtons = document.querySelectorAll('.btn, .video-close-btn');
-            allButtons.forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    playJelly(this);
-                });
+            document.querySelectorAll('.btn, .video-close-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) { playJelly(this); });
             });
 
-            // Specific Button Logic
-            document.getElementById('contactBtn').addEventListener('click', function() { document.getElementById('contact-overlay').classList.remove('hidden'); });
-            document.getElementById('callBtn').addEventListener('click', function() { if(isStoreOpen()) { window.location.href = "tel:4794395471"; } else { document.getElementById('closed-overlay').classList.remove('hidden'); } });
+            // Contact and Call Button Logic
+            document.getElementById('contactBtn').addEventListener('click', () => document.getElementById('contact-overlay').classList.remove('hidden'));
+            document.getElementById('callBtn').addEventListener('click', () => { if(isStoreOpen()) { window.location.href = "tel:4794395471"; } else { document.getElementById('closed-overlay').classList.remove('hidden'); } });
             
-            const lastFmBtn = document.getElementById('lastfm-link');
-            const lastFmOverlay = document.getElementById('lastfm-overlay');
-            lastFmBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                const targetUrl = this.href;
-                if(targetUrl === '#' || targetUrl === '') return;
-                lastFmOverlay.classList.remove('hidden');
-                setTimeout(function() { window.open(targetUrl, '_blank'); setTimeout(() => lastFmOverlay.classList.add('hidden'), 1000); }, 2500);
+            // Deals & Portfolio (Still use target="_blank" for non-critical links)
+            document.querySelectorAll('.link-delay').forEach(link => { 
+                link.addEventListener('click', function(e) {
+                    // No overlay needed for these
+                }); 
             });
-
-            const googleBtn = document.getElementById('googleBtn');
-            googleBtn.addEventListener('click', function(e) { e.preventDefault(); document.getElementById('redirect-overlay').classList.remove('hidden'); setTimeout(function() { window.open(googleBtn.href, '_blank'); setTimeout(() => document.getElementById('redirect-overlay').classList.add('hidden'), 1000); }, 2500); });
-            
-            document.querySelectorAll('.link-delay').forEach(link => { link.addEventListener('click', function(e) { e.preventDefault(); setTimeout(() => { window.open(this.href, '_blank'); }, 500); }); });
 
             // Purpose Video Logic
             const purposeBtn = document.getElementById('purposeBtn');
@@ -589,15 +567,14 @@
             const purposeVideo = document.getElementById('purpose-video');
             
             purposeBtn.addEventListener('click', function() {
+                playJelly(this);
                 purposeOverlay.classList.remove('hidden');
                 purposeVideo.currentTime = 0;
                 purposeVideo.play();
             });
 
             purposeOverlay.addEventListener('click', function(e) {
-                if (e.target === purposeOverlay) {
-                    closeVideoOverlay();
-                }
+                if (e.target === purposeOverlay) { closeVideoOverlay(); }
             });
 
             const savedScore = localStorage.getItem('attSnakeHighScore');
