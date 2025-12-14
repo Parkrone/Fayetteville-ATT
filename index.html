@@ -436,6 +436,13 @@
             <div class="score-board"><span>Score: <span id="score">0</span></span><span>High Score: <span id="highScore">0</span></span></div>
             <div class="game-instructions">Swipe to steer. Collect the energy bolts!</div>
             <canvas id="snakeCanvas" width="300" height="300"></canvas>
+            
+            <div id="start-overlay" class="overlay-base" style="position: absolute; border-radius: 10px; background: rgba(255,255,255,0.9); z-index: 50;">
+                <h2 style="color: var(--att-blue);">Ready?</h2>
+                <p style="color: #333; margin-bottom: 20px;">Swipe or use arrow keys to eat the bolts.</p>
+                <button onclick="startSession()" class="btn btn-game" style="width: auto; padding: 10px 30px;">Start Game</button>
+            </div>
+
             <div id="game-overlay" class="overlay-base hidden" style="position: absolute; border-radius: 10px;">
                 <h2>GAME OVER</h2>
                 <p>Final Score: <span id="final-score">0</span></p>
@@ -616,7 +623,35 @@
         }
 
         const canvas = document.getElementById("snakeCanvas"); const ctx = canvas.getContext("2d"); const snakeImg = new Image(); snakeImg.src = 'phone.png'; const foodImg = new Image(); foodImg.src = 'bolt.png'; const GRID_SIZE = 20; const SPEED = 2; const TILE_COUNT = canvas.width / GRID_SIZE; let animationId; let gameRunning = false; let score = 0; let path = []; let snakeLength = 3; let headX = 0, headY = 0, velX = 0, velY = 0, nextVelX = 0, nextVelY = 0; let food = { x: 0, y: 0 }; let lastTime = 0; const targetFPS = 60; const frameInterval = 1000 / targetFPS;
-        function toggleGame() { const g = document.getElementById('game-area'); if(g.style.display==='block'){g.style.display='none'; stopGame();}else{g.style.display='block'; setTimeout(initGame,100);} }
+        
+        // --- UPDATED GAME CONTROL LOGIC ---
+        function toggleGame() { 
+            const g = document.getElementById('game-area'); 
+            const startOverlay = document.getElementById('start-overlay');
+            const gameOverOverlay = document.getElementById('game-overlay');
+
+            if(g.style.display==='block'){
+                // Close Game
+                g.style.display='none'; 
+                stopGame();
+            } else {
+                // Open Game, Scroll to it, Show Start Button (Do not init game yet)
+                g.style.display='block'; 
+                
+                // Auto Scroll
+                g.scrollIntoView({ behavior: "smooth", block: "center" });
+
+                // Reset Overlays
+                startOverlay.classList.remove('hidden');
+                gameOverOverlay.classList.add('hidden');
+            } 
+        }
+
+        function startSession() {
+            document.getElementById('start-overlay').classList.add('hidden');
+            initGame();
+        }
+
         function initGame() { stopGame(); document.getElementById('game-overlay').classList.add('hidden'); score = 0; snakeLength = 3; document.getElementById('score').innerText = score; headX = Math.floor(TILE_COUNT/2)*GRID_SIZE; headY = Math.floor(TILE_COUNT/2)*GRID_SIZE; path=[]; for(let i=0; i<snakeLength*(GRID_SIZE/SPEED); i++){path.push({x:headX, y:headY+i});} velX=0; velY=-SPEED; nextVelX=0; nextVelY=-SPEED; spawnFood(); startCountdown(); }
         function restartGame() { initGame(); }
         function startCountdown() { let count=3; draw(); drawCountdownText(count); let t=setInterval(()=>{count--; if(count>0){draw(); drawCountdownText(count);}else{clearInterval(t); draw(); drawCountdownText("GO!"); setTimeout(()=>{gameRunning=true; lastTime=0; requestAnimationFrame(gameLoop);},500);}},1000); }
