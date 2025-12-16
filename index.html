@@ -665,8 +665,36 @@
         function getCentralTime() { const d = new Date(); return new Date(d.toLocaleString("en-US", {timeZone: "America/Chicago"})); }
         function isStoreOpen() { const now = getCentralTime(); const day = now.getDay(); const currentMilitaryTime = (now.getHours() * 100) + now.getMinutes(); const todayHours = storeSchedule[day]; return (currentMilitaryTime >= todayHours.open && currentMilitaryTime < todayHours.close); }
         function checkStoreStatus() { const now = getCentralTime(); const day = now.getDay(); const todayHours = storeSchedule[day]; const badge = document.getElementById('hours-badge'); const formatTime = (num) => { let hour = Math.floor(num / 100); let ampm = hour >= 12 ? 'PM' : 'AM'; let displayHour = hour % 12; displayHour = displayHour ? displayHour : 12; return displayHour + ampm; }; const openStr = formatTime(todayHours.open); const closeStr = formatTime(todayHours.close); badge.classList.remove('skeleton', 'skeleton-text'); badge.style.width = 'auto'; if (isStoreOpen()) { badge.innerHTML = `<span id="status-dot" class="pulsing-dot dot-open"></span> Open (${openStr} - ${closeStr})`; } else { badge.innerHTML = `<span id="status-dot" class="pulsing-dot dot-closed"></span> Closed Now`; document.getElementById('closed-msg').innerText = `We are currently closed. Our hours today are ${openStr} to ${closeStr}. (Hours may vary on holidays)`; } }
-        async function fetchWeather() { try { const lat = 36.0822; const lon = -94.1719; const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&temperature_unit=fahrenheit`; const response = await fetch(url); const data = await response.json(); if (data.current) { updateWeatherUI(Math.round(data.current.temperature_2m), data.current.weather_code); } } catch (error) { console.log("Weather error:", error); document.getElementById('weather-widget').style.display = 'none'; } }
-        function updateWeatherUI(temp, code) { const tempEl = document.getElementById('weather-temp'); const iconEl = document.getElementById('weather-icon'); tempEl.classList.remove('skeleton', 'skeleton-text'); tempEl.style.width = 'auto'; iconEl.classList.remove('skeleton', 'skeleton-text'); iconEl.style.width = 'auto'; tempEl.innerText = `${temp}°F`; if (temp <= 32) document.getElementById('ice-border').style.display = 'block'; if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) { iconEl.innerText = "🌧️"; startPrecipitation('rain'); } else if ([71, 73, 75, 77, 85, 86].includes(code)) { iconEl.innerText = "❄️"; startPrecipitation('snow'); } else if ([45, 48].includes(code)) { iconEl.innerText = "🌫️"; document.getElementById('fog-container').style.display = 'block'; } else if (code <= 3) { iconEl.innerText = code === 0 ? "☀️" : "☁️"; } else if ([95, 96, 99].includes(code)) { iconEl.innerText = "⛈️"; startPrecipitation('rain'); } }
+        async function fetchWeather() { try { const lat = 36.0822; const lon = -94.1719; const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,is_day&temperature_unit=fahrenheit`; const response = await fetch(url); const data = await response.json(); if (data.current) { updateWeatherUI(Math.round(data.current.temperature_2m), data.current.weather_code, data.current.is_day); } } catch (error) { console.log("Weather error:", error); document.getElementById('weather-widget').style.display = 'none'; } }
+        function updateWeatherUI(temp, code, isDay) { 
+            const tempEl = document.getElementById('weather-temp'); 
+            const iconEl = document.getElementById('weather-icon'); 
+            tempEl.classList.remove('skeleton', 'skeleton-text'); tempEl.style.width = 'auto'; 
+            iconEl.classList.remove('skeleton', 'skeleton-text'); iconEl.style.width = 'auto'; 
+            tempEl.innerText = `${temp}°F`; 
+
+            // Handle Ice Border
+            if (temp <= 32) document.getElementById('ice-border').style.display = 'block'; 
+
+            // WEATHER ICONS LOGIC
+            // Day = 1, Night = 0
+            if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) { 
+                iconEl.innerText = "🌧️"; startPrecipitation('rain'); 
+            } else if ([71, 73, 75, 77, 85, 86].includes(code)) { 
+                iconEl.innerText = "❄️"; startPrecipitation('snow'); 
+            } else if ([45, 48].includes(code)) { 
+                iconEl.innerText = "🌫️"; document.getElementById('fog-container').style.display = 'block'; 
+            } else if ([95, 96, 99].includes(code)) { 
+                iconEl.innerText = "⛈️"; startPrecipitation('rain'); 
+            } else if (code <= 3) { 
+                // Clear / Cloudy logic with Day/Night switch
+                if (code === 0) {
+                    iconEl.innerText = isDay === 1 ? "☀️" : "🌙"; 
+                } else {
+                    iconEl.innerText = isDay === 1 ? "☁️" : "☁️"; // Cloud is generic
+                }
+            } 
+        }
         function startPrecipitation(type) { const container = document.getElementById('weather-container'); for (let i = 0; i < 50; i++) { const p = document.createElement('div'); p.classList.add(type); p.style.left = Math.random() * 100 + 'vw'; p.style.animationDuration = (Math.random() * 1 + 0.5) + 's'; p.style.animationDelay = Math.random() * 2 + 's'; container.appendChild(p); } }
         
         async function fetchNowPlaying() {
