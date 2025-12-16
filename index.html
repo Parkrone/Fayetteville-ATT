@@ -268,6 +268,39 @@
         /* --- OVERLAYS --- */
         .overlay-base { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--overlay-bg); display: flex; flex-direction: column; justify-content: center; align-items: center; border-radius: 10px; z-index: 10000; padding: 25px; text-align: center; }
         .hidden { display: none !important; }
+
+        /* --- NEW REDDIT-STYLE INSTALL BANNER --- */
+        #install-banner {
+            position: fixed; top: 15px; left: 50%; transform: translateX(-50%) translateY(-150%);
+            width: 90%; max-width: 400px;
+            background-color: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            border-radius: 12px;
+            padding: 12px 15px;
+            display: flex; align-items: center; justify-content: space-between;
+            z-index: 12000;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #install-banner.visible { transform: translateX(-50%) translateY(0); }
+        .ib-content { display: flex; align-items: center; gap: 12px; }
+        .ib-icon { width: 40px; height: 40px; border-radius: 8px; }
+        .ib-text { display: flex; flex-direction: column; text-align: left;}
+        .ib-title { font-weight: 700; font-size: 15px; color: #000; }
+        .ib-url { font-size: 11px; color: #888; margin-top: 2px; }
+        .ib-actions { display: flex; align-items: center; gap: 12px; }
+        .ib-install-btn { 
+            color: var(--att-blue); font-weight: 700; font-size: 14px; 
+            background: none; border: none; cursor: pointer; padding: 5px;
+        }
+        .ib-close { 
+            color: #ccc; font-size: 20px; cursor: pointer; line-height: 1; padding: 5px;
+        }
+        @media (prefers-color-scheme: dark) {
+            #install-banner { background-color: #2a2a2a; }
+            .ib-title { color: white; }
+            .ib-url { color: #aaa; }
+            .ib-install-btn { color: #4da3ff; }
+        }
         
         /* Confirmation Overlays specific styling */
         .confirm-title { color: var(--att-blue); font-size: 24px; margin-bottom: 15px; font-weight: 700; }
@@ -340,12 +373,17 @@
     <div id="fog-container"><div class="fog-cloud"></div><div class="fog-cloud two"></div></div>
     <div id="preloader"><img src="att.gif" alt="Loading..."></div>
 
-    <div id="pwa-install-overlay" class="overlay-base action-overlay hidden">
-        <h2>Install App</h2>
-        <p>Install the Fayetteville Mall Portal for quick access to deals, hours, and the game!</p>
-        <div class="overlay-actions">
-            <button onclick="closeOverlay('pwa-install-overlay')" class="btn btn-secondary">Not Now</button>
-            <button id="pwa-install-btn" class="btn btn-primary">Install Now 📲</button>
+    <div id="install-banner">
+        <div class="ib-content">
+            <img src="att.png" class="ib-icon" alt="App Icon">
+            <div class="ib-text">
+                <span class="ib-title">Install Fayetteville Portal</span>
+                <span class="ib-url">att-fayetteville.com</span>
+            </div>
+        </div>
+        <div class="ib-actions">
+            <button id="banner-install-btn" class="ib-install-btn">Install</button>
+            <span id="banner-close" class="ib-close">&times;</span>
         </div>
     </div>
 
@@ -480,11 +518,12 @@
         const LASTFM_USER = 'ATTFayetteville'; 
         const LASTFM_API_KEY = 'f7020f441263b35598d85540e23c950c';
 
-        // --- PWA INSTALLATION LOGIC ---
+        // --- PWA INSTALLATION LOGIC (UPDATED UI) ---
         let deferredPrompt;
         const installBtn = document.getElementById('headerInstallBtn');
-        const pwaOverlay = document.getElementById('pwa-install-overlay');
-        const pwaOverlayBtn = document.getElementById('pwa-install-btn');
+        const installBanner = document.getElementById('install-banner');
+        const bannerInstallBtn = document.getElementById('banner-install-btn');
+        const bannerCloseBtn = document.getElementById('banner-close');
 
         // 1. Visit Counter
         let visits = localStorage.getItem('siteVisits') || 0;
@@ -499,14 +538,30 @@
             // Show Header Button (Always available if installable)
             installBtn.style.display = 'flex';
 
-            // Show Auto-Popup if visits >= 2 (Second visit onward)
+            // Show Auto-Popup Banner if visits >= 2 (Second visit onward)
+            // AND ensure we haven't dismissed it this session (optional, kept simple here)
             if (visits >= 2) {
-                pwaOverlay.classList.remove('hidden');
+                setTimeout(() => {
+                   installBanner.classList.add('visible');
+                }, 1500); // Slight delay for smoother UI entrance
             }
         });
 
-        // 3. Handle Click (Header Button)
-        installBtn.addEventListener('click', async () => {
+        // 3. Handle Header Button Click
+        installBtn.addEventListener('click', triggerInstall);
+
+        // 4. Handle Banner Install Click
+        bannerInstallBtn.addEventListener('click', () => {
+            triggerInstall();
+            installBanner.classList.remove('visible'); // Hide banner
+        });
+
+        // 5. Handle Banner Close 'X'
+        bannerCloseBtn.addEventListener('click', () => {
+            installBanner.classList.remove('visible');
+        });
+
+        async function triggerInstall() {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
@@ -516,21 +571,7 @@
                 deferredPrompt = null; 
                 installBtn.style.display = 'none';
             }
-        });
-
-        // 4. Handle Click (Overlay Button)
-        pwaOverlayBtn.addEventListener('click', async () => {
-            pwaOverlay.classList.add('hidden'); // Close overlay
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') {
-                    console.log('User accepted install');
-                }
-                deferredPrompt = null; 
-                installBtn.style.display = 'none';
-            }
-        });
+        }
 
         document.addEventListener("DOMContentLoaded", function () {
             const loader = document.getElementById("preloader");
