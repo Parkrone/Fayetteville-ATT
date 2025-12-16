@@ -255,7 +255,8 @@
         .btn-contact:hover, .btn-call:hover { background-color: var(--btn-gray-hover); }
         @media (prefers-color-scheme: dark) { .btn-contact { background-color: #444; border: 1px solid #666;} .btn-contact:hover { background-color: #555; } }
         
-        .icon-inline { height: 1.3em; width: auto; vertical-align: middle; margin-left: 6px; margin-top: -2px; }
+        /* Updated Icon Style */
+        .icon-inline { height: 1.3em; width: auto; vertical-align: middle; margin-left: 8px; margin-top: -3px; }
 
         .status-badge { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; font-weight: 700; margin-top: 5px; opacity: 1; letter-spacing: 0.3px; min-height: 20px;}
         .pulsing-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; position: relative; }
@@ -338,6 +339,15 @@
     <div id="weather-container"></div>
     <div id="fog-container"><div class="fog-cloud"></div><div class="fog-cloud two"></div></div>
     <div id="preloader"><img src="att.gif" alt="Loading..."></div>
+
+    <div id="pwa-install-overlay" class="overlay-base action-overlay hidden">
+        <h2>Install App</h2>
+        <p>Install the Fayetteville Mall Portal for quick access to deals, hours, and the game!</p>
+        <div class="overlay-actions">
+            <button onclick="closeOverlay('pwa-install-overlay')" class="btn btn-secondary">Not Now</button>
+            <button id="pwa-install-btn" class="btn btn-primary">Install Now 📲</button>
+        </div>
+    </div>
 
     <div id="google-confirm-overlay" class="overlay-base action-overlay hidden">
         <h2 class="confirm-title">Heading to Google</h2>
@@ -424,13 +434,13 @@
         
         <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0;">
 
-        <a href="https://www.att.com/stores/arkansas/fayetteville/146068" class="btn btn-primary link-delay" target="_blank">Explore Fayetteville Mall Deals</a>
-        <a href="https://search.google.com/local/writereview?placeid=ChIJ84Inr4tryYcRQUkKOVeSnF8" id="googleBtn" class="btn btn-secondary">Review us on Google</a>
+        <a href="https://www.att.com/stores/arkansas/fayetteville/146068" class="btn btn-primary link-delay" target="_blank">Explore Fayetteville Mall Deals <img src="discount.png" class="icon-inline" alt=""></a>
+        <a href="https://search.google.com/local/writereview?placeid=ChIJ84Inr4tryYcRQUkKOVeSnF8" id="googleBtn" class="btn btn-secondary">Review us on Google <img src="GoogleMapsPin.png" class="icon-inline" alt=""></a>
         <button id="purposeBtn" class="btn btn-secondary" style="margin-top: 15px;">Our Purpose: Connecting People <img src="AT&T_Globe.png" class="icon-inline" alt=""></button>
 
         <p style="margin: 15px 0; color: var(--subtext-color); font-size: 14px;">— OR —</p>
 
-        <button class="btn btn-game">Play AT&T Snake While You Wait 🐍</button>
+        <button onclick="toggleGame()" class="btn btn-game">Play AT&T Snake While You Wait 🐍</button>
 
         <div id="game-area">
             <div class="score-board"><span>Score: <span id="score">0</span></span><span>High Score: <span id="highScore">0</span></span></div>
@@ -463,24 +473,60 @@
       }
     </script>
 
+    <script src="https://cdn.jsdelivr.net/npm/bad-words@4.0.0/dist/index.min.js"></script>
+
     <script>
         const storeSchedule = { 0: { open: 1200, close: 1800 }, 1: { open: 1100, close: 2000 }, 2: { open: 1100, close: 2000 }, 3: { open: 1100, close: 2000 }, 4: { open: 1100, close: 2000 }, 5: { open: 1100, close: 2000 }, 6: { open: 1100, close: 2000 } };
         const LASTFM_USER = 'ATTFayetteville'; 
         const LASTFM_API_KEY = 'f7020f441263b35598d85540e23c950c';
 
-        // PWA Install Logic - Moved to Header Button
+        // --- PWA INSTALLATION LOGIC ---
         let deferredPrompt;
         const installBtn = document.getElementById('headerInstallBtn');
+        const pwaOverlay = document.getElementById('pwa-install-overlay');
+        const pwaOverlayBtn = document.getElementById('pwa-install-btn');
+
+        // 1. Visit Counter
+        let visits = localStorage.getItem('siteVisits') || 0;
+        visits++;
+        localStorage.setItem('siteVisits', visits);
+
+        // 2. Capture the install event
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault(); 
             deferredPrompt = e; 
-            installBtn.style.display = 'flex'; // Show button when install is available
+            
+            // Show Header Button (Always available if installable)
+            installBtn.style.display = 'flex';
+
+            // Show Auto-Popup if visits >= 2 (Second visit onward)
+            if (visits >= 2) {
+                pwaOverlay.classList.remove('hidden');
+            }
         });
+
+        // 3. Handle Click (Header Button)
         installBtn.addEventListener('click', async () => {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') console.log('User accepted install');
+                if (outcome === 'accepted') {
+                    console.log('User accepted install');
+                }
+                deferredPrompt = null; 
+                installBtn.style.display = 'none';
+            }
+        });
+
+        // 4. Handle Click (Overlay Button)
+        pwaOverlayBtn.addEventListener('click', async () => {
+            pwaOverlay.classList.add('hidden'); // Close overlay
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    console.log('User accepted install');
+                }
                 deferredPrompt = null; 
                 installBtn.style.display = 'none';
             }
@@ -516,14 +562,12 @@
 
             lastFmBtn.addEventListener('click', function(e) {
                 e.preventDefault();
-                // Store the dynamic URL from the button's current href
                 currentLastFmUrl = this.href;
                 if(currentLastFmUrl === '#' || !currentLastFmUrl) return; 
                 lastFmOverlay.classList.remove('hidden');
             });
 
             confirmLastFm.addEventListener('click', function() {
-                // Open directly on user click event to prevent blocking
                 window.open(currentLastFmUrl, '_blank');
                 lastFmOverlay.classList.add('hidden');
             });
@@ -532,7 +576,6 @@
             const googleBtn = document.getElementById('googleBtn');
             const googleOverlay = document.getElementById('google-confirm-overlay');
             const confirmGoogle = document.getElementById('confirm-google-btn');
-            // Hardcoded Google URL since it doesn't change
             const googleUrl = "https://search.google.com/local/writereview?placeid=ChIJ84Inr4tryYcRQUkKOVeSnF8";
 
             googleBtn.addEventListener('click', function(e) {
@@ -541,7 +584,6 @@
             });
 
             confirmGoogle.addEventListener('click', function() {
-                // Open directly on user click event to prevent blocking
                 window.open(googleUrl, '_blank');
                 googleOverlay.classList.add('hidden');
             });
@@ -564,8 +606,6 @@
             purposeOverlay.addEventListener('click', function(e) { if (e.target === purposeOverlay) closeVideoOverlay(); });
 
             // Game
-            document.querySelector('.btn-game').addEventListener('click', function() { playJelly(this); toggleGame(); });
-
             const savedScore = localStorage.getItem('attSnakeHighScore');
             if(savedScore) document.getElementById('highScore').innerText = savedScore;
 
@@ -631,17 +671,11 @@
             const gameOverOverlay = document.getElementById('game-overlay');
 
             if(g.style.display==='block'){
-                // Close Game
                 g.style.display='none'; 
                 stopGame();
             } else {
-                // Open Game, Scroll to it, Show Start Button (Do not init game yet)
                 g.style.display='block'; 
-                
-                // Auto Scroll
                 g.scrollIntoView({ behavior: "smooth", block: "center" });
-
-                // Reset Overlays
                 startOverlay.classList.remove('hidden');
                 gameOverOverlay.classList.add('hidden');
             } 
