@@ -1,0 +1,20 @@
+{
+  "name": "AT&T Fayetteville Mall Portal",
+  "short_name": "AT&T Fay",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0057B8",
+  "icons": [
+    {
+      "src": "att.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "att.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
