@@ -353,7 +353,7 @@
         .game-instructions { font-size: 12px; color: var(--subtext-color); margin-bottom: 10px; font-style: italic; }
 
         /* LEADERBOARD HIDDEN BY DEFAULT */
-        #store-leaderboard { display: none; margin-top: 20px; border: 2px solid #0057B8; border-radius: 10px; padding: 20px; max-width: 400px; margin-left: auto; margin-right: auto; background: var(--container-bg); color: var(--text-color); width: 90%; }
+        #store-leaderboard { margin-top: 20px; border: 2px solid #0057B8; border-radius: 10px; padding: 20px; max-width: 400px; margin-left: auto; margin-right: auto; background: var(--container-bg); color: var(--text-color); width: 90%; }
 
         /* --- FOOTER --- */
         footer { margin-top: auto; padding: 30px 20px; font-size: 13px; color: var(--footer-text); text-align: center; line-height: 1.6; z-index: 20; position: relative; }
@@ -503,7 +503,7 @@
             </div>
         </div>
 
-        <div id="store-leaderboard">
+        <div id="store-leaderboard" style="display: none;">
             <h3 style="color: var(--att-blue); margin-top: 0; margin-bottom: 10px;">🏆 High Scores</h3>
             
             <div id="score-input-area" style="display: flex; gap: 5px; justify-content: center; margin-bottom: 15px;">
@@ -545,7 +545,7 @@
             console.log("Filter library loading...", e);
         }
 
-        // Fetch Scores (Uses CORS Proxy for Mixed Content Fix)
+        // Fetch Scores
         async function fetchLeaderboard() {
             // TARGET URL (HTTP)
             const targetUrl = `http://dreamlo.com/lb/${DREAMLO_PUBLIC}/json`;
@@ -579,6 +579,7 @@
                     item.style.justifyContent = "space-between";
                     item.style.fontSize = "14px";
                     
+                    // Highlight top score
                     if (index === 0) item.style.fontWeight = "bold";
 
                     item.innerHTML = `<span><b>#${index + 1}</b> ${entry.name}</span> <span>${entry.score} pts</span>`;
@@ -889,10 +890,10 @@
 
             // Handle Input based on Key Code
             switch(e.code) {
-                case "ArrowLeft": handleInput(-1, 0); break;
-                case "ArrowUp": handleInput(0, -1); break;
-                case "ArrowRight": handleInput(1, 0); break;
-                case "ArrowDown": handleInput(0, 1); break;
+                case "ArrowLeft": handleInput(-100, 0); break;
+                case "ArrowUp": handleInput(0, -100); break;
+                case "ArrowRight": handleInput(100, 0); break;
+                case "ArrowDown": handleInput(0, 100); break;
             }
         });
 
