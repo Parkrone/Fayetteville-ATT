@@ -529,7 +529,7 @@
 
         <p style="margin: 15px 0; color: var(--subtext-color); font-size: 14px;">— OR —</p>
 
-        <button onclick="toggleGame()" class="btn btn-game">Play AT&T Snake While You Wait 🐍</button>
+        <button class="btn btn-game">Play AT&T Snake While You Wait 🐍</button>
 
         <div id="game-area">
             <div class="score-board"><span>Score: <span id="score">0</span></span><span>High Score: <span id="highScore">0</span></span></div>
@@ -572,11 +572,10 @@
     <footer>&copy; 2025 Fayetteville Mall Store Location.<br>Built by <a href="https://parkrone.github.io/Parker-Design-Lab/" target="_blank">Parker Thompson</a></footer>
 
     <script>
-      // SAFE PRELOADER DISMISSAL (Runs independently of other scripts)
+      // SAFE PRELOADER DISMISSAL
       window.addEventListener('load', () => {
           const loader = document.getElementById("preloader");
           const container = document.getElementById("mainContainer");
-          // Force hide after 4.2s no matter what error happens elsewhere
           setTimeout(() => {
               if(loader) {
                   loader.classList.add("loader-hidden");
@@ -846,6 +845,10 @@
         const GRID_SIZE = 20; const SPEED = 2; const TILE_COUNT = 15; 
         let animationId; let gameRunning = false; let score = 0; let path = []; let snakeLength = 3; let headX = 0, headY = 0, velX = 0, velY = 0, nextVelX = 0, nextVelY = 0; let food = { x: 0, y: 0 }; let lastTime = 0; const targetFPS = 60; const frameInterval = 1000 / targetFPS;
         
+        // Game Button Trigger - FIXED: Use JS Listener Only
+        const gameBtn = document.querySelector('.btn-game');
+        if(gameBtn) gameBtn.addEventListener('click', function() { playJelly(this); toggleGame(); });
+
         function toggleGame() { 
             const g = document.getElementById('game-area'); 
             const lb = document.getElementById('store-leaderboard');
@@ -1011,11 +1014,6 @@
         });
 
         function handleInput(dx,dy) { if(Math.abs(dx)<10 && Math.abs(dy)<10)return; if(Math.abs(dx)>Math.abs(dy)){if(dx>0){nextVelX=SPEED; nextVelY=0;}else{nextVelX=-SPEED; nextVelY=0;}}else{if(dy>0){nextVelX=0; nextVelY=SPEED;}else{nextVelX=0; nextVelY=-SPEED;}} }
-        
-        // Game Button Trigger
-        const gameBtn = document.querySelector('.btn-game');
-        if(gameBtn) gameBtn.addEventListener('click', function() { playJelly(this); toggleGame(); });
-
     </script>
 </body>
 </html>
