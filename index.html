@@ -352,6 +352,9 @@
         .score-board { margin-bottom: 5px; font-weight: bold; color: var(--att-blue); font-size: 16px; display: flex; justify-content: space-between; padding: 0 10px; }
         .game-instructions { font-size: 12px; color: var(--subtext-color); margin-bottom: 10px; font-style: italic; }
 
+        /* LEADERBOARD HIDDEN BY DEFAULT */
+        #store-leaderboard { display: none; margin-top: 20px; border: 2px solid #0057B8; border-radius: 10px; padding: 20px; max-width: 400px; margin-left: auto; margin-right: auto; background: var(--container-bg); color: var(--text-color); width: 90%; }
+
         /* --- FOOTER --- */
         footer { margin-top: auto; padding: 30px 20px; font-size: 13px; color: var(--footer-text); text-align: center; line-height: 1.6; z-index: 20; position: relative; }
         footer a { color: var(--att-blue); text-decoration: none; font-weight: 700; transition: color 0.2s;}
@@ -500,7 +503,7 @@
             </div>
         </div>
 
-        <div id="store-leaderboard" style="border: 2px solid #0057B8; border-radius: 10px; padding: 20px; max-width: 400px; margin: 20px auto; background: var(--container-bg); color: var(--text-color); width: 90%;">
+        <div id="store-leaderboard">
             <h3 style="color: var(--att-blue); margin-top: 0; margin-bottom: 10px;">🏆 High Scores</h3>
             
             <div id="score-input-area" style="display: flex; gap: 5px; justify-content: center; margin-bottom: 15px;">
@@ -542,13 +545,15 @@
             console.log("Filter library loading...", e);
         }
 
-        // Fetch Scores
+        // Fetch Scores (Uses CORS Proxy for Mixed Content Fix)
         async function fetchLeaderboard() {
-            // Note: If your site is HTTPS, this HTTP request might be blocked by some browsers.
-            // Dreamlo Free tier is HTTP only.
-            const url = `http://dreamlo.com/lb/${DREAMLO_PUBLIC}/json`; 
+            // TARGET URL (HTTP)
+            const targetUrl = `http://dreamlo.com/lb/${DREAMLO_PUBLIC}/json`;
+            // PROXY URL (HTTPS) -> Forces browser to accept request
+            const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
+
             try {
-                const response = await fetch(url);
+                const response = await fetch(proxyUrl);
                 const data = await response.json();
                 
                 const listContainer = document.getElementById('leaderboard-list');
@@ -574,7 +579,6 @@
                     item.style.justifyContent = "space-between";
                     item.style.fontSize = "14px";
                     
-                    // Highlight top score
                     if (index === 0) item.style.fontWeight = "bold";
 
                     item.innerHTML = `<span><b>#${index + 1}</b> ${entry.name}</span> <span>${entry.score} pts</span>`;
@@ -583,7 +587,7 @@
                 
             } catch (error) {
                 console.error("Leaderboard error:", error);
-                document.getElementById('leaderboard-list').innerHTML = "<p style='font-size:12px; color:#888;'>Leaderboard unavailable (Mixed Content Block).</p>";
+                document.getElementById('leaderboard-list').innerHTML = "<p style='font-size:12px; color:#888;'>Leaderboard unavailable (Network Error).</p>";
             }
         }
 
@@ -603,17 +607,18 @@
                 document.getElementById('filter-msg').style.display = 'none';
             }
 
-            const submitUrl = `http://dreamlo.com/lb/${DREAMLO_PRIVATE}/add/${encodeURIComponent(rawName)}/${score}`;
+            // TARGET URL (HTTP)
+            const targetUrl = `http://dreamlo.com/lb/${DREAMLO_PRIVATE}/add/${encodeURIComponent(rawName)}/${score}`;
+            // PROXY URL (HTTPS)
+            const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
             
             try {
-                await fetch(submitUrl);
+                await fetch(proxyUrl);
                 usernameInput.value = ""; 
                 fetchLeaderboard(); 
                 alert("Score saved!");
             } catch (error) {
                 console.error(error);
-                // Even if fetch fails due to CORS/Mixed Content, Dreamlo often still records the GET request.
-                // We reload to check.
                 setTimeout(fetchLeaderboard, 1000);
             }
         }
@@ -838,14 +843,17 @@
         // --- UPDATED GAME CONTROL LOGIC ---
         function toggleGame() { 
             const g = document.getElementById('game-area'); 
+            const lb = document.getElementById('store-leaderboard');
             const startOverlay = document.getElementById('start-overlay');
             const gameOverOverlay = document.getElementById('game-overlay');
 
             if(g.style.display==='block'){
                 g.style.display='none'; 
+                lb.style.display='none'; // Hide leaderboard
                 stopGame();
             } else {
                 g.style.display='block'; 
+                lb.style.display='block'; // Show leaderboard
                 g.scrollIntoView({ behavior: "smooth", block: "center" });
                 startOverlay.classList.remove('hidden');
                 gameOverOverlay.classList.add('hidden');
@@ -868,7 +876,27 @@
         function draw() { ctx.fillStyle="#fff"; ctx.fillRect(0,0,canvas.width,canvas.height); ctx.drawImage(foodImg,food.x,food.y,GRID_SIZE,GRID_SIZE); const step=GRID_SIZE/SPEED; for(let i=0; i<path.length; i+=step){let idx=Math.floor(i); if(idx>=path.length) break; let seg=path[idx]; let ang=0; if(i===0){if(velX>0) ang=Math.PI/2; else if(velX<0) ang=-Math.PI/2; else if(velY>0) ang=Math.PI; else ang=0;}else{let n=Math.max(0,idx-step); let ns=path[n]; let dx=ns.x-seg.x; let dy=ns.y-seg.y; if(dx>0) ang=Math.PI/2; else if(dx<0) ang=-Math.PI/2; else if(dy>0) ang=Math.PI; else ang=0;} drawRotatedImage(snakeImg,seg.x,seg.y,ang);} }
         function drawRotatedImage(img,x,y,ang){ ctx.save(); ctx.translate(x+GRID_SIZE/2,y+GRID_SIZE/2); ctx.rotate(ang); ctx.drawImage(img,-GRID_SIZE/2,-GRID_SIZE/2,GRID_SIZE,GRID_SIZE); ctx.restore(); }
         function triggerGameOver() { gameRunning=false; let h=parseInt(localStorage.getItem('attSnakeHighScore'))||0; if(score>h){localStorage.setItem('attSnakeHighScore',score); document.getElementById('highScore').innerText=score;} document.getElementById('final-score').innerText=score; document.getElementById('game-overlay').classList.remove('hidden'); }
-        let tsX=0, tsY=0; canvas.addEventListener('touchstart', e=>{tsX=e.changedTouches[0].screenX; tsY=e.changedTouches[0].screenY;}, {passive:false}); canvas.addEventListener('touchend', e=>{if(!gameRunning)return; let dx=e.changedTouches[0].screenX-tsX; let dy=e.changedTouches[0].screenY-tsY; handleInput(dx,dy);}, {passive:false}); document.addEventListener('keydown', e=>{if(!gameRunning)return; if(e.keyCode===37)handleInput(-1,0); if(e.keyCode===38)handleInput(0,-1); if(e.keyCode===39)handleInput(1,0); if(e.keyCode===40)handleInput(0,1);}); function handleInput(dx,dy) { if(Math.abs(dx)<10 && Math.abs(dy)<10)return; if(Math.abs(dx)>Math.abs(dy)){if(dx>0){nextVelX=SPEED; nextVelY=0;}else{nextVelX=-SPEED; nextVelY=0;}}else{if(dy>0){nextVelX=0; nextVelY=SPEED;}else{nextVelX=0; nextVelY=-SPEED;}} }
+        let tsX=0, tsY=0; canvas.addEventListener('touchstart', e=>{tsX=e.changedTouches[0].screenX; tsY=e.changedTouches[0].screenY;}, {passive:false}); canvas.addEventListener('touchend', e=>{if(!gameRunning)return; let dx=e.changedTouches[0].screenX-tsX; let dy=e.changedTouches[0].screenY-tsY; handleInput(dx,dy);}, {passive:false}); 
+        
+        // --- NEW IMPROVED KEYBOARD LISTENER ---
+        window.addEventListener('keydown', e => {
+            // Prevent default scrolling for arrow keys
+            if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
+                e.preventDefault();
+            }
+            
+            if(!gameRunning || e.repeat) return; 
+
+            // Handle Input based on Key Code
+            switch(e.code) {
+                case "ArrowLeft": handleInput(-1, 0); break;
+                case "ArrowUp": handleInput(0, -1); break;
+                case "ArrowRight": handleInput(1, 0); break;
+                case "ArrowDown": handleInput(0, 1); break;
+            }
+        });
+
+        function handleInput(dx,dy) { if(Math.abs(dx)<10 && Math.abs(dy)<10)return; if(Math.abs(dx)>Math.abs(dy)){if(dx>0){nextVelX=SPEED; nextVelY=0;}else{nextVelX=-SPEED; nextVelY=0;}}else{if(dy>0){nextVelX=0; nextVelY=SPEED;}else{nextVelX=0; nextVelY=-SPEED;}} }
     </script>
 </body>
 </html>
