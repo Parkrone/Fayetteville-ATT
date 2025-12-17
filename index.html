@@ -23,6 +23,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 
     <script src="https://cdn.jsdelivr.net/npm/bad-words@4.0.0/dist/index.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <script type="text/javascript">
         (function(c,l,a,r,i,t,y){
@@ -360,6 +361,44 @@
         .score-board { margin-bottom: 5px; font-weight: bold; color: var(--att-blue); font-size: 16px; display: flex; justify-content: space-between; padding: 0 10px; }
         .game-instructions { font-size: 12px; color: var(--subtext-color); margin-bottom: 10px; font-style: italic; }
 
+        /* ROCKET EFFECT */
+        #rocket-effect {
+            position: fixed; bottom: -50px; left: 50%; transform: translateX(-50%);
+            font-size: 60px; pointer-events: none; z-index: 9999;
+            transition: none; opacity: 0;
+        }
+        @keyframes rocketFly {
+            0% { bottom: -50px; opacity: 1; transform: translateX(-50%) rotate(0deg); }
+            10% { transform: translateX(-55%) rotate(-5deg); }
+            20% { transform: translateX(-45%) rotate(5deg); }
+            100% { bottom: 110vh; opacity: 1; transform: translateX(-50%) rotate(0deg); }
+        }
+        .rocket-anim { animation: rocketFly 1.5s ease-in forwards; }
+
+        /* SCREEN SHAKE */
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+        .shake-screen { animation: shake 0.5s; }
+
+        /* BOUNCY GAME OVER */
+        @keyframes bouncy {
+            0% { transform: scale(0.1); opacity: 0; }
+            60% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+        .bouncy-box { animation: bouncy 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
         /* LEADERBOARD HIDDEN BY DEFAULT */
         #store-leaderboard { margin-top: 20px; border: 2px solid #0057B8; border-radius: 10px; padding: 20px; max-width: 400px; margin-left: auto; margin-right: auto; background: var(--container-bg); color: var(--text-color); width: 90%; }
 
@@ -385,6 +424,8 @@
     <div id="weather-container"></div>
     <div id="fog-container"><div class="fog-cloud"></div><div class="fog-cloud two"></div></div>
     <div id="preloader"><img src="att.gif" alt="Loading..."></div>
+
+    <div id="rocket-effect">🚀</div>
 
     <div id="install-banner">
         <div class="ib-content">
@@ -547,7 +588,8 @@
         const DREAMLO_PUBLIC = "6942f2278f40bbcf805cdd26";  
         const DREAMLO_PRIVATE = "fKYDKbAwxUW9b4L3xT98OQRWMO4zuSWEixyiSgUfLM6g"; 
         const MAX_SCORES_TO_SHOW = 5;
-        let globalScores = []; // Stores fetched scores for gap calculation
+        let globalScores = []; 
+        let scoreMilestones = []; // To track overtake milestones
 
         // Initialize Profanity Filter
         let filter;
@@ -557,7 +599,7 @@
             console.log("Filter library loading...", e);
         }
 
-        // Fetch Scores (With Cache Busting Fix)
+        // Fetch Scores & Set Milestones for Rocket
         async function fetchLeaderboard() {
             const targetUrl = `http://dreamlo.com/lb/${DREAMLO_PUBLIC}/json?t=${new Date().getTime()}`;
             const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
@@ -572,6 +614,7 @@
                 if (!data.dreamlo.leaderboard) {
                     listContainer.innerHTML = "<p>No scores yet!</p>";
                     globalScores = [];
+                    scoreMilestones = [];
                     return;
                 }
 
@@ -580,7 +623,10 @@
 
                 // Sort High to Low
                 scores.sort((a, b) => parseInt(b.score) - parseInt(a.score)); 
-                globalScores = scores; // Update global variable
+                globalScores = scores; 
+                
+                // Extract unique milestones for rocket effect
+                scoreMilestones = [...new Set(scores.map(s => parseInt(s.score)))].sort((a,b) => a-b);
 
                 const topScores = scores.slice(0, MAX_SCORES_TO_SHOW);
 
@@ -604,7 +650,7 @@
             }
         }
 
-        // Save Score from Game Over Screen (FIXED: Uses CORS Proxy)
+        // Save Score
         async function submitScoreFromGame() {
             const usernameInput = document.getElementById('gameover-name-input');
             const msg = document.getElementById('gameover-msg');
@@ -624,7 +670,6 @@
                 return;
             }
 
-            // Using Proxy for saving too
             const targetUrl = `http://dreamlo.com/lb/${DREAMLO_PRIVATE}/add/${encodeURIComponent(rawName)}/${scoreToSubmit}`;
             const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
             
@@ -633,13 +678,11 @@
                 usernameInput.value = ""; 
                 alert(`Score of ${scoreToSubmit} saved to Leaderboard!`);
                 
-                // Hide input after successful save to prevent double submission
                 document.getElementById('save-score-area').style.display = 'none';
                 msg.innerText = "Score Saved!";
                 msg.style.display = 'block';
                 msg.style.color = '#2ecc71';
 
-                // Refresh list
                 fetchLeaderboard(); 
             } catch (error) {
                 console.error(error);
@@ -652,55 +695,34 @@
         const LASTFM_USER = 'ATTFayetteville'; 
         const LASTFM_API_KEY = 'f7020f441263b35598d85540e23c950c';
 
-        // --- PWA INSTALLATION LOGIC (UPDATED UI) ---
+        // --- PWA INSTALLATION LOGIC ---
         let deferredPrompt;
         const installBtn = document.getElementById('headerInstallBtn');
         const installBanner = document.getElementById('install-banner');
         const bannerInstallBtn = document.getElementById('banner-install-btn');
         const bannerCloseBtn = document.getElementById('banner-close');
 
-        // 1. Visit Counter
         let visits = localStorage.getItem('siteVisits') || 0;
         visits++;
         localStorage.setItem('siteVisits', visits);
 
-        // 2. Capture the install event
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault(); 
             deferredPrompt = e; 
-            
-            // Show Header Button (Always available if installable)
             installBtn.style.display = 'flex';
-
-            // Show Auto-Popup Banner if visits >= 2 (Second visit onward)
             if (visits >= 2) {
-                setTimeout(() => {
-                   installBanner.classList.add('visible');
-                }, 1500); 
+                setTimeout(() => { installBanner.classList.add('visible'); }, 1500); 
             }
         });
 
-        // 3. Handle Header Button Click
         installBtn.addEventListener('click', triggerInstall);
-
-        // 4. Handle Banner Install Click
-        bannerInstallBtn.addEventListener('click', () => {
-            triggerInstall();
-            installBanner.classList.remove('visible'); 
-        });
-
-        // 5. Handle Banner Close 'X'
-        bannerCloseBtn.addEventListener('click', () => {
-            installBanner.classList.remove('visible');
-        });
+        bannerInstallBtn.addEventListener('click', () => { triggerInstall(); installBanner.classList.remove('visible'); });
+        bannerCloseBtn.addEventListener('click', () => { installBanner.classList.remove('visible'); });
 
         async function triggerInstall() {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') {
-                    console.log('User accepted install');
-                }
                 deferredPrompt = null; 
                 installBtn.style.display = 'none';
             }
@@ -711,7 +733,6 @@
             const container = document.getElementById("mainContainer");
             const video = document.getElementById("bg-video");
 
-            // Video Fade
             function showVideo() { video.style.opacity = '1'; document.getElementById('video-skeleton').style.display = 'none'; }
             if (video.readyState >= 3) { showVideo(); } else { video.addEventListener('loadeddata', showVideo); video.addEventListener('canplay', showVideo); }
 
@@ -719,19 +740,15 @@
             fetchWeather();
             if(isStoreOpen()) { fetchNowPlaying(); setInterval(fetchNowPlaying, 30000); }
             
-            // Load Leaderboard
             fetchLeaderboard();
 
-            // Bounce Logic
             document.querySelectorAll('.btn, .video-close-btn').forEach(btn => {
                 btn.addEventListener('click', function(e) { playJelly(this); });
             });
 
-            // Buttons
             document.getElementById('contactBtn').addEventListener('click', () => document.getElementById('contact-overlay').classList.remove('hidden'));
             document.getElementById('callBtn').addEventListener('click', () => { if(isStoreOpen()) { window.location.href = "tel:4794395471"; } else { document.getElementById('closed-overlay').classList.remove('hidden'); } });
             
-            // --- UPDATED LAST.FM LOGIC (Confirmation Overlay) ---
             let currentLastFmUrl = "";
             const lastFmBtn = document.getElementById('lastfm-link');
             const lastFmOverlay = document.getElementById('lastfm-confirm-overlay');
@@ -749,7 +766,6 @@
                 lastFmOverlay.classList.add('hidden');
             });
 
-            // --- UPDATED GOOGLE LOGIC (Confirmation Overlay) ---
             const googleBtn = document.getElementById('googleBtn');
             const googleOverlay = document.getElementById('google-confirm-overlay');
             const confirmGoogle = document.getElementById('confirm-google-btn');
@@ -765,14 +781,10 @@
                 googleOverlay.classList.add('hidden');
             });
 
-            // Deals & Portfolio
             document.querySelectorAll('.link-delay').forEach(link => { 
-                link.addEventListener('click', function(e) {
-                    // No overlay for these, just let them open
-                }); 
+                link.addEventListener('click', function(e) { }); 
             });
 
-            // Purpose Video
             const purposeBtn = document.getElementById('purposeBtn');
             const purposeOverlay = document.getElementById('purpose-video-overlay');
             const purposeVideo = document.getElementById('purpose-video');
@@ -782,7 +794,6 @@
             });
             purposeOverlay.addEventListener('click', function(e) { if (e.target === purposeOverlay) closeVideoOverlay(); });
 
-            // Game
             const savedScore = localStorage.getItem('attSnakeHighScore');
             if(savedScore) document.getElementById('highScore').innerText = savedScore;
 
@@ -797,7 +808,6 @@
         function closeOverlay(id) { document.getElementById(id).classList.add('hidden'); }
         function playJelly(element) { element.classList.remove('btn-animate'); void element.offsetWidth; element.classList.add('btn-animate'); }
 
-        // Core Functions
         function getCentralTime() { const d = new Date(); return new Date(d.toLocaleString("en-US", {timeZone: "America/Chicago"})); }
         function isStoreOpen() { const now = getCentralTime(); const day = now.getDay(); const currentMilitaryTime = (now.getHours() * 100) + now.getMinutes(); const todayHours = storeSchedule[day]; return (currentMilitaryTime >= todayHours.open && currentMilitaryTime < todayHours.close); }
         function checkStoreStatus() { const now = getCentralTime(); const day = now.getDay(); const todayHours = storeSchedule[day]; const badge = document.getElementById('hours-badge'); const formatTime = (num) => { let hour = Math.floor(num / 100); let ampm = hour >= 12 ? 'PM' : 'AM'; let displayHour = hour % 12; displayHour = displayHour ? displayHour : 12; return displayHour + ampm; }; const openStr = formatTime(todayHours.open); const closeStr = formatTime(todayHours.close); badge.classList.remove('skeleton', 'skeleton-text'); badge.style.width = 'auto'; if (isStoreOpen()) { badge.innerHTML = `<span id="status-dot" class="pulsing-dot dot-open"></span> Open (${openStr} - ${closeStr})`; } else { badge.innerHTML = `<span id="status-dot" class="pulsing-dot dot-closed"></span> Closed Now`; document.getElementById('closed-msg').innerText = `We are currently closed. Our hours today are ${openStr} to ${closeStr}. (Hours may vary on holidays)`; } }
@@ -811,21 +821,11 @@
 
             if (temp <= 32) document.getElementById('ice-border').style.display = 'block'; 
 
-            if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) { 
-                iconEl.innerText = "🌧️"; startPrecipitation('rain'); 
-            } else if ([71, 73, 75, 77, 85, 86].includes(code)) { 
-                iconEl.innerText = "❄️"; startPrecipitation('snow'); 
-            } else if ([45, 48].includes(code)) { 
-                iconEl.innerText = "🌫️"; document.getElementById('fog-container').style.display = 'block'; 
-            } else if ([95, 96, 99].includes(code)) { 
-                iconEl.innerText = "⛈️"; startPrecipitation('rain'); 
-            } else if (code <= 3) { 
-                if (code === 0) {
-                    iconEl.innerText = isDay === 1 ? "☀️" : "🌙"; 
-                } else {
-                    iconEl.innerText = isDay === 1 ? "☁️" : "☁️"; 
-                }
-            } 
+            if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) { iconEl.innerText = "🌧️"; startPrecipitation('rain'); 
+            } else if ([71, 73, 75, 77, 85, 86].includes(code)) { iconEl.innerText = "❄️"; startPrecipitation('snow'); 
+            } else if ([45, 48].includes(code)) { iconEl.innerText = "🌫️"; document.getElementById('fog-container').style.display = 'block'; 
+            } else if ([95, 96, 99].includes(code)) { iconEl.innerText = "⛈️"; startPrecipitation('rain'); 
+            } else if (code <= 3) { if (code === 0) { iconEl.innerText = isDay === 1 ? "☀️" : "🌙"; } else { iconEl.innerText = isDay === 1 ? "☁️" : "☁️"; } } 
         }
         function startPrecipitation(type) { const container = document.getElementById('weather-container'); for (let i = 0; i < 50; i++) { const p = document.createElement('div'); p.classList.add(type); p.style.left = Math.random() * 100 + 'vw'; p.style.animationDuration = (Math.random() * 1 + 0.5) + 's'; p.style.animationDelay = Math.random() * 2 + 's'; container.appendChild(p); } }
         
@@ -839,33 +839,22 @@
                 if (track) {
                     const musicSection = document.getElementById('music-section');
                     musicSection.style.display = 'block';
-
                     const titleEl = document.getElementById('track-title');
                     const artistEl = document.getElementById('track-artist');
                     const artEl = document.getElementById('track-art');
                     const linkEl = document.getElementById('lastfm-link');
-
                     titleEl.innerText = track.name;
                     artistEl.innerText = track.artist['#text'];
-                    linkEl.href = track.url; // Update the link for the overlay logic to grab later
-
-                    if (track.image && track.image[1]['#text']) {
-                        artEl.src = track.image[1]['#text'];
-                    } else {
-                        artEl.src = 'https://via.placeholder.com/50';
-                    }
-                    
+                    linkEl.href = track.url; 
+                    if (track.image && track.image[1]['#text']) { artEl.src = track.image[1]['#text']; } else { artEl.src = 'https://via.placeholder.com/50'; }
                     titleEl.classList.remove('skeleton', 'skeleton-text');
                     artistEl.classList.remove('skeleton', 'skeleton-text');
                 }
-            } catch (error) {
-                console.log("Music fetch error:", error);
-            }
+            } catch (error) { console.log("Music fetch error:", error); }
         }
 
         const canvas = document.getElementById("snakeCanvas"); const ctx = canvas.getContext("2d"); const snakeImg = new Image(); snakeImg.src = 'phone.png'; const foodImg = new Image(); foodImg.src = 'bolt.png'; const GRID_SIZE = 20; const SPEED = 2; const TILE_COUNT = canvas.width / GRID_SIZE; let animationId; let gameRunning = false; let score = 0; let path = []; let snakeLength = 3; let headX = 0, headY = 0, velX = 0, velY = 0, nextVelX = 0, nextVelY = 0; let food = { x: 0, y: 0 }; let lastTime = 0; const targetFPS = 60; const frameInterval = 1000 / targetFPS;
         
-        // --- UPDATED GAME CONTROL LOGIC ---
         function toggleGame() { 
             const g = document.getElementById('game-area'); 
             const lb = document.getElementById('store-leaderboard');
@@ -874,22 +863,18 @@
 
             if(g.style.display==='block'){
                 g.style.display='none'; 
-                lb.style.display='none'; // Hide leaderboard
+                lb.style.display='none'; 
                 stopGame();
             } else {
                 g.style.display='block'; 
-                lb.style.display='block'; // Show leaderboard
+                lb.style.display='block'; 
                 g.scrollIntoView({ behavior: "smooth", block: "center" });
                 startOverlay.classList.remove('hidden');
                 gameOverOverlay.classList.add('hidden');
             } 
         }
 
-        function startSession() {
-            document.getElementById('start-overlay').classList.add('hidden');
-            initGame();
-        }
-
+        function startSession() { document.getElementById('start-overlay').classList.add('hidden'); initGame(); }
         function initGame() { stopGame(); document.getElementById('game-overlay').classList.add('hidden'); score = 0; snakeLength = 3; document.getElementById('score').innerText = score; headX = Math.floor(TILE_COUNT/2)*GRID_SIZE; headY = Math.floor(TILE_COUNT/2)*GRID_SIZE; path=[]; for(let i=0; i<snakeLength*(GRID_SIZE/SPEED); i++){path.push({x:headX, y:headY+i});} velX=0; velY=-SPEED; nextVelX=0; nextVelY=-SPEED; spawnFood(); startCountdown(); }
         function restartGame() { initGame(); }
         function startCountdown() { let count=3; draw(); drawCountdownText(count); let t=setInterval(()=>{count--; if(count>0){draw(); drawCountdownText(count);}else{clearInterval(t); draw(); drawCountdownText("GO!"); setTimeout(()=>{gameRunning=true; lastTime=0; requestAnimationFrame(gameLoop);},500);}},1000); }
@@ -897,29 +882,65 @@
         function stopGame() { gameRunning=false; cancelAnimationFrame(animationId); }
         function spawnFood() { food.x = Math.floor(Math.random()*TILE_COUNT)*GRID_SIZE; food.y = Math.floor(Math.random()*TILE_COUNT)*GRID_SIZE; }
         function gameLoop(t) { if(!gameRunning) return; if(!lastTime) lastTime=t; const dt=t-lastTime; if(dt>=frameInterval){update(); draw(); lastTime=t-(dt%frameInterval);} animationId=requestAnimationFrame(gameLoop); }
-        function update() { if(headX%GRID_SIZE===0 && headY%GRID_SIZE===0){if(nextVelX!==0||nextVelY!==0){if(velX===0&&nextVelY!==-velY||velY===0&&nextVelX!==-velX){velX=nextVelX; velY=nextVelY;}}} headX+=velX; headY+=velY; path.unshift({x:headX, y:headY}); if(path.length>snakeLength*(GRID_SIZE/SPEED)) path.pop(); if(headX<0||headX>=canvas.width||headY<0||headY>=canvas.height){triggerGameOver(); return;} let skip=GRID_SIZE/SPEED*2; for(let i=skip; i<path.length; i++){if(path[i].x===headX && path[i].y===headY){triggerGameOver(); return;}} if(Math.hypot(headX-food.x, headY-food.y)<SPEED){headX=food.x; headY=food.y; score++; document.getElementById('score').innerText=score; snakeLength++; spawnFood();} }
+        
+        function update() { 
+            if(headX%GRID_SIZE===0 && headY%GRID_SIZE===0){if(nextVelX!==0||nextVelY!==0){if(velX===0&&nextVelY!==-velY||velY===0&&nextVelX!==-velX){velX=nextVelX; velY=nextVelY;}}} 
+            headX+=velX; headY+=velY; 
+            path.unshift({x:headX, y:headY}); 
+            if(path.length>snakeLength*(GRID_SIZE/SPEED)) path.pop(); 
+            if(headX<0||headX>=canvas.width||headY<0||headY>=canvas.height){triggerGameOver(); return;} 
+            let skip=GRID_SIZE/SPEED*2; 
+            for(let i=skip; i<path.length; i++){if(path[i].x===headX && path[i].y===headY){triggerGameOver(); return;}} 
+            if(Math.hypot(headX-food.x, headY-food.y)<SPEED){
+                headX=food.x; headY=food.y; 
+                score++; 
+                document.getElementById('score').innerText=score; 
+                snakeLength++; 
+                spawnFood();
+                
+                // ROCKET CHECK
+                if (scoreMilestones.length > 0 && score >= scoreMilestones[0]) {
+                    const rocket = document.getElementById('rocket-effect');
+                    rocket.classList.remove('rocket-anim');
+                    void rocket.offsetWidth; 
+                    rocket.classList.add('rocket-anim');
+                    document.body.classList.add('shake-screen');
+                    setTimeout(() => document.body.classList.remove('shake-screen'), 500);
+                    scoreMilestones.shift(); // Remove passed milestone
+                }
+            } 
+        }
         function draw() { ctx.fillStyle="#fff"; ctx.fillRect(0,0,canvas.width,canvas.height); ctx.drawImage(foodImg,food.x,food.y,GRID_SIZE,GRID_SIZE); const step=GRID_SIZE/SPEED; for(let i=0; i<path.length; i+=step){let idx=Math.floor(i); if(idx>=path.length) break; let seg=path[idx]; let ang=0; if(i===0){if(velX>0) ang=Math.PI/2; else if(velX<0) ang=-Math.PI/2; else if(velY>0) ang=Math.PI; else ang=0;}else{let n=Math.max(0,idx-step); let ns=path[n]; let dx=ns.x-seg.x; let dy=ns.y-seg.y; if(dx>0) ang=Math.PI/2; else if(dx<0) ang=-Math.PI/2; else if(dy>0) ang=Math.PI; else ang=0;} drawRotatedImage(snakeImg,seg.x,seg.y,ang);} }
         function drawRotatedImage(img,x,y,ang){ ctx.save(); ctx.translate(x+GRID_SIZE/2,y+GRID_SIZE/2); ctx.rotate(ang); ctx.drawImage(img,-GRID_SIZE/2,-GRID_SIZE/2,GRID_SIZE,GRID_SIZE); ctx.restore(); }
         
-        // --- UPDATED GAME OVER TRIGGER (With New Logic) ---
+        // --- UPDATED GAME OVER TRIGGER (With Celebrations) ---
         function triggerGameOver() { 
             gameRunning = false; 
             const finalScore = score;
             const savedHighScore = parseInt(localStorage.getItem('attSnakeHighScore')) || 0;
+            const gameOverBox = document.querySelector('#game-overlay');
             
             // Check for High Score
             if (finalScore > savedHighScore) {
                 localStorage.setItem('attSnakeHighScore', finalScore);
                 document.getElementById('highScore').innerText = finalScore;
                 
-                // SHOW Save Button
+                // Show Save Button
                 document.getElementById('save-score-area').style.display = 'block';
                 const msg = document.getElementById('gameover-msg');
-                msg.innerText = "🎉 NEW HIGH SCORE! Save it to the board! 🎉";
+                msg.innerText = "🎉 NEW HIGH SCORE! 🎉";
                 msg.style.display = 'block';
                 msg.style.color = '#2ecc71'; 
+
+                // TRIGGER CONFETTI if #1
+                if (globalScores.length > 0 && finalScore > parseInt(globalScores[0].score)) {
+                    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                    // Add bouncy animation
+                    gameOverBox.classList.add('bouncy-box');
+                    setTimeout(() => gameOverBox.classList.remove('bouncy-box'), 1000);
+                }
+
             } else {
-                // NO New High Score -> HIDE Save Button
                 document.getElementById('save-score-area').style.display = 'none';
                 const msg = document.getElementById('gameover-msg');
                 
@@ -936,13 +957,11 @@
 
             document.getElementById('final-score').innerText = finalScore;
             
-            // --- LEADERBOARD GAP CALCULATION ---
+            // GAP CALCULATION
             const gapMsg = document.getElementById('leaderboard-gap-msg');
             if (globalScores.length > 0) {
                 let nextTarget = null;
                 let rank = 0;
-
-                // Find the person immediately above you
                 for (let i = globalScores.length - 1; i >= 0; i--) {
                     if (parseInt(globalScores[i].score) > finalScore) {
                         nextTarget = globalScores[i];
@@ -956,11 +975,9 @@
                     gapMsg.innerText = `🔥 You need ${diff} more points to overtake #${rank} (${nextTarget.name})!`;
                     gapMsg.style.display = 'block';
                 } else if (globalScores.length < 5) {
-                     // Empty board, easy win
                      gapMsg.innerText = "Top 5 is wide open! Go for it!";
                      gapMsg.style.display = 'block';
                 } else {
-                    // You are #1
                     gapMsg.innerText = "You are the Snake Champion! 👑";
                     gapMsg.style.display = 'block';
                 }
@@ -968,21 +985,16 @@
                 gapMsg.style.display = 'none';
             }
 
-            document.getElementById('game-overlay').classList.remove('hidden'); 
+            gameOverBox.classList.remove('hidden'); 
         }
 
         let tsX=0, tsY=0; canvas.addEventListener('touchstart', e=>{tsX=e.changedTouches[0].screenX; tsY=e.changedTouches[0].screenY;}, {passive:false}); canvas.addEventListener('touchend', e=>{if(!gameRunning)return; let dx=e.changedTouches[0].screenX-tsX; let dy=e.changedTouches[0].screenY-tsY; handleInput(dx,dy);}, {passive:false}); 
         
-        // --- NEW IMPROVED KEYBOARD LISTENER ---
         window.addEventListener('keydown', e => {
-            // Prevent default scrolling for arrow keys
             if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
                 e.preventDefault();
             }
-            
             if(!gameRunning || e.repeat) return; 
-
-            // Handle Input based on Key Code
             switch(e.code) {
                 case "ArrowLeft": handleInput(-100, 0); break;
                 case "ArrowUp": handleInput(0, -100); break;
