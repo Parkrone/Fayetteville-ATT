@@ -621,6 +621,10 @@
                     if(listContainer) listContainer.innerHTML = "<p>No scores yet!</p>";
                     globalScores = [];
                     scoreMilestones = [];
+                    
+                    // SYNC FIX: Leaderboard is empty, so our local "submitted" status is definitely wrong.
+                    // Allow the user to submit their high score again.
+                    localStorage.removeItem('attSnakeSubmittedScore'); 
                     return;
                 }
 
@@ -630,6 +634,20 @@
                 // Sort High to Low
                 scores.sort((a, b) => parseInt(b.score) - parseInt(a.score)); 
                 globalScores = scores; 
+                
+                // --- FINGERPRINT SYNC CHECK ---
+                // If browser thinks we submitted a score, check if it's actually there.
+                const localSubmitted = parseInt(localStorage.getItem('attSnakeSubmittedScore')) || 0;
+                if (localSubmitted > 0) {
+                    // Check if ANY score on the board matches our submitted score
+                    const isScoreOnBoard = globalScores.some(entry => parseInt(entry.score) === localSubmitted);
+                    
+                    if (!isScoreOnBoard) {
+                        console.log("Sync: Local score not found on server. Resetting fingerprint.");
+                        localStorage.removeItem('attSnakeSubmittedScore');
+                    }
+                }
+                // -----------------------------
                 
                 // Extract unique milestones for rocket effect
                 scoreMilestones = [...new Set(scores.map(s => parseInt(s.score)))].sort((a,b) => a-b);
@@ -674,10 +692,10 @@
             try {
                 await fetch(proxyUrl);
                 
-                // Fingerprint: Mark this score as submitted
+                // Fingerprint: Mark THIS score as submitted.
                 localStorage.setItem('attSnakeSubmittedScore', scoreToSubmit);
                 
-                // FIX: Clear the cached name so it doesn't persist for the next person
+                // Clear the cached name (fresh start for next player)
                 localStorage.removeItem('attSnakeCachedName');
 
                 usernameInput.value = ""; 
@@ -915,7 +933,6 @@
             gameRunning = false; 
             const finalScore = score;
             const savedHighScore = parseInt(localStorage.getItem('attSnakeHighScore')) || 0;
-            // Get last score submitted to leaderboard
             const lastSubmittedScore = parseInt(localStorage.getItem('attSnakeSubmittedScore')) || -1; 
             const gameOverBox = document.querySelector('#game-overlay');
             const saveReasonMsg = document.getElementById('save-reason-msg');
@@ -929,7 +946,6 @@
                 localStorage.setItem('attSnakeHighScore', finalScore);
                 document.getElementById('highScore').innerText = finalScore;
                 
-                // Trigger Confetti if #1 on Leaderboard
                 if (globalScores.length > 0 && finalScore > parseInt(globalScores[0].score)) {
                     if(typeof confetti === "function") {
                         confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
@@ -941,32 +957,31 @@
 
             document.getElementById('final-score').innerText = finalScore;
 
-            // FIX: Restore the cached name if it exists
+            // RESTORE NAME (From previous fix)
             const cachedName = localStorage.getItem('attSnakeCachedName');
             if(cachedName) {
                 nameInput.value = cachedName;
             }
 
-            // LOGIC FIX: Show Save Button if Best Score > Last Submitted Score
-            // This ensures if they have a cached 29 but never submitted it, they get prompted now.
+            // FINGERPRINT LOGIC:
+            // If my Best Score (29) is higher than what I successfully submitted (e.g. -1 or 10),
+            // OR if I have a score > 0 and haven't submitted anything yet...
+            // Show the save box.
             if (bestScore > lastSubmittedScore && bestScore > 0) {
                 document.getElementById('save-score-area').style.display = 'block';
                 
                 if (finalScore >= bestScore) {
-                    // Just set a new record
                     saveReasonMsg.innerText = "🎉 NEW HIGH SCORE!";
                     saveReasonMsg.style.color = "#2ecc71";
                 } else {
-                    // Didn't beat record this time, but has a better one cached
                     saveReasonMsg.innerText = `Unsubmitted High Score Detected: ${bestScore}!`;
                     saveReasonMsg.style.color = "#ffcc00";
                 }
                 
                 const msg = document.getElementById('gameover-msg');
-                msg.style.display = 'none'; // Hide "Keep practicing" while Save is active
+                msg.style.display = 'none'; 
                 
             } else {
-                // Already submitted best score, or score is 0
                 document.getElementById('save-score-area').style.display = 'none';
                 
                 const msg = document.getElementById('gameover-msg');
