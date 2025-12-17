@@ -679,8 +679,13 @@
             const msg = document.getElementById('gameover-msg');
             const rawName = usernameInput.value.trim();
             
+            // Get current and best scores
             const currentSessionScore = parseInt(document.getElementById('final-score').innerText) || 0;
             const allTimeHighScore = parseInt(localStorage.getItem('attSnakeHighScore')) || 0;
+            
+            // CRITICAL FIX: Submit the best score available.
+            // This ensures if you played a 12 but have a cached 29, the 29 gets submitted (fixing your lost score).
+            // But if you just played a 5 on a new device, it submits 5.
             const scoreToSubmit = Math.max(currentSessionScore, allTimeHighScore);
 
             if (!rawName) { alert("Please enter a name!"); return; }
@@ -963,25 +968,32 @@
                 nameInput.value = cachedName;
             }
 
-            // FINGERPRINT LOGIC:
-            // If my Best Score (29) is higher than what I successfully submitted (e.g. -1 or 10),
-            // OR if I have a score > 0 and haven't submitted anything yet...
-            // Show the save box.
-            if (bestScore > lastSubmittedScore && bestScore > 0) {
+            // --- SAVE LOGIC FIX ---
+            // Simplified condition: Always show save button if user has a score > 0 OR a cached score > 0.
+            // This ensures the button appears even if "lastSubmittedScore" logic was blocking it.
+            if (finalScore > 0 || (bestScore > lastSubmittedScore && bestScore > 0)) {
                 document.getElementById('save-score-area').style.display = 'block';
                 
                 if (finalScore >= bestScore) {
+                    // New record
                     saveReasonMsg.innerText = "🎉 NEW HIGH SCORE!";
                     saveReasonMsg.style.color = "#2ecc71";
-                } else {
+                } else if (bestScore > lastSubmittedScore && finalScore < bestScore) {
+                    // Played a 12, but have a 29 cached.
+                    // We let you save the 12, but remind you about the 29.
+                    // (The Submit function will automatically pick the 29).
                     saveReasonMsg.innerText = `Unsubmitted High Score Detected: ${bestScore}!`;
                     saveReasonMsg.style.color = "#ffcc00";
+                } else {
+                    saveReasonMsg.innerText = "Join the Leaderboard!";
+                    saveReasonMsg.style.color = "#fff";
                 }
                 
                 const msg = document.getElementById('gameover-msg');
                 msg.style.display = 'none'; 
                 
             } else {
+                // Score is 0 and nothing better cached
                 document.getElementById('save-score-area').style.display = 'none';
                 
                 const msg = document.getElementById('gameover-msg');
