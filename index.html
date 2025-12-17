@@ -677,6 +677,9 @@
                 // Fingerprint: Mark this score as submitted
                 localStorage.setItem('attSnakeSubmittedScore', scoreToSubmit);
                 
+                // FIX: Clear the cached name so it doesn't persist for the next person
+                localStorage.removeItem('attSnakeCachedName');
+
                 usernameInput.value = ""; 
                 alert(`Score of ${scoreToSubmit} saved to Leaderboard!`);
                 
@@ -797,6 +800,14 @@
 
             const savedScore = localStorage.getItem('attSnakeHighScore');
             if(savedScore) document.getElementById('highScore').innerText = savedScore;
+
+            // FIX: Save name to local storage as user types
+            const nameInput = document.getElementById('gameover-name-input');
+            if(nameInput) {
+                nameInput.addEventListener('input', (e) => {
+                    localStorage.setItem('attSnakeCachedName', e.target.value);
+                });
+            }
         });
 
         function closeVideoOverlay() {
@@ -908,6 +919,7 @@
             const lastSubmittedScore = parseInt(localStorage.getItem('attSnakeSubmittedScore')) || -1; 
             const gameOverBox = document.querySelector('#game-overlay');
             const saveReasonMsg = document.getElementById('save-reason-msg');
+            const nameInput = document.getElementById('gameover-name-input');
             
             // What is the absolute best score this user has?
             const bestScore = Math.max(finalScore, savedHighScore);
@@ -928,6 +940,12 @@
             }
 
             document.getElementById('final-score').innerText = finalScore;
+
+            // FIX: Restore the cached name if it exists
+            const cachedName = localStorage.getItem('attSnakeCachedName');
+            if(cachedName) {
+                nameInput.value = cachedName;
+            }
 
             // LOGIC FIX: Show Save Button if Best Score > Last Submitted Score
             // This ensures if they have a cached 29 but never submitted it, they get prompted now.
