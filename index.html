@@ -509,10 +509,10 @@
                 <p>Final Score: <span id="final-score">0</span></p>
                 
                 <div style="margin: 15px 0;">
-                    <input type="text" id="gameover-name-input" placeholder="Enter Name" maxlength="12" style="padding: 8px; width: 60%; border-radius: 4px; border: 1px solid #ccc;">
-                    <button onclick="submitScoreFromGame()" class="btn btn-primary" style="display:inline-block; width: auto; padding: 8px 15px; margin-left: 5px;">Save</button>
+                    <input type="text" id="gameover-name-input" placeholder="Enter Name" maxlength="12" style="padding: 8px; width: 60%; border-radius: 4px; border: 1px solid #ccc; font-size: 16px;">
+                    <button onclick="submitScoreFromGame()" class="btn btn-primary" style="display:inline-block; width: auto; padding: 8px 15px; margin-left: 5px; font-size: 14px;">Save</button>
                 </div>
-                <p id="gameover-msg" style="color: yellow; font-size: 12px; display:none;"></p>
+                <p id="gameover-msg" style="color: #d32f2f; font-weight: bold; font-size: 12px; display:none;"></p>
 
                 <button onclick="restartGame()" class="btn btn-game" style="width: auto; padding: 10px 30px; margin-top: 10px;">Try Again</button>
             </div>
@@ -553,9 +553,9 @@
             console.log("Filter library loading...", e);
         }
 
-        // Fetch Scores (With Cache Busting Fix)
+        // Fetch Scores (FIXED: Uses CORS Proxy to fix Mixed Content blocking)
         async function fetchLeaderboard() {
-            // Add random timestamp to prevent browser from showing cached old scores
+            // Timestamp added to URL to prevent caching old scores
             const targetUrl = `http://dreamlo.com/lb/${DREAMLO_PUBLIC}/json?t=${new Date().getTime()}`;
             const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
 
@@ -598,7 +598,7 @@
             }
         }
 
-        // Submit Score from Game Over Screen
+        // Save Score from Game Over Screen (FIXED: Uses CORS Proxy)
         async function submitScoreFromGame() {
             const usernameInput = document.getElementById('gameover-name-input');
             const msg = document.getElementById('gameover-msg');
@@ -618,6 +618,7 @@
                 msg.style.display = 'none';
             }
 
+            // Using Proxy for saving too
             const targetUrl = `http://dreamlo.com/lb/${DREAMLO_PRIVATE}/add/${encodeURIComponent(rawName)}/${score}`;
             const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
             
