@@ -603,7 +603,13 @@
             const usernameInput = document.getElementById('gameover-name-input');
             const msg = document.getElementById('gameover-msg');
             const rawName = usernameInput.value.trim();
-            const score = document.getElementById('final-score').innerText; 
+            
+            // LOGIC FIX: Compare Current Score vs All-Time Cached Score
+            const currentSessionScore = parseInt(document.getElementById('final-score').innerText) || 0;
+            const allTimeHighScore = parseInt(localStorage.getItem('attSnakeHighScore')) || 0;
+            
+            // We submit the HIGHER of the two
+            const scoreToSubmit = Math.max(currentSessionScore, allTimeHighScore);
 
             if (!rawName) {
                 alert("Please enter a name!");
@@ -619,13 +625,13 @@
             }
 
             // Using Proxy for saving too
-            const targetUrl = `http://dreamlo.com/lb/${DREAMLO_PRIVATE}/add/${encodeURIComponent(rawName)}/${score}`;
+            const targetUrl = `http://dreamlo.com/lb/${DREAMLO_PRIVATE}/add/${encodeURIComponent(rawName)}/${scoreToSubmit}`;
             const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
             
             try {
                 await fetch(proxyUrl);
                 usernameInput.value = ""; 
-                alert("Score saved to Leaderboard!");
+                alert(`Score of ${scoreToSubmit} saved to Leaderboard!`);
                 // Refresh list
                 fetchLeaderboard(); 
             } catch (error) {
