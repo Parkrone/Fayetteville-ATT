@@ -508,11 +508,14 @@
                 <h2>GAME OVER</h2>
                 <p>Final Score: <span id="final-score">0</span></p>
                 
-                <div style="margin: 15px 0;">
+                <div id="save-score-area" style="display:none; margin: 15px 0;">
                     <input type="text" id="gameover-name-input" placeholder="Enter Name" maxlength="12" style="padding: 8px; width: 60%; border-radius: 4px; border: 1px solid #ccc; font-size: 16px;">
                     <button onclick="submitScoreFromGame()" class="btn btn-primary" style="display:inline-block; width: auto; padding: 8px 15px; margin-left: 5px; font-size: 14px;">Save</button>
                 </div>
-                <p id="gameover-msg" style="color: #d32f2f; font-weight: bold; font-size: 12px; display:none;"></p>
+                
+                <p id="gameover-msg" style="color: #ffcc00; font-weight: bold; font-size: 14px; margin-top: 10px;"></p>
+                
+                <p id="leaderboard-gap-msg" style="color: #fff; font-size: 12px; margin-top: 5px; font-style: italic; display: none;"></p>
 
                 <button onclick="restartGame()" class="btn btn-game" style="width: auto; padding: 10px 30px; margin-top: 10px;">Try Again</button>
             </div>
@@ -544,6 +547,7 @@
         const DREAMLO_PUBLIC = "6942f2278f40bbcf805cdd26";  
         const DREAMLO_PRIVATE = "fKYDKbAwxUW9b4L3xT98OQRWMO4zuSWEixyiSgUfLM6g"; 
         const MAX_SCORES_TO_SHOW = 5;
+        let globalScores = []; // Stores fetched scores for gap calculation
 
         // Initialize Profanity Filter
         let filter;
@@ -553,9 +557,8 @@
             console.log("Filter library loading...", e);
         }
 
-        // Fetch Scores (FIXED: Uses CORS Proxy to fix Mixed Content blocking)
+        // Fetch Scores (With Cache Busting Fix)
         async function fetchLeaderboard() {
-            // Timestamp added to URL to prevent caching old scores
             const targetUrl = `http://dreamlo.com/lb/${DREAMLO_PUBLIC}/json?t=${new Date().getTime()}`;
             const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
 
@@ -568,6 +571,7 @@
 
                 if (!data.dreamlo.leaderboard) {
                     listContainer.innerHTML = "<p>No scores yet!</p>";
+                    globalScores = [];
                     return;
                 }
 
@@ -576,6 +580,8 @@
 
                 // Sort High to Low
                 scores.sort((a, b) => parseInt(b.score) - parseInt(a.score)); 
+                globalScores = scores; // Update global variable
+
                 const topScores = scores.slice(0, MAX_SCORES_TO_SHOW);
 
                 topScores.forEach((entry, index) => {
@@ -604,11 +610,8 @@
             const msg = document.getElementById('gameover-msg');
             const rawName = usernameInput.value.trim();
             
-            // LOGIC FIX: Compare Current Score vs All-Time Cached Score
             const currentSessionScore = parseInt(document.getElementById('final-score').innerText) || 0;
             const allTimeHighScore = parseInt(localStorage.getItem('attSnakeHighScore')) || 0;
-            
-            // We submit the HIGHER of the two
             const scoreToSubmit = Math.max(currentSessionScore, allTimeHighScore);
 
             if (!rawName) {
@@ -617,11 +620,8 @@
             }
 
             if (filter && filter.isProfane(rawName)) {
-                msg.innerText = "⚠️ Please choose a cleaner name!";
-                msg.style.display = 'block';
+                alert("⚠️ Please choose a cleaner name!");
                 return;
-            } else {
-                msg.style.display = 'none';
             }
 
             // Using Proxy for saving too
@@ -632,6 +632,13 @@
                 await fetch(proxyUrl);
                 usernameInput.value = ""; 
                 alert(`Score of ${scoreToSubmit} saved to Leaderboard!`);
+                
+                // Hide input after successful save to prevent double submission
+                document.getElementById('save-score-area').style.display = 'none';
+                msg.innerText = "Score Saved!";
+                msg.style.display = 'block';
+                msg.style.color = '#2ecc71';
+
                 // Refresh list
                 fetchLeaderboard(); 
             } catch (error) {
@@ -893,7 +900,77 @@
         function update() { if(headX%GRID_SIZE===0 && headY%GRID_SIZE===0){if(nextVelX!==0||nextVelY!==0){if(velX===0&&nextVelY!==-velY||velY===0&&nextVelX!==-velX){velX=nextVelX; velY=nextVelY;}}} headX+=velX; headY+=velY; path.unshift({x:headX, y:headY}); if(path.length>snakeLength*(GRID_SIZE/SPEED)) path.pop(); if(headX<0||headX>=canvas.width||headY<0||headY>=canvas.height){triggerGameOver(); return;} let skip=GRID_SIZE/SPEED*2; for(let i=skip; i<path.length; i++){if(path[i].x===headX && path[i].y===headY){triggerGameOver(); return;}} if(Math.hypot(headX-food.x, headY-food.y)<SPEED){headX=food.x; headY=food.y; score++; document.getElementById('score').innerText=score; snakeLength++; spawnFood();} }
         function draw() { ctx.fillStyle="#fff"; ctx.fillRect(0,0,canvas.width,canvas.height); ctx.drawImage(foodImg,food.x,food.y,GRID_SIZE,GRID_SIZE); const step=GRID_SIZE/SPEED; for(let i=0; i<path.length; i+=step){let idx=Math.floor(i); if(idx>=path.length) break; let seg=path[idx]; let ang=0; if(i===0){if(velX>0) ang=Math.PI/2; else if(velX<0) ang=-Math.PI/2; else if(velY>0) ang=Math.PI; else ang=0;}else{let n=Math.max(0,idx-step); let ns=path[n]; let dx=ns.x-seg.x; let dy=ns.y-seg.y; if(dx>0) ang=Math.PI/2; else if(dx<0) ang=-Math.PI/2; else if(dy>0) ang=Math.PI; else ang=0;} drawRotatedImage(snakeImg,seg.x,seg.y,ang);} }
         function drawRotatedImage(img,x,y,ang){ ctx.save(); ctx.translate(x+GRID_SIZE/2,y+GRID_SIZE/2); ctx.rotate(ang); ctx.drawImage(img,-GRID_SIZE/2,-GRID_SIZE/2,GRID_SIZE,GRID_SIZE); ctx.restore(); }
-        function triggerGameOver() { gameRunning=false; let h=parseInt(localStorage.getItem('attSnakeHighScore'))||0; if(score>h){localStorage.setItem('attSnakeHighScore',score); document.getElementById('highScore').innerText=score;} document.getElementById('final-score').innerText=score; document.getElementById('game-overlay').classList.remove('hidden'); }
+        
+        // --- UPDATED GAME OVER TRIGGER (With New Logic) ---
+        function triggerGameOver() { 
+            gameRunning = false; 
+            const finalScore = score;
+            const savedHighScore = parseInt(localStorage.getItem('attSnakeHighScore')) || 0;
+            
+            // Check for High Score
+            if (finalScore > savedHighScore) {
+                localStorage.setItem('attSnakeHighScore', finalScore);
+                document.getElementById('highScore').innerText = finalScore;
+                
+                // SHOW Save Button
+                document.getElementById('save-score-area').style.display = 'block';
+                const msg = document.getElementById('gameover-msg');
+                msg.innerText = "🎉 NEW HIGH SCORE! Save it to the board! 🎉";
+                msg.style.display = 'block';
+                msg.style.color = '#2ecc71'; 
+            } else {
+                // NO New High Score -> HIDE Save Button
+                document.getElementById('save-score-area').style.display = 'none';
+                const msg = document.getElementById('gameover-msg');
+                
+                let messageText = `Your Best: ${savedHighScore}. `;
+                if (finalScore >= (savedHighScore * 0.8) && finalScore > 0) {
+                    messageText += "So close! 🤏";
+                } else {
+                    messageText += "Keep practicing! 🐍";
+                }
+                msg.innerText = messageText;
+                msg.style.display = 'block';
+                msg.style.color = '#ffcc00'; 
+            }
+
+            document.getElementById('final-score').innerText = finalScore;
+            
+            // --- LEADERBOARD GAP CALCULATION ---
+            const gapMsg = document.getElementById('leaderboard-gap-msg');
+            if (globalScores.length > 0) {
+                let nextTarget = null;
+                let rank = 0;
+
+                // Find the person immediately above you
+                for (let i = globalScores.length - 1; i >= 0; i--) {
+                    if (parseInt(globalScores[i].score) > finalScore) {
+                        nextTarget = globalScores[i];
+                        rank = i + 1;
+                        break; 
+                    }
+                }
+                
+                if (nextTarget) {
+                    const diff = parseInt(nextTarget.score) - finalScore + 1;
+                    gapMsg.innerText = `🔥 You need ${diff} more points to overtake #${rank} (${nextTarget.name})!`;
+                    gapMsg.style.display = 'block';
+                } else if (globalScores.length < 5) {
+                     // Empty board, easy win
+                     gapMsg.innerText = "Top 5 is wide open! Go for it!";
+                     gapMsg.style.display = 'block';
+                } else {
+                    // You are #1
+                    gapMsg.innerText = "You are the Snake Champion! 👑";
+                    gapMsg.style.display = 'block';
+                }
+            } else {
+                gapMsg.style.display = 'none';
+            }
+
+            document.getElementById('game-overlay').classList.remove('hidden'); 
+        }
+
         let tsX=0, tsY=0; canvas.addEventListener('touchstart', e=>{tsX=e.changedTouches[0].screenX; tsY=e.changedTouches[0].screenY;}, {passive:false}); canvas.addEventListener('touchend', e=>{if(!gameRunning)return; let dx=e.changedTouches[0].screenX-tsX; let dy=e.changedTouches[0].screenY-tsY; handleInput(dx,dy);}, {passive:false}); 
         
         // --- NEW IMPROVED KEYBOARD LISTENER ---
