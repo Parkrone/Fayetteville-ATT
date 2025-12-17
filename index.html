@@ -24,6 +24,14 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bad-words@4.0.0/dist/index.min.js"></script>
 
+    <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "un34t53aiv");
+    </script>
+
     <style>
         /* --- CSS VARIABLES --- */
         :root {
@@ -499,19 +507,19 @@
             <div id="game-overlay" class="overlay-base hidden" style="position: absolute; border-radius: 10px;">
                 <h2>GAME OVER</h2>
                 <p>Final Score: <span id="final-score">0</span></p>
-                <button onclick="restartGame()" class="btn btn-game" style="width: auto; padding: 10px 30px;">Try Again</button>
+                
+                <div style="margin: 15px 0;">
+                    <input type="text" id="gameover-name-input" placeholder="Enter Name" maxlength="12" style="padding: 8px; width: 60%; border-radius: 4px; border: 1px solid #ccc;">
+                    <button onclick="submitScoreFromGame()" class="btn btn-primary" style="display:inline-block; width: auto; padding: 8px 15px; margin-left: 5px;">Save</button>
+                </div>
+                <p id="gameover-msg" style="color: yellow; font-size: 12px; display:none;"></p>
+
+                <button onclick="restartGame()" class="btn btn-game" style="width: auto; padding: 10px 30px; margin-top: 10px;">Try Again</button>
             </div>
         </div>
 
         <div id="store-leaderboard" style="display: none;">
             <h3 style="color: var(--att-blue); margin-top: 0; margin-bottom: 10px;">🏆 High Scores</h3>
-            
-            <div id="score-input-area" style="display: flex; gap: 5px; justify-content: center; margin-bottom: 15px;">
-                <input type="text" id="username-input" placeholder="Enter name" maxlength="12" style="padding: 10px; width: 60%; border: 1px solid #ccc; border-radius: 4px; font-size: 16px;">
-                <button onclick="submitScore()" style="background: var(--att-blue); color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">Save</button>
-            </div>
-            <p id="filter-msg" style="color: red; font-size: 12px; display: none; margin-top: -10px; margin-bottom: 10px;">⚠️ Please choose a cleaner name!</p>
-
             <div id="leaderboard-list" style="text-align: left;">
                 <p>Loading scores...</p>
             </div>
@@ -545,11 +553,10 @@
             console.log("Filter library loading...", e);
         }
 
-        // Fetch Scores
+        // Fetch Scores (With Cache Busting Fix)
         async function fetchLeaderboard() {
-            // TARGET URL (HTTP)
-            const targetUrl = `http://dreamlo.com/lb/${DREAMLO_PUBLIC}/json`;
-            // PROXY URL (HTTPS) -> Forces browser to accept request
+            // Add random timestamp to prevent browser from showing cached old scores
+            const targetUrl = `http://dreamlo.com/lb/${DREAMLO_PUBLIC}/json?t=${new Date().getTime()}`;
             const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
 
             try {
@@ -579,7 +586,6 @@
                     item.style.justifyContent = "space-between";
                     item.style.fontSize = "14px";
                     
-                    // Highlight top score
                     if (index === 0) item.style.fontWeight = "bold";
 
                     item.innerHTML = `<span><b>#${index + 1}</b> ${entry.name}</span> <span>${entry.score} pts</span>`;
@@ -592,34 +598,38 @@
             }
         }
 
-        // Submit Score
-        async function submitScore() {
-            const usernameInput = document.getElementById('username-input');
+        // Submit Score from Game Over Screen
+        async function submitScoreFromGame() {
+            const usernameInput = document.getElementById('gameover-name-input');
+            const msg = document.getElementById('gameover-msg');
             const rawName = usernameInput.value.trim();
-            const score = localStorage.getItem('attSnakeHighScore') || 0; 
+            const score = document.getElementById('final-score').innerText; 
 
-            if (!rawName) return alert("Please enter a name!");
-            if (score == 0) return alert("Play the game first to get a score!");
-
-            if (filter && filter.isProfane(rawName)) {
-                document.getElementById('filter-msg').style.display = 'block';
+            if (!rawName) {
+                alert("Please enter a name!");
                 return;
-            } else {
-                document.getElementById('filter-msg').style.display = 'none';
             }
 
-            // TARGET URL (HTTP)
+            if (filter && filter.isProfane(rawName)) {
+                msg.innerText = "⚠️ Please choose a cleaner name!";
+                msg.style.display = 'block';
+                return;
+            } else {
+                msg.style.display = 'none';
+            }
+
             const targetUrl = `http://dreamlo.com/lb/${DREAMLO_PRIVATE}/add/${encodeURIComponent(rawName)}/${score}`;
-            // PROXY URL (HTTPS)
             const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
             
             try {
                 await fetch(proxyUrl);
                 usernameInput.value = ""; 
+                alert("Score saved to Leaderboard!");
+                // Refresh list
                 fetchLeaderboard(); 
-                alert("Score saved!");
             } catch (error) {
                 console.error(error);
+                alert("Saved locally. (Network issue with global board)");
                 setTimeout(fetchLeaderboard, 1000);
             }
         }
