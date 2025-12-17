@@ -652,8 +652,9 @@
                 }
                 // -----------------------------
                 
-                // Extract unique milestones for rocket effect
-                scoreMilestones = [...new Set(scores.map(s => parseInt(s.score)))].sort((a,b) => a-b);
+                // ROCKET FIX: Only calculate milestones for TOP 5 scores
+                const top5Scores = scores.slice(0, MAX_SCORES_TO_SHOW);
+                scoreMilestones = [...new Set(top5Scores.map(s => parseInt(s.score)))].sort((a,b) => a-b);
 
                 const topScores = scores.slice(0, MAX_SCORES_TO_SHOW);
 
@@ -978,8 +979,8 @@
                     saveReasonMsg.style.color = "#2ecc71";
                 } else {
                     // We played a lower score, but our best isn't on the board yet.
-                    saveReasonMsg.innerText = `Unsubmitted High Score: ${bestScore}!`;
-                    saveReasonMsg.style.color = "#ffcc00";
+                    saveReasonMsg.innerText = "Join the Leaderboard!";
+                    saveReasonMsg.style.color = "#fff";
                 }
                 
                 const msg = document.getElementById('gameover-msg');
