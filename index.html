@@ -317,6 +317,24 @@
         .confirm-title { color: var(--att-blue); font-size: 24px; margin-bottom: 15px; font-weight: 700; }
         .confirm-text { font-size: 15px; color: var(--subtext-color); line-height: 1.5; margin-bottom: 20px; }
         
+        /* iOS INSTALL OVERLAY */
+        #ios-install-overlay {
+            justify-content: flex-end; /* Align to bottom */
+            padding-bottom: 40px;
+        }
+        .ios-instruction-box {
+            background: white; border-radius: 15px; padding: 20px;
+            color: #333; max-width: 320px; width: 100%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: center; position: relative;
+        }
+        .ios-step { display: flex; align-items: center; margin: 10px 0; font-size: 14px; text-align: left;}
+        .ios-icon { font-size: 24px; margin-right: 15px; width: 30px; text-align: center; }
+        .ios-arrow {
+            position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%) rotate(45deg);
+            width: 20px; height: 20px; background: white;
+        }
+        
         /* Updated Last.fm Descriptions */
         .lastfm-desc { font-size: 14px; color: var(--subtext-color); line-height: 1.5; margin-bottom: 15px; text-align: left; }
         .fine-print { font-size: 9px; opacity: 0.8; color: #888; margin-bottom: 20px; line-height: 1.3; text-align: justify; }
@@ -435,6 +453,22 @@
         <div class="ib-actions">
             <button id="banner-install-btn" class="ib-install-btn">Install</button>
             <span id="banner-close" class="ib-close">&times;</span>
+        </div>
+    </div>
+
+    <div id="ios-install-overlay" class="overlay-base hidden">
+        <div class="ios-instruction-box">
+            <h3 style="margin-bottom: 15px; color: #000;">Install on iPhone</h3>
+            <div class="ios-step">
+                <span class="ios-icon">📤</span>
+                <span>1. Tap the <b>Share</b> button in the menu bar.</span>
+            </div>
+            <div class="ios-step">
+                <span class="ios-icon">➕</span>
+                <span>2. Scroll down and select <b>"Add to Home Screen"</b>.</span>
+            </div>
+            <button onclick="closeOverlay('ios-install-overlay')" class="btn btn-primary" style="margin-top: 15px; width: 100%; padding: 10px;">Got it!</button>
+            <div class="ios-arrow"></div>
         </div>
     </div>
 
@@ -572,6 +606,31 @@
     <footer>&copy; 2025 Fayetteville Mall Store Location.<br>Built by <a href="https://parkrone.github.io/Parker-Design-Lab/" target="_blank">Parker Thompson</a></footer>
 
     <script>
+      // SAFE PRELOADER DISMISSAL (Optimized)
+      function dismissPreloader() {
+          const loader = document.getElementById("preloader");
+          const container = document.getElementById("mainContainer");
+          
+          if(loader && !loader.classList.contains("loader-hidden")) {
+              loader.classList.add("loader-hidden");
+              if(container) container.classList.add("content-visible");
+              setTimeout(() => { if(loader.parentNode) loader.parentNode.removeChild(loader); }, 500);
+          }
+      }
+      
+      document.addEventListener('DOMContentLoaded', () => { setTimeout(dismissPreloader, 800); });
+      setTimeout(dismissPreloader, 3000); // Failsafe
+      window.addEventListener('load', dismissPreloader);
+
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./service-worker.js')
+            .catch(err => console.log('SW Failed:', err));
+        });
+      }
+    </script>
+
+    <script>
         // --- LEADERBOARD CONFIGURATION ---
         const DREAMLO_PUBLIC = "6942f2278f40bbcf805cdd26";  
         const DREAMLO_PRIVATE = "fKYDKbAwxUW9b4L3xT98OQRWMO4zuSWEixyiSgUfLM6g"; 
@@ -579,11 +638,9 @@
         let globalScores = []; 
         let scoreMilestones = []; 
 
-        // Initialize Profanity Filter Safe
         let filter;
         try { filter = new Filter(); } catch(e) { console.log("Filter not loaded"); }
 
-        // Fetch Scores & Set Milestones for Rocket
         async function fetchLeaderboard() {
             const targetUrl = `http://dreamlo.com/lb/${DREAMLO_PUBLIC}/json?t=${new Date().getTime()}`;
             const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
@@ -599,7 +656,6 @@
                     if(listContainer) listContainer.innerHTML = "<p>No scores yet!</p>";
                     globalScores = [];
                     scoreMilestones = [];
-                    // SYNC FIX: Leaderboard empty. Local submission status is wrong.
                     localStorage.removeItem('attSnakeSubmittedName'); 
                     return;
                 }
@@ -607,30 +663,24 @@
                 let scores = data.dreamlo.leaderboard.entry;
                 if (!Array.isArray(scores)) scores = [scores];
 
-                // Sort High to Low
                 scores.sort((a, b) => parseInt(b.score) - parseInt(a.score)); 
                 globalScores = scores; 
                 
-                // --- FINGERPRINT SYNC CHECK (NAME BASED) ---
-                // Find local high score and the name we last used
+                // NAME SYNC CHECK
                 const localHigh = parseInt(localStorage.getItem('attSnakeHighScore')) || 0;
                 const localName = localStorage.getItem('attSnakeSubmittedName');
 
                 if (localHigh > 0 && localName) {
-                    // Check if ANY entry on the board matches BOTH our name AND our score
                     const isVerifiedOnBoard = globalScores.some(entry => 
                         entry.name === localName && parseInt(entry.score) === localHigh
                     );
-                    
                     if (!isVerifiedOnBoard) {
-                        console.log("Sync: Local high score not found under stored name. Resetting submission status.");
-                        // We aren't on the board with that name/score combo. Reset so we can submit again.
+                        console.log("Sync: Resetting submission status.");
                         localStorage.removeItem('attSnakeSubmittedName');
                     }
                 }
-                // -----------------------------
                 
-                // ROCKET FIX: Only calculate milestones for TOP 5 scores
+                // ROCKET FIX: Top 5 Only
                 const top5Scores = scores.slice(0, MAX_SCORES_TO_SHOW);
                 scoreMilestones = [...new Set(top5Scores.map(s => parseInt(s.score)))].sort((a,b) => a-b);
 
@@ -649,23 +699,15 @@
                         listContainer.appendChild(item);
                     });
                 }
-                
-            } catch (error) {
-                console.log("Leaderboard fetch error (handled silently)");
-            }
+            } catch (error) { console.log("Leaderboard fetch error"); }
         }
 
-        // Save Score
         async function submitScoreFromGame() {
             const usernameInput = document.getElementById('gameover-name-input');
             const msg = document.getElementById('gameover-msg');
             const rawName = usernameInput.value.trim();
-            
-            // Get current and best scores
             const currentSessionScore = parseInt(document.getElementById('final-score').innerText) || 0;
             const allTimeHighScore = parseInt(localStorage.getItem('attSnakeHighScore')) || 0;
-            
-            // SUBMIT LOGIC: Submit the highest score available.
             const scoreToSubmit = Math.max(currentSessionScore, allTimeHighScore);
 
             if (!rawName) { alert("Please enter a name!"); return; }
@@ -676,51 +718,47 @@
             
             try {
                 await fetch(proxyUrl);
-                
-                // Fingerprint: Save the NAME used for this score.
                 localStorage.setItem('attSnakeSubmittedName', rawName);
-                
-                // Clear the cached name prepopulation (fresh start for next player)
                 localStorage.removeItem('attSnakeCachedName');
-
                 usernameInput.value = ""; 
                 alert(`Score of ${scoreToSubmit} saved to Leaderboard as ${rawName}!`);
-                
                 document.getElementById('save-score-area').style.display = 'none';
                 msg.innerText = "Score Saved!";
                 msg.style.display = 'block';
                 msg.style.color = '#2ecc71';
-
                 fetchLeaderboard(); 
-            } catch (error) {
-                console.error(error);
-                alert("Saved locally. (Network issue with global board)");
-            }
+            } catch (error) { alert("Saved locally. (Network issue)"); }
         }
 
         const storeSchedule = { 0: { open: 1200, close: 1800 }, 1: { open: 1100, close: 2000 }, 2: { open: 1100, close: 2000 }, 3: { open: 1100, close: 2000 }, 4: { open: 1100, close: 2000 }, 5: { open: 1100, close: 2000 }, 6: { open: 1100, close: 2000 } };
         const LASTFM_USER = 'ATTFayetteville'; 
         const LASTFM_API_KEY = 'f7020f441263b35598d85540e23c950c';
 
-        // --- PWA LOGIC ---
+        // --- PWA LOGIC (UPDATED FOR iOS) ---
         let deferredPrompt;
         const installBtn = document.getElementById('headerInstallBtn');
         const installBanner = document.getElementById('install-banner');
         const bannerInstallBtn = document.getElementById('banner-install-btn');
         const bannerCloseBtn = document.getElementById('banner-close');
 
-        let visits = localStorage.getItem('siteVisits') || 0;
-        visits++;
-        localStorage.setItem('siteVisits', visits);
+        // Check for iOS
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
 
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault(); 
             deferredPrompt = e; 
             if(installBtn) installBtn.style.display = 'flex';
-            if (visits >= 2 && installBanner) {
-                setTimeout(() => { installBanner.classList.add('visible'); }, 1500); 
-            }
+            let visits = localStorage.getItem('siteVisits') || 0;
+            visits++;
+            localStorage.setItem('siteVisits', visits);
+            if (visits >= 2 && installBanner) { setTimeout(() => { installBanner.classList.add('visible'); }, 1500); }
         });
+
+        // FORCE SHOW BUTTON ON IOS (If not already installed)
+        if (isIOS && !isStandalone && installBtn) {
+            installBtn.style.display = 'flex';
+        }
 
         if(installBtn) installBtn.addEventListener('click', triggerInstall);
         if(bannerInstallBtn) bannerInstallBtn.addEventListener('click', () => { triggerInstall(); installBanner.classList.remove('visible'); });
@@ -732,10 +770,12 @@
                 const { outcome } = await deferredPrompt.userChoice;
                 deferredPrompt = null; 
                 if(installBtn) installBtn.style.display = 'none';
+            } else if (isIOS) {
+                // Show iOS Instructions
+                document.getElementById('ios-install-overlay').classList.remove('hidden');
             }
         }
 
-        // --- MAIN INITIALIZATION ---
         document.addEventListener("DOMContentLoaded", function () {
             const container = document.getElementById("mainContainer");
             const video = document.getElementById("bg-video");
@@ -804,7 +844,6 @@
             const savedScore = localStorage.getItem('attSnakeHighScore');
             if(savedScore) document.getElementById('highScore').innerText = savedScore;
 
-            // FIX: Save name to local storage as user types
             const nameInput = document.getElementById('gameover-name-input');
             if(nameInput) {
                 nameInput.addEventListener('input', (e) => {
@@ -859,7 +898,6 @@
         const GRID_SIZE = 20; const SPEED = 2; const TILE_COUNT = 15; 
         let animationId; let gameRunning = false; let score = 0; let path = []; let snakeLength = 3; let headX = 0, headY = 0, velX = 0, velY = 0, nextVelX = 0, nextVelY = 0; let food = { x: 0, y: 0 }; let lastTime = 0; const targetFPS = 60; const frameInterval = 1000 / targetFPS;
         
-        // Game Button Trigger - FIXED: Use JS Listener Only
         const gameBtn = document.querySelector('.btn-game');
         if(gameBtn) gameBtn.addEventListener('click', function() { playJelly(this); toggleGame(); });
 
@@ -896,7 +934,6 @@
                 snakeLength++; 
                 spawnFood();
                 
-                // ROCKET CHECK
                 if (scoreMilestones.length > 0 && score >= scoreMilestones[0]) {
                     const rocket = document.getElementById('rocket-effect');
                     if(rocket) {
@@ -913,7 +950,6 @@
         function draw() { if(!ctx) return; ctx.fillStyle="#fff"; ctx.fillRect(0,0,300,300); ctx.drawImage(foodImg,food.x,food.y,20,20); const step=10; for(let i=0; i<path.length; i+=step){let idx=Math.floor(i); if(idx>=path.length) break; let seg=path[idx]; let ang=0; if(i===0){if(velX>0) ang=Math.PI/2; else if(velX<0) ang=-Math.PI/2; else if(velY>0) ang=Math.PI; else ang=0;}else{let n=Math.max(0,idx-step); let ns=path[n]; let dx=ns.x-seg.x; let dy=ns.y-seg.y; if(dx>0) ang=Math.PI/2; else if(dx<0) ang=-Math.PI/2; else if(dy>0) ang=Math.PI; else ang=0;} drawRotatedImage(snakeImg,seg.x,seg.y,ang);} }
         function drawRotatedImage(img,x,y,ang){ ctx.save(); ctx.translate(x+10,y+10); ctx.rotate(ang); ctx.drawImage(img,-10,-10,20,20); ctx.restore(); }
         
-        // --- UPDATED GAME OVER TRIGGER ---
         function triggerGameOver() { 
             gameRunning = false; 
             const finalScore = score;
@@ -925,11 +961,9 @@
             
             const bestScore = Math.max(finalScore, savedHighScore);
             
-            // Update Local High Score
             if (finalScore > savedHighScore) {
                 localStorage.setItem('attSnakeHighScore', finalScore);
                 document.getElementById('highScore').innerText = finalScore;
-                // If we beat the high score, we need to submit again, so clear the name proof.
                 localStorage.removeItem('attSnakeSubmittedName');
                 
                 if (globalScores.length > 0 && finalScore > parseInt(globalScores[0].score)) {
@@ -941,31 +975,21 @@
 
             document.getElementById('final-score').innerText = finalScore;
 
-            // Restore Cached Name
             const cachedName = localStorage.getItem('attSnakeCachedName');
             if(cachedName) nameInput.value = cachedName;
 
-            // --- SAVE LOGIC UPDATE (NAME VERIFICATION) ---
-            // Show save button IF:
-            // 1. We have a score > 0 AND
-            // 2. We have NOT successfully submitted this high score under a name yet.
             if (bestScore > 0 && !submittedName) {
                 document.getElementById('save-score-area').style.display = 'block';
-                
                 if (finalScore >= bestScore) {
                     saveReasonMsg.innerText = "🎉 NEW HIGH SCORE!";
                     saveReasonMsg.style.color = "#2ecc71";
                 } else {
-                    // We played a lower score, but our best isn't on the board yet.
                     saveReasonMsg.innerText = "Join the Leaderboard!";
                     saveReasonMsg.style.color = "#fff";
                 }
-                
                 const msg = document.getElementById('gameover-msg');
                 msg.style.display = 'none'; 
-                
             } else {
-                // Either score is 0, OR we already submitted this score under a name.
                 document.getElementById('save-score-area').style.display = 'none';
                 const msg = document.getElementById('gameover-msg');
                 msg.innerText = "Keep practicing! 🐍";
@@ -973,7 +997,6 @@
                 msg.style.color = '#ffcc00'; 
             }
             
-            // GAP CALCULATION
             const gapMsg = document.getElementById('leaderboard-gap-msg');
             if (globalScores.length > 0) {
                 let nextTarget = null;
@@ -1023,42 +1046,6 @@
         });
 
         function handleInput(dx,dy) { if(Math.abs(dx)<10 && Math.abs(dy)<10)return; if(Math.abs(dx)>Math.abs(dy)){if(dx>0){nextVelX=SPEED; nextVelY=0;}else{nextVelX=-SPEED; nextVelY=0;}}else{if(dy>0){nextVelX=0; nextVelY=SPEED;}else{nextVelX=0; nextVelY=-SPEED;}} }
-
-        // OPTIMIZED PRELOADER LOGIC
-      function dismissPreloader() {
-          const loader = document.getElementById("preloader");
-          const container = document.getElementById("mainContainer");
-          
-          if(loader && !loader.classList.contains("loader-hidden")) {
-              loader.classList.add("loader-hidden");
-              if(container) container.classList.add("content-visible");
-              
-              // Remove from DOM after fade-out transition (0.5s)
-              setTimeout(() => { 
-                  if(loader.parentNode) loader.parentNode.removeChild(loader); 
-              }, 500);
-          }
-      }
-
-      // 1. FAST DISMISSAL: Trigger as soon as the DOM is ready (don't wait for video/images)
-      document.addEventListener('DOMContentLoaded', () => {
-          // Small buffer (800ms) to let the animation play at least once smoothly
-          setTimeout(dismissPreloader, 800); 
-      });
-
-      // 2. FAILSAFE: If DOMContentLoaded hangs or connection is terrible, force open after 3s
-      setTimeout(dismissPreloader, 3000);
-
-      // 3. FALLBACK: Catch-all for when window fully loads (if earlier events missed)
-      window.addEventListener('load', dismissPreloader);
-
-      // Service Worker Registration
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./service-worker.js')
-            .catch(err => console.log('SW Failed:', err));
-        });
-      }
     </script>
 </body>
 </html>
