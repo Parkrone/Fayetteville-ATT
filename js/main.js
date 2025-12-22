@@ -48,7 +48,6 @@ window.addEventListener('beforeinstallprompt', (e) => {
     }
 });
 
-// Force button on iOS
 if (isIOS && !isStandalone && installBtn) {
     installBtn.style.display = 'flex';
 }
@@ -70,12 +69,10 @@ async function triggerInstall() {
 
 // --- HELPER FUNCTIONS ---
 
-// FIXED: Handles both removal of .hidden and addition of .overlay-visible
 function openOverlay(id) {
     const el = document.getElementById(id);
     if (el) {
         el.classList.remove('hidden');
-        // Small timeout to allow browser to register display:flex before adding opacity
         setTimeout(() => {
             el.classList.add('overlay-visible');
         }, 10);
@@ -86,7 +83,6 @@ function closeOverlay(id) {
     const el = document.getElementById(id);
     if (el) {
         el.classList.remove('overlay-visible');
-        // Wait for transition to finish before hiding
         setTimeout(() => {
             el.classList.add('hidden');
         }, 300);
@@ -162,11 +158,7 @@ document.addEventListener("DOMContentLoaded", function () {
     
     const callBtn = document.getElementById('callBtn');
     if(callBtn) callBtn.addEventListener('click', () => { 
-        // Call link is handled by browser, no openOverlay needed unless closed
         if(!isStoreOpen()) { 
-            // Only block call if closed AND you want to show overlay first
-            // Otherwise, let href="tel:..." work
-            // Since you have the closed check in the click listener, it's fine.
             openOverlay('closed-overlay'); 
         } 
     });
@@ -221,6 +213,20 @@ document.addEventListener("DOMContentLoaded", function () {
             localStorage.setItem('attSnakeCachedName', e.target.value);
         });
     }
+
+    // --- BUTTON GLOW ANIMATION ---
+    // Rotates the glow angle for .btn-glow elements
+    let angle = 0;
+    const rotateGradient = () => {
+        // Increment slower than before (0.5 instead of 1 or 2)
+        angle = (angle + 0.5) % 360; 
+        const glowButtons = document.querySelectorAll('.btn-glow');
+        glowButtons.forEach(btn => {
+            btn.style.setProperty('--glow-angle', `${angle}deg`);
+        });
+        requestAnimationFrame(rotateGradient);
+    };
+    rotateGradient();
 });
 
 // Absolute Failsafe
