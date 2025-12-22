@@ -46,7 +46,7 @@ In the modern retail environment, customers often consult with representatives i
 
 | Mobile Interface | Leaderboard & Game |
 |:---:|:---:|
-| <img src="media/game.png" width="300"> | <img src="media/leaderboard.png" width="300"> |
+| <img src="media/portal.gif" width="500"> | <img src="media/leaderboard.png" width="500"> |
 | *Clean, touch-friendly mobile navigation* | *Integrated Snake game with live high scores* |
 
 ---
