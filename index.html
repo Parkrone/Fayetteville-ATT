@@ -89,14 +89,14 @@
         .btn { 
             display: flex; justify-content: center; align-items: center; width: 100%; padding: 16px 20px; margin-bottom: 15px; 
             text-decoration: none; border-radius: 30px; font-weight: 600; font-size: 18px; 
-            transition: transform 0.1s ease;
+            transition: transform 0.1s ease; 
             border: 2px solid transparent; cursor: pointer; transform-origin: center; line-height: 1.2; 
-            position: relative; z-index: 2;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2); 
-            background-clip: padding-box; 
+            position: relative; z-index: 1; /* Low z-index to allow glow behind */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+            /* Fix for massive icons */
         }
-
-        /* CRITICAL FIX: Forces icons to stay small inside buttons */
+        
+        /* FIX: Prevents icons from blowing up */
         .icon-inline { 
             height: 1.3em !important; 
             width: auto !important; 
@@ -104,62 +104,57 @@
             margin-left: 8px; 
             margin-top: -3px; 
         }
-        
+
         @keyframes jellyPop { 0% { transform: scale(1); } 30% { transform: scale(0.90); } 50% { transform: scale(1.05); } 70% { transform: scale(0.98); } 100% { transform: scale(1); } }
         .btn-animate { animation: jellyPop 0.4s ease-out forwards; }
 
-        /* Standard Buttons */
+        /* Button Colors */
         .btn-primary { background-color: var(--att-blue); color: white; }
-        .btn-primary:hover { background-color: var(--att-blue-hover); }
         .btn-secondary { background-color: var(--btn-sec-bg); color: var(--btn-sec-text); border: 2px solid var(--btn-sec-border); }
-        .btn-secondary:hover { background-color: var(--btn-sec-hover); }
-        
-        /* Special Buttons */
         .btn-game { background-color: #ff7900; color: white; border: none; font-size: 15px; }
-        .btn-game:hover { background-color: #e66c00; }
         .btn-contact, .btn-call { background-color: var(--btn-gray-bg); color: white; border: 1px solid rgba(255,255,255,0.1); } 
-        .btn-contact:hover, .btn-call:hover { background-color: var(--btn-gray-hover); }
 
-        /* --- FINAL GLOW FIX (MASKED BACKGROUND) --- */
+        /* --- FIXED GLOW ANIMATION (NO PROPELLER) --- */
         .btn-glow {
-            /* Make button itself transparent so ::after can act as the solid background */
-            background-color: transparent !important;
-            border: none !important; 
+            overflow: visible; /* Let the glow shine outside the button */
         }
 
-        /* 1. The Spinning Gradient (Behind everything) */
+        /* 1. The Spinning Gradient (Behind) */
         .btn-glow::before {
             content: "";
             position: absolute;
-            inset: -3px; /* Creates the border width */
-            border-radius: 34px; 
+            z-index: -2; /* Way behind */
+            inset: -3px; /* How thick the border looks */
             background: conic-gradient(
                 from 0deg, 
                 transparent 0%, 
-                var(--att-blue) 15%, 
+                #0057B8 10%, 
                 #00c6ff 50%, 
-                var(--att-blue) 85%, 
+                #0057B8 90%, 
                 transparent 100%
             );
-            z-index: -2;
+            border-radius: 34px; 
             animation: rotateGlow 3s linear infinite;
-            filter: blur(4px); /* Slight blur for neon effect */
         }
 
-        /* 2. The Solid Background (Covers the propeller center) */
+        /* 2. The Solid Mask (Middle) - Hides the propeller center */
         .btn-glow::after {
             content: "";
             position: absolute;
-            inset: 0;
-            border-radius: 30px; 
-            z-index: -1; 
+            z-index: -1; /* Behind text, in front of gradient */
+            inset: 0; /* Matches button size exactly */
+            border-radius: 30px;
+            background: inherit; /* Copies the button's background color */
         }
-
-        /* Assign background colors to the mask based on button type */
-        .btn-secondary.btn-glow::after { background-color: var(--btn-sec-bg); border: 2px solid var(--btn-sec-border); }
+        
+        /* Explicit backgrounds for the mask to work */
         .btn-primary.btn-glow::after { background-color: var(--att-blue); }
+        .btn-secondary.btn-glow::after { background-color: var(--btn-sec-bg); }
 
-        @keyframes rotateGlow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes rotateGlow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
 
         /* --- GENERAL LAYOUT --- */
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
@@ -213,7 +208,7 @@
         .dot-open { background-color: #2ecc71; box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); animation: pulse-green 2s infinite; }
         .dot-closed { background-color: #e74c3c; box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); animation: pulse-red 2s infinite; }
         
-        /* Overlays - Fixed Visibility & Animation */
+        /* Overlays */
         .overlay-base { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background-color: var(--overlay-bg); 
