@@ -74,7 +74,7 @@
                 --border-color: #444;
                 --preloader-bg: #ffffff; 
                 --btn-gray-bg: #555555;
-                --btn-gray-hover: #777777;
+                --btn-gray-hover: #555555;
                 --player-bg: #252525;
                 --player-border: #333;
                 --track-name: #fff;
@@ -108,7 +108,7 @@
         @keyframes jellyPop { 0% { transform: scale(1); } 30% { transform: scale(0.90); } 50% { transform: scale(1.05); } 70% { transform: scale(0.98); } 100% { transform: scale(1); } }
         .btn-animate { animation: jellyPop 0.4s ease-out forwards; }
 
-        /* --- STANDARD BUTTON COLORS --- */
+        /* --- STANDARD BUTTON COLORS (Solid) --- */
         .btn-primary { 
             background-color: var(--att-blue); 
             color: white !important; 
@@ -124,6 +124,7 @@
         }
         .btn-secondary:hover { background-color: var(--btn-sec-hover); }
         
+        /* Special override for glowing secondary buttons so text is readable */
         .btn-secondary.btn-glow {
             color: white !important;
             --btn-bg-color: var(--att-blue);
@@ -142,8 +143,11 @@
 
         /* --- FIXED GLOW ANIMATION (Background Clip Method) --- */
         .btn-glow {
-            --glow-angle: 0deg; 
-            --glow-color: #00c6ff; 
+            --glow-angle: 0deg; /* Updated by JS */
+            --glow-color: #00c6ff; /* Cyan */
+            
+            /* Layer 1: Solid background inside the padding box (covers center) */
+            /* Layer 2: Conic gradient inside the border box (shows on edges) */
             background: 
                 linear-gradient(var(--btn-bg-color), var(--btn-bg-color)) padding-box,
                 conic-gradient(
@@ -152,7 +156,9 @@
                     var(--glow-color) 10%, 
                     transparent 20%
                 ) border-box;
-            border: 3px solid transparent; 
+            
+            border: 3px solid transparent; /* The width of the glow */
+            /* Ensure text sits on top */
             z-index: 10;
         }
 
@@ -233,11 +239,20 @@
             display: flex; flex-direction: column; justify-content: center; align-items: center; 
             border-radius: 0; z-index: 10000; padding: 25px; text-align: center; 
             opacity: 0; visibility: hidden; transform: scale(0.95);
+            /* SCROLL FIX */
+            overflow-y: auto; 
             transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), visibility 0.3s ease;
         }
         .overlay-visible { opacity: 1; visibility: visible; transform: scale(1); }
         .hidden { display: none !important; }
         
+        /* FIX FOR POPUP ICON SIZE */
+        .confirm-icon {
+            width: 80px;
+            height: auto;
+            margin-bottom: 15px;
+        }
+
         #install-banner { position: fixed; top: 15px; left: 50%; transform: translateX(-50%) translateY(-150%); width: 90%; max-width: 400px; background-color: white; box-shadow: 0 4px 20px rgba(0,0,0,0.15); border-radius: 12px; padding: 12px 15px; display: flex; align-items: center; justify-content: space-between; z-index: 12000; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         #install-banner.visible { transform: translateX(-50%) translateY(0); }
         .ib-content { display: flex; align-items: center; gap: 12px; }
