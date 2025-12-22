@@ -229,8 +229,8 @@ document.addEventListener("DOMContentLoaded", function () {
     // Rotates the glow angle for .btn-glow elements
     let angle = 0;
     const rotateGradient = () => {
-        // Increment slower than before (0.5 instead of 1 or 2)
-        angle = (angle + 0.5) % 360; 
+        // Increased speed from 0.5 to 1.5
+        angle = (angle + 1.5) % 360; 
         const glowButtons = document.querySelectorAll('.btn-glow');
         glowButtons.forEach(btn => {
             btn.style.setProperty('--glow-angle', `${angle}deg`);
