@@ -1,6 +1,6 @@
 // --- PRELOADER CONFIG ---
 const startTime = Date.now();
-const MIN_DISPLAY_TIME = 4000; // 4 seconds
+const MIN_DISPLAY_TIME = 3500; // 3.5 seconds
 
 function dismissPreloader() {
     const loader = document.getElementById("preloader");
@@ -70,17 +70,6 @@ async function triggerInstall() {
 // --- HELPER FUNCTIONS ---
 
 function openOverlay(id) {
-    // FORCE GAME AREA TO CLOSE to prevent overlap
-    const gameArea = document.getElementById('game-area');
-    if(gameArea) gameArea.style.display = 'none';
-    
-    // Also ensure game overlays are hidden
-    const gameOverlay = document.getElementById('game-overlay');
-    if(gameOverlay) {
-        gameOverlay.classList.remove('overlay-visible');
-        gameOverlay.classList.add('hidden');
-    }
-
     const el = document.getElementById(id);
     if (el) {
         el.classList.remove('hidden');
@@ -226,11 +215,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // --- BUTTON GLOW ANIMATION ---
-    // Rotates the glow angle for .btn-glow elements
     let angle = 0;
     const rotateGradient = () => {
-        // Increased speed from 0.5 to 1.5
-        angle = (angle + 1.5) % 360; 
+        angle = (angle + 2) % 360; // Increased to 2 for faster speed
         const glowButtons = document.querySelectorAll('.btn-glow');
         glowButtons.forEach(btn => {
             btn.style.setProperty('--glow-angle', `${angle}deg`);
