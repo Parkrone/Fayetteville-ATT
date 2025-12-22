@@ -23,20 +23,25 @@ function toggleGame() {
         g.style.display='block'; 
         lb.style.display='block'; 
         g.scrollIntoView({ behavior: "smooth", block: "center" }); 
-        // Force display so button is visible
+        
+        // Fix: Use openOverlay helpers logic (manual here since it's inside game logic)
+        startOverlay.classList.remove('hidden');
         startOverlay.classList.add('overlay-visible');
         gameOverOverlay.classList.remove('overlay-visible'); 
+        gameOverOverlay.classList.add('hidden');
     } 
 }
 
 function startSession() { 
-    document.getElementById('start-overlay').classList.remove('overlay-visible'); 
+    document.getElementById('start-overlay').classList.remove('overlay-visible');
+    setTimeout(() => document.getElementById('start-overlay').classList.add('hidden'), 300);
     initGame(); 
 }
 
 function initGame() { 
     stopGame(); 
     document.getElementById('game-overlay').classList.remove('overlay-visible'); 
+    document.getElementById('game-overlay').classList.add('hidden');
     score = 0; snakeLength = 3; document.getElementById('score').innerText = score; headX = 140; headY = 140; path=[]; for(let i=0; i<snakeLength*10; i++){path.push({x:headX, y:headY+i});} velX=0; velY=-SPEED; nextVelX=0; nextVelY=-SPEED; spawnFood(); startCountdown(); 
 }
 
@@ -78,6 +83,7 @@ function update() {
 function draw() { if(!ctx) return; ctx.fillStyle="#fff"; ctx.fillRect(0,0,300,300); ctx.drawImage(foodImg,food.x,food.y,20,20); const step=10; for(let i=0; i<path.length; i+=step){let idx=Math.floor(i); if(idx>=path.length) break; let seg=path[idx]; let ang=0; if(i===0){if(velX>0) ang=Math.PI/2; else if(velX<0) ang=-Math.PI/2; else if(velY>0) ang=Math.PI; else ang=0;}else{let n=Math.max(0,idx-step); let ns=path[n]; let dx=ns.x-seg.x; let dy=ns.y-seg.y; if(dx>0) ang=Math.PI/2; else if(dx<0) ang=-Math.PI/2; else if(dy>0) ang=Math.PI; else ang=0;} drawRotatedImage(snakeImg,seg.x,seg.y,ang);} }
 function drawRotatedImage(img,x,y,ang){ ctx.save(); ctx.translate(x+10,y+10); ctx.rotate(ang); ctx.drawImage(img,-10,-10,20,20); ctx.restore(); }
 
+// --- UPDATED GAME OVER TRIGGER ---
 function triggerGameOver() { 
     gameRunning = false; 
     const finalScore = score;
@@ -151,6 +157,10 @@ function triggerGameOver() {
         gapMsg.style.display = 'none';
     }
 
+    // FIX: REVEAL OVERLAY CORRECTLY
+    gameOverBox.classList.remove('hidden');
+    // Force reflow
+    void gameOverBox.offsetWidth;
     gameOverBox.classList.add('overlay-visible'); 
 }
 
