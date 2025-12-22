@@ -70,6 +70,17 @@ async function triggerInstall() {
 // --- HELPER FUNCTIONS ---
 
 function openOverlay(id) {
+    // FORCE GAME AREA TO CLOSE to prevent overlap
+    const gameArea = document.getElementById('game-area');
+    if(gameArea) gameArea.style.display = 'none';
+    
+    // Also ensure game overlays are hidden
+    const gameOverlay = document.getElementById('game-overlay');
+    if(gameOverlay) {
+        gameOverlay.classList.remove('overlay-visible');
+        gameOverlay.classList.add('hidden');
+    }
+
     const el = document.getElementById(id);
     if (el) {
         el.classList.remove('hidden');
@@ -218,7 +229,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Fixes the 360Hz vs 60Hz speed difference
     let angle = 0;
     let lastTime = 0;
-    const ROTATION_SPEED = 90; // Degrees per second (Adjust this number to make it faster/slower)
+    const ROTATION_SPEED = 90; // Standardized Speed (90 deg/sec)
 
     const rotateGradient = (timestamp) => {
         if (!lastTime) lastTime = timestamp;
