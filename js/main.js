@@ -48,7 +48,6 @@ window.addEventListener('beforeinstallprompt', (e) => {
     }
 });
 
-// Force button on iOS
 if (isIOS && !isStandalone && installBtn) {
     installBtn.style.display = 'flex';
 }
@@ -64,22 +63,40 @@ async function triggerInstall() {
         deferredPrompt = null; 
         if(installBtn) installBtn.style.display = 'none';
     } else if (isIOS) {
-        // Use smooth fade class
-        document.getElementById('ios-install-overlay').classList.add('overlay-visible');
+        openOverlay('ios-install-overlay');
     }
 }
 
 // --- HELPER FUNCTIONS ---
 
+// FIXED: Handles both removal of .hidden and addition of .overlay-visible
+function openOverlay(id) {
+    const el = document.getElementById(id);
+    if (el) {
+        el.classList.remove('hidden');
+        // Small timeout to allow browser to register display:flex before adding opacity
+        setTimeout(() => {
+            el.classList.add('overlay-visible');
+        }, 10);
+    }
+}
+
+function closeOverlay(id) { 
+    const el = document.getElementById(id);
+    if (el) {
+        el.classList.remove('overlay-visible');
+        // Wait for transition to finish before hiding
+        setTimeout(() => {
+            el.classList.add('hidden');
+        }, 300);
+    }
+}
+
 function closeVideoOverlay() {
     const purposeOverlay = document.getElementById('purpose-video-overlay');
     const purposeVideo = document.getElementById('purpose-video');
     purposeVideo.pause(); 
-    purposeOverlay.classList.remove('overlay-visible');
-}
-
-function closeOverlay(id) { 
-    document.getElementById(id).classList.remove('overlay-visible'); 
+    closeOverlay('purpose-video-overlay');
 }
 
 function playJelly(element) { 
@@ -140,10 +157,13 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     const contactBtn = document.getElementById('contactBtn');
-    if(contactBtn) contactBtn.addEventListener('click', () => document.getElementById('contact-overlay').classList.add('overlay-visible'));
+    if(contactBtn) contactBtn.addEventListener('click', () => openOverlay('contact-overlay'));
     
     const callBtn = document.getElementById('callBtn');
-    if(callBtn) callBtn.addEventListener('click', () => { if(isStoreOpen()) { window.location.href = "tel:4794395471"; } else { document.getElementById('closed-overlay').classList.add('overlay-visible'); } });
+    if(callBtn) callBtn.addEventListener('click', () => { 
+        if(isStoreOpen()) { window.location.href = "tel:4794395471"; } 
+        else { openOverlay('closed-overlay'); } 
+    });
     
     let currentLastFmUrl = "";
     const lastFmBtn = document.getElementById('lastfm-link');
@@ -154,12 +174,12 @@ document.addEventListener("DOMContentLoaded", function () {
         e.preventDefault();
         currentLastFmUrl = this.href;
         if(currentLastFmUrl === '#' || !currentLastFmUrl) return; 
-        lastFmOverlay.classList.add('overlay-visible');
+        openOverlay('lastfm-confirm-overlay');
     });
 
     if(confirmLastFm) confirmLastFm.addEventListener('click', function() {
         window.open(currentLastFmUrl, '_blank');
-        lastFmOverlay.classList.remove('overlay-visible');
+        closeOverlay('lastfm-confirm-overlay');
     });
 
     const googleBtn = document.getElementById('googleBtn');
@@ -168,12 +188,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if(googleBtn) googleBtn.addEventListener('click', function(e) {
         e.preventDefault();
-        googleOverlay.classList.add('overlay-visible');
+        openOverlay('google-confirm-overlay');
     });
 
     if(confirmGoogle) confirmGoogle.addEventListener('click', function() {
         window.open("https://search.google.com/local/writereview?placeid=ChIJ84Inr4tryYcRQUkKOVeSnF8", '_blank');
-        googleOverlay.classList.remove('overlay-visible');
+        closeOverlay('google-confirm-overlay');
     });
 
     const purposeBtn = document.getElementById('purposeBtn');
@@ -181,7 +201,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const purposeVideo = document.getElementById('purpose-video');
     
     if(purposeBtn) purposeBtn.addEventListener('click', function() {
-        purposeOverlay.classList.add('overlay-visible');
+        openOverlay('purpose-video-overlay');
         purposeVideo.currentTime = 0; purposeVideo.play();
     });
     if(purposeOverlay) purposeOverlay.addEventListener('click', function(e) { if (e.target === purposeOverlay) closeVideoOverlay(); });
