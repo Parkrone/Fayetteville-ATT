@@ -7,7 +7,7 @@ The **AT&T Fayetteville Mall Store Portal** is a Progressive Web App (PWA) desig
 
 Built to enhance the customer experience while they wait in-store, it also serves as a critical **sales enablement tool** that allows customers to continue their purchasing journey from home while ensuring local store representatives retain credit for the sale.
 
-🔗 **Live Demo:** [att-fayetteville.com](https://att-fayetteville.com) *(or your github pages link)*
+🔗 **Live Demo:** [att-fayetteville](https://parkrone.github.io/Fayetteville-ATT/)
 
 ---
 
@@ -46,7 +46,7 @@ In the modern retail environment, customers often consult with representatives i
 
 | Mobile Interface | Leaderboard & Game |
 |:---:|:---:|
-| <img src="media/image_14622e.png" width="300"> | <img src="media/image_090183.png" width="300"> |
+| <img src="media/game.png" width="300"> | <img src="media/leaderboard.png" width="300"> |
 | *Clean, touch-friendly mobile navigation* | *Integrated Snake game with live high scores* |
 
 ---
