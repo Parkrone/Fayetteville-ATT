@@ -42,7 +42,7 @@
             --game-area-bg: #f9f9f9;
             --border-color: #ddd;
             --preloader-bg: #ffffff; 
-            /* Restored Gray for Contact Buttons */
+            /* Button Colors */
             --btn-gray-bg: #444444; 
             --btn-gray-hover: #222222;
             --player-bg: #f8f9fa;
@@ -83,29 +83,6 @@
             }
         }
 
-        /* --- GENERAL LAYOUT --- */
-        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
-        html { scroll-behavior: smooth; }
-        body { font-family: 'Open Sans', sans-serif; background-color: var(--bg-color); color: var(--text-color); display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; transition: background-color 0.3s ease, color 0.3s ease; position: relative; }
-        
-        .container { 
-            width: 90%; max-width: 500px; 
-            background: transparent; /* Transparent Container */
-            padding: 30px; border-radius: 8px; 
-            text-align: center; opacity: 0; transform: translateY(20px); 
-            transition: opacity 0.8s ease, transform 0.8s ease; 
-            margin-bottom: 20px; position: relative; z-index: 10; 
-        }
-        .content-visible { opacity: 1; transform: translateY(0); }
-        
-        /* Brighter Welcome Text with Shadow */
-        .welcome-text { 
-            margin-bottom: 25px; font-size: 16px; 
-            color: #ffffff; 
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8); 
-            font-weight: 600; line-height: 1.5; 
-        }
-
         /* --- BUTTON STYLES --- */
         .button-group { display: flex; gap: 10px; margin-bottom: 15px; width: 100%; }
         .button-group .btn { flex: 1; margin-bottom: 0; font-size: 16px; padding: 14px 10px; }
@@ -113,26 +90,43 @@
         .btn { 
             display: flex; justify-content: center; align-items: center; width: 100%; padding: 16px 20px; margin-bottom: 15px; 
             text-decoration: none; border-radius: 30px; font-weight: 600; font-size: 18px; 
-            transition: transform 0.1s ease, background-color 0.2s; 
+            transition: transform 0.1s ease; 
             border: 2px solid transparent; cursor: pointer; transform-origin: center; line-height: 1.2; 
             position: relative; z-index: 1;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2); 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
         }
         
-        .icon-inline { height: 1.3em !important; width: auto !important; vertical-align: middle; margin-left: 8px; margin-top: -3px; }
+        .icon-inline { 
+            height: 1.3em !important; 
+            width: auto !important; 
+            vertical-align: middle; 
+            margin-left: 8px; 
+            margin-top: -3px; 
+        }
 
         @keyframes jellyPop { 0% { transform: scale(1); } 30% { transform: scale(0.90); } 50% { transform: scale(1.05); } 70% { transform: scale(0.98); } 100% { transform: scale(1); } }
         .btn-animate { animation: jellyPop 0.4s ease-out forwards; }
 
-        /* --- ALL MAIN BUTTONS ARE NOW SOLID BLUE --- */
-        .btn-primary, .btn-secondary { 
+        /* --- STANDARD BUTTON COLORS (Solid) --- */
+        .btn-primary { 
             background-color: var(--att-blue); 
             color: white !important; 
-            border: none;
+            --btn-bg-color: var(--att-blue); /* Used for glow masking */
         }
-        .btn-primary:hover, .btn-secondary:hover { 
-            background-color: var(--att-blue-hover); 
+        .btn-primary:hover { background-color: var(--att-blue-hover); }
+
+        .btn-secondary { 
+            background-color: var(--btn-sec-bg); 
+            color: var(--btn-sec-text) !important; 
+            border: 2px solid var(--btn-sec-border); 
+            --btn-bg-color: var(--btn-sec-bg); /* Used for glow masking */
         }
+        /* When secondary is active/glow, ensure text is visible */
+        .btn-secondary.btn-glow {
+            color: white !important; /* Secondary becomes blue when glowing */
+            --btn-bg-color: var(--att-blue); 
+        }
+        .btn-secondary:hover { background-color: var(--btn-sec-hover); }
 
         .btn-game { background-color: #ff7900; color: white; border: none; font-size: 15px; }
         .btn-game:hover { background-color: #e66c00; }
@@ -145,27 +139,25 @@
         } 
         .btn-contact:hover, .btn-call:hover { background-color: var(--btn-gray-hover); }
 
-        /* --- FIXED GLOW ANIMATION (Layered Behind Solid Button) --- */
+        /* --- FIXED GLOW ANIMATION (Background Clip Method) --- */
         .btn-glow {
-            /* Button must be solid to cover the center of the spinner */
-            background-color: var(--att-blue);
-            overflow: visible; /* Let the glow extend outside */
-        }
-        
-        /* The Spinning Gradient */
-        .btn-glow::before {
-            content: "";
-            position: absolute;
-            z-index: -1; /* Behind the button */
-            inset: -4px; /* Width of the glow ring */
-            border-radius: 34px; /* Match button curvature + inset */
-            background: conic-gradient(
-                from var(--glow-angle), 
-                transparent 0%, 
-                #00c6ff 15%, 
-                transparent 30%
-            );
-            filter: blur(3px); /* Slight blur for neon effect */
+            --glow-angle: 0deg; /* Updated by JS */
+            --glow-color: #00c6ff; /* Cyan */
+            
+            /* Layer 1: Solid background inside the padding box (covers center) */
+            /* Layer 2: Conic gradient inside the border box (shows on edges) */
+            background: 
+                linear-gradient(var(--btn-bg-color), var(--btn-bg-color)) padding-box,
+                conic-gradient(
+                    from var(--glow-angle), 
+                    transparent 0%, 
+                    var(--glow-color) 25%, 
+                    transparent 50%
+                ) border-box;
+            
+            border: 3px solid transparent; /* The width of the glow */
+            /* Ensure text sits on top */
+            z-index: 10;
         }
 
         /* --- PULSING DOTS --- */
@@ -176,7 +168,11 @@
         @keyframes pulse-green { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(46, 204, 113, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); } }
         @keyframes pulse-red { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(231, 76, 60, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); } }
 
-        /* --- OTHER STYLES (Keep existing) --- */
+        /* --- GENERAL LAYOUT --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Open Sans', sans-serif; background-color: var(--bg-color); color: var(--text-color); display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; transition: background-color 0.3s ease, color 0.3s ease; position: relative; }
+        
         .skeleton { background: linear-gradient(90deg, var(--border-color) 25%, var(--bg-color) 50%, var(--border-color) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 4px; color: transparent !important; cursor: default; }
         .skeleton-text { min-height: 1em; display: inline-block; width: 100%; }
         @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
@@ -215,6 +211,25 @@
         #headerInstallBtn:active { transform: scale(0.95); }
         @media (max-width: 600px) { header { flex-direction: column; gap: 5px; padding-bottom: 10px; } .header-controls { position: static; transform: none; margin-top: 5px; justify-content: center; width: 100%; } header h1 { font-size: 20px; text-align: center; margin-top: 5px; } }
 
+        /* --- CONTAINER MODS (TRANSPARENT) --- */
+        .container { 
+            width: 90%; max-width: 500px; 
+            background: transparent; 
+            padding: 30px; border-radius: 8px; 
+            box-shadow: none;
+            text-align: center; opacity: 0; transform: translateY(20px); 
+            transition: opacity 0.8s ease, transform 0.8s ease; 
+            margin-bottom: 20px; position: relative; z-index: 10; 
+        }
+        .content-visible { opacity: 1; transform: translateY(0); }
+        
+        .welcome-text { 
+            margin-bottom: 25px; font-size: 16px; 
+            color: #ffffff; 
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8); 
+            font-weight: 600; line-height: 1.5; 
+        }
+        
         /* Overlays - Fixed Visibility & Animation (iOS Style) */
         .overlay-base { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
