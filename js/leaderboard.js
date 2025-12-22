@@ -12,7 +12,6 @@ let BAD_WORDS_LIST = [];
 fetch('data/bad-words-comma.txt')
     .then(response => response.text())
     .then(text => {
-        // Split by comma and clean up whitespace
         BAD_WORDS_LIST = text.split(',').map(w => w.trim().toLowerCase()).filter(w => w.length > 0);
         console.log(`Loaded ${BAD_WORDS_LIST.length} bad words.`);
     })
@@ -21,10 +20,7 @@ fetch('data/bad-words-comma.txt')
 function isProfane(text) {
     if (!text || BAD_WORDS_LIST.length === 0) return false;
     
-    // 1. Normalize Leet Speak
     let normalized = text.toLowerCase();
-    
-    // Basic substitutions
     normalized = normalized.replace(/0/g, 'o');
     normalized = normalized.replace(/1/g, 'i');
     normalized = normalized.replace(/!/g, 'i');
@@ -36,19 +32,14 @@ function isProfane(text) {
     normalized = normalized.replace(/7/g, 't');
     normalized = normalized.replace(/\+/g, 't');
     
-    // 2. Strict Check (Whole words or obvious inclusions)
-    // We check if the normalized name *contains* a bad word.
-    // Note: This can be strict. "Cassie" contains "ass". 
-    // For a game leaderboard, usually better to be safe than sorry, 
-    // but strict substring matching can have false positives.
-    
-    // To minimize false positives with short words like "ass", we can check boundaries 
-    // or just rely on the massive list covering most variations.
     return BAD_WORDS_LIST.some(bad => normalized.includes(bad));
 }
 
 // Fetch Scores
 async function fetchLeaderboard() {
+    const btn = document.getElementById('refresh-scores-btn');
+    if(btn) btn.classList.add('spin-anim');
+
     const targetUrl = `http://dreamlo.com/lb/${DREAMLO_PUBLIC}/json?t=${new Date().getTime()}`;
     const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
 
@@ -109,6 +100,8 @@ async function fetchLeaderboard() {
         }
     } catch (error) {
         console.log("Leaderboard fetch error: " + error);
+    } finally {
+        if(btn) btn.classList.remove('spin-anim');
     }
 }
 
@@ -124,7 +117,6 @@ async function submitScoreFromGame() {
 
     if (!rawName) { alert("Please enter a name!"); return; }
     
-    // FILTER CHECK
     if (isProfane(rawName)) { 
         alert("⚠️ Please choose a cleaner name!"); 
         return; 
@@ -135,7 +127,6 @@ async function submitScoreFromGame() {
     
     try {
         await fetch(proxyUrl);
-        
         localStorage.setItem('attSnakeSubmittedName', rawName);
         localStorage.removeItem('attSnakeCachedName');
         usernameInput.value = ""; 
@@ -150,3 +141,13 @@ async function submitScoreFromGame() {
         alert("Saved locally. (Network issue - Score safe on device)"); 
     }
 }
+
+// Hook up the refresh button
+document.addEventListener("DOMContentLoaded", function() {
+    const refreshBtn = document.getElementById('refresh-scores-btn');
+    if(refreshBtn) {
+        refreshBtn.addEventListener('click', function() {
+            fetchLeaderboard();
+        });
+    }
+});
