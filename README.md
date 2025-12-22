@@ -1,6 +1,6 @@
 # AT&T Fayetteville Mall Store Portal
 
-![Store Portal Hero](media/image_14c76e.png)
+![Store Portal Hero](media/Store-Pic.jpeg)
 
 ## 📖 Overview
 The **AT&T Fayetteville Mall Store Portal** is a Progressive Web App (PWA) designed to bridge the gap between physical retail interactions and digital convenience. 
@@ -46,7 +46,7 @@ In the modern retail environment, customers often consult with representatives i
 
 | Mobile Interface | Leaderboard & Game |
 |:---:|:---:|
-| <img src="media/portal.gif" width="500"> | <img src="media/leaderboard.png" width="500"> |
+| <img src="media/portal.gif" width="500"> | <img src="media/gameandleaderboard.png" width="500"> |
 | *Clean, touch-friendly mobile navigation* | *Integrated Snake game with live high scores* |
 
 ---
