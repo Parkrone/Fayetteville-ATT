@@ -214,17 +214,28 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // --- BUTTON GLOW ANIMATION ---
+    // --- BUTTON GLOW ANIMATION (TIME-BASED) ---
+    // Fixes the 360Hz vs 60Hz speed difference
     let angle = 0;
-    const rotateGradient = () => {
-        angle = (angle + 2) % 360; // Increased to 2 for faster speed
+    let lastTime = 0;
+    const ROTATION_SPEED = 90; // Degrees per second (Adjust this number to make it faster/slower)
+
+    const rotateGradient = (timestamp) => {
+        if (!lastTime) lastTime = timestamp;
+        const deltaTime = (timestamp - lastTime) / 1000; // Convert to seconds
+        lastTime = timestamp;
+
+        // Update angle based on time passed, not frames painted
+        angle = (angle + (ROTATION_SPEED * deltaTime)) % 360;
+        
         const glowButtons = document.querySelectorAll('.btn-glow');
         glowButtons.forEach(btn => {
             btn.style.setProperty('--glow-angle', `${angle}deg`);
         });
+        
         requestAnimationFrame(rotateGradient);
     };
-    rotateGradient();
+    requestAnimationFrame(rotateGradient);
 });
 
 // Absolute Failsafe
