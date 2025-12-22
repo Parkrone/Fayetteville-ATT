@@ -48,6 +48,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
     }
 });
 
+// Force button on iOS
 if (isIOS && !isStandalone && installBtn) {
     installBtn.style.display = 'flex';
 }
@@ -161,8 +162,13 @@ document.addEventListener("DOMContentLoaded", function () {
     
     const callBtn = document.getElementById('callBtn');
     if(callBtn) callBtn.addEventListener('click', () => { 
-        if(isStoreOpen()) { window.location.href = "tel:4794395471"; } 
-        else { openOverlay('closed-overlay'); } 
+        // Call link is handled by browser, no openOverlay needed unless closed
+        if(!isStoreOpen()) { 
+            // Only block call if closed AND you want to show overlay first
+            // Otherwise, let href="tel:..." work
+            // Since you have the closed check in the click listener, it's fine.
+            openOverlay('closed-overlay'); 
+        } 
     });
     
     let currentLastFmUrl = "";
