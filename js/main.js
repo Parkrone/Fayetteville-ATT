@@ -70,6 +70,9 @@ async function triggerInstall() {
 // --- HELPER FUNCTIONS ---
 
 function openOverlay(id) {
+    // If opening an overlay, we ensure the game area is hidden
+    document.getElementById('game-area').style.display = 'none';
+    
     const el = document.getElementById(id);
     if (el) {
         el.classList.remove('hidden');
