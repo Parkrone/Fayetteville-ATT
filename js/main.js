@@ -167,11 +167,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const contactBtn = document.getElementById('contactBtn');
     if(contactBtn) contactBtn.addEventListener('click', () => openOverlay('contact-overlay'));
     
+    // FIX: ADDED ELSE BLOCK TO CALL STORE WHEN OPEN
     const callBtn = document.getElementById('callBtn');
     if(callBtn) callBtn.addEventListener('click', () => { 
         if(!isStoreOpen()) { 
             openOverlay('closed-overlay'); 
-        } 
+        } else {
+            window.location.href = "tel:4794395471";
+        }
     });
     
     let currentLastFmUrl = "";
@@ -226,7 +229,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // --- BUTTON GLOW ANIMATION (TIME-BASED) ---
-    // Fixes the 360Hz vs 60Hz speed difference
     let angle = 0;
     let lastTime = 0;
     const ROTATION_SPEED = 90; // Standardized Speed (90 deg/sec)
