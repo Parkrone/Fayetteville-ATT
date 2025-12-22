@@ -1,7 +1,6 @@
 // --- PRELOADER CONFIG ---
-// Define these at the very top to ensure they exist before anything calls them.
 const startTime = Date.now();
-const MIN_DISPLAY_TIME = 4000; // 4 seconds (Full animation cycle)
+const MIN_DISPLAY_TIME = 4000; // 4 seconds
 
 function dismissPreloader() {
     const loader = document.getElementById("preloader");
@@ -11,13 +10,11 @@ function dismissPreloader() {
         const elapsed = Date.now() - startTime;
         const remaining = MIN_DISPLAY_TIME - elapsed;
 
-        // If 4s hasn't passed, wait the remaining time
         if (remaining > 0) {
             setTimeout(dismissPreloader, remaining);
             return;
         }
 
-        // Otherwise dismiss
         loader.classList.add("loader-hidden");
         if(container) container.classList.add("content-visible");
         setTimeout(() => { if(loader.parentNode) loader.parentNode.removeChild(loader); }, 500);
@@ -67,97 +64,38 @@ async function triggerInstall() {
         deferredPrompt = null; 
         if(installBtn) installBtn.style.display = 'none';
     } else if (isIOS) {
-        document.getElementById('ios-install-overlay').classList.remove('hidden');
+        // Use smooth fade class
+        document.getElementById('ios-install-overlay').classList.add('overlay-visible');
     }
 }
 
-// --- INITIALIZATION ---
-document.addEventListener("DOMContentLoaded", function () {
-    // Attempt dismissal (will be deferred by logic if < 4s)
-    dismissPreloader();
+// --- HELPER FUNCTIONS ---
 
-    const container = document.getElementById("mainContainer");
-    const video = document.getElementById("bg-video");
-
-    function showVideo() { if(video) video.style.opacity = '1'; const sk = document.getElementById('video-skeleton'); if(sk) sk.style.display = 'none'; }
-    if (video) {
-        if (video.readyState >= 3) { showVideo(); } else { video.addEventListener('loadeddata', showVideo); video.addEventListener('canplay', showVideo); }
-    }
-
-    checkStoreStatus();
-    fetchWeather();
-    if(isStoreOpen()) { fetchNowPlaying(); setInterval(fetchNowPlaying, 30000); }
-    fetchLeaderboard();
-
-    document.querySelectorAll('.btn, .video-close-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) { playJelly(this); });
-    });
-
-    const contactBtn = document.getElementById('contactBtn');
-    if(contactBtn) contactBtn.addEventListener('click', () => document.getElementById('contact-overlay').classList.remove('hidden'));
-    
-    const callBtn = document.getElementById('callBtn');
-    if(callBtn) callBtn.addEventListener('click', () => { if(isStoreOpen()) { window.location.href = "tel:4794395471"; } else { document.getElementById('closed-overlay').classList.remove('hidden'); } });
-    
-    let currentLastFmUrl = "";
-    const lastFmBtn = document.getElementById('lastfm-link');
-    const lastFmOverlay = document.getElementById('lastfm-confirm-overlay');
-    const confirmLastFm = document.getElementById('confirm-lastfm-btn');
-
-    if(lastFmBtn) lastFmBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        currentLastFmUrl = this.href;
-        if(currentLastFmUrl === '#' || !currentLastFmUrl) return; 
-        lastFmOverlay.classList.remove('hidden');
-    });
-
-    if(confirmLastFm) confirmLastFm.addEventListener('click', function() {
-        window.open(currentLastFmUrl, '_blank');
-        lastFmOverlay.classList.add('hidden');
-    });
-
-    const googleBtn = document.getElementById('googleBtn');
-    const googleOverlay = document.getElementById('google-confirm-overlay');
-    const confirmGoogle = document.getElementById('confirm-google-btn');
-
-    if(googleBtn) googleBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        googleOverlay.classList.remove('hidden');
-    });
-
-    if(confirmGoogle) confirmGoogle.addEventListener('click', function() {
-        window.open("https://search.google.com/local/writereview?placeid=ChIJ84Inr4tryYcRQUkKOVeSnF8", '_blank');
-        googleOverlay.classList.add('hidden');
-    });
-
-    const purposeBtn = document.getElementById('purposeBtn');
-    const purposeOverlay = document.getElementById('purpose-video-overlay');
-    const purposeVideo = document.getElementById('purpose-video');
-    
-    if(purposeBtn) purposeBtn.addEventListener('click', function() {
-        purposeOverlay.classList.remove('hidden');
-        purposeVideo.currentTime = 0; purposeVideo.play();
-    });
-    if(purposeOverlay) purposeOverlay.addEventListener('click', function(e) { if (e.target === purposeOverlay) closeVideoOverlay(); });
-
-    const savedScore = localStorage.getItem('attSnakeHighScore');
-    if(savedScore) document.getElementById('highScore').innerText = savedScore;
-
-    const nameInput = document.getElementById('gameover-name-input');
-    if(nameInput) {
-        nameInput.addEventListener('input', (e) => {
-            localStorage.setItem('attSnakeCachedName', e.target.value);
-        });
-    }
-});
+// NEW: Open link with delay for bounce animation
+function openLinkWithDelay(url) {
+    setTimeout(() => {
+        window.open(url, '_blank');
+    }, 500); // 500ms delay
+}
 
 function closeVideoOverlay() {
     const purposeOverlay = document.getElementById('purpose-video-overlay');
     const purposeVideo = document.getElementById('purpose-video');
-    purposeVideo.pause(); purposeOverlay.classList.add('hidden');
+    purposeVideo.pause(); 
+    // Use smooth fade class
+    purposeOverlay.classList.remove('overlay-visible');
 }
-function closeOverlay(id) { document.getElementById(id).classList.add('hidden'); }
-function playJelly(element) { element.classList.remove('btn-animate'); void element.offsetWidth; element.classList.add('btn-animate'); }
+
+// UPDATED: Use smooth fade class
+function closeOverlay(id) { 
+    document.getElementById(id).classList.remove('overlay-visible'); 
+}
+
+function playJelly(element) { 
+    element.classList.remove('btn-animate'); 
+    void element.offsetWidth; 
+    element.classList.add('btn-animate'); 
+}
 
 function getCentralTime() { const d = new Date(); return new Date(d.toLocaleString("en-US", {timeZone: "America/Chicago"})); }
 function isStoreOpen() { const now = getCentralTime(); const day = now.getDay(); const currentMilitaryTime = (now.getHours() * 100) + now.getMinutes(); const todayHours = storeSchedule[day]; return (currentMilitaryTime >= todayHours.open && currentMilitaryTime < todayHours.close); }
@@ -188,6 +126,103 @@ async function fetchNowPlaying() {
         }
     } catch (error) { console.log("Music error"); }
 }
+
+// --- INITIALIZATION ---
+document.addEventListener("DOMContentLoaded", function () {
+    dismissPreloader();
+
+    const container = document.getElementById("mainContainer");
+    const video = document.getElementById("bg-video");
+
+    function showVideo() { if(video) video.style.opacity = '1'; const sk = document.getElementById('video-skeleton'); if(sk) sk.style.display = 'none'; }
+    if (video) {
+        if (video.readyState >= 3) { showVideo(); } else { video.addEventListener('loadeddata', showVideo); video.addEventListener('canplay', showVideo); }
+    }
+
+    checkStoreStatus();
+    fetchWeather();
+    if(isStoreOpen()) { fetchNowPlaying(); setInterval(fetchNowPlaying, 30000); }
+    fetchLeaderboard();
+
+    document.querySelectorAll('.btn, .video-close-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) { playJelly(this); });
+    });
+
+    //UPDATED: Use smooth fade class for contact overlay
+    const contactBtn = document.getElementById('contactBtn');
+    if(contactBtn) contactBtn.addEventListener('click', () => document.getElementById('contact-overlay').classList.add('overlay-visible'));
+    
+    //UPDATED: Use smooth fade class for closed overlay
+    const callBtn = document.getElementById('callBtn');
+    if(callBtn) callBtn.addEventListener('click', () => { if(isStoreOpen()) { window.location.href = "tel:4794395471"; } else { document.getElementById('closed-overlay').classList.add('overlay-visible'); } });
+    
+    //UPDATED: Use smooth fade class for Last.fm overlay
+    let currentLastFmUrl = "";
+    const lastFmBtn = document.getElementById('lastfm-link');
+    const lastFmOverlay = document.getElementById('lastfm-confirm-overlay');
+    const confirmLastFm = document.getElementById('confirm-lastfm-btn');
+
+    if(lastFmBtn) lastFmBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        currentLastFmUrl = this.href;
+        if(currentLastFmUrl === '#' || !currentLastFmUrl) return; 
+        lastFmOverlay.classList.add('overlay-visible');
+    });
+
+    // UPDATED: Last.fm confirm uses delayed open
+    if(confirmLastFm) confirmLastFm.addEventListener('click', function() {
+        openLinkWithDelay(currentLastFmUrl);
+        lastFmOverlay.classList.remove('overlay-visible');
+    });
+
+    // UPDATED: Use smooth fade class for Google overlay
+    const googleBtn = document.getElementById('googleBtn');
+    const googleOverlay = document.getElementById('google-confirm-overlay');
+    const confirmGoogle = document.getElementById('confirm-google-btn');
+
+    if(googleBtn) googleBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        googleOverlay.classList.add('overlay-visible');
+    });
+
+    // UPDATED: Google confirm uses delayed open
+    if(confirmGoogle) confirmGoogle.addEventListener('click', function() {
+        openLinkWithDelay("https://search.google.com/local/writereview?placeid=ChIJ84Inr4tryYcRQUkKOVeSnF8");
+        googleOverlay.classList.remove('overlay-visible');
+    });
+
+    // UPDATED: Deals link uses delayed open
+    const dealsLink = document.querySelector('.link-delay');
+    if(dealsLink) {
+        dealsLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            playJelly(this); // Ensure bounce happens
+            openLinkWithDelay(this.href);
+        });
+    }
+
+
+    // UPDATED: Use smooth fade class for Purpose overlay
+    const purposeBtn = document.getElementById('purposeBtn');
+    const purposeOverlay = document.getElementById('purpose-video-overlay');
+    const purposeVideo = document.getElementById('purpose-video');
+    
+    if(purposeBtn) purposeBtn.addEventListener('click', function() {
+        purposeOverlay.classList.add('overlay-visible');
+        purposeVideo.currentTime = 0; purposeVideo.play();
+    });
+    if(purposeOverlay) purposeOverlay.addEventListener('click', function(e) { if (e.target === purposeOverlay) closeVideoOverlay(); });
+
+    const savedScore = localStorage.getItem('attSnakeHighScore');
+    if(savedScore) document.getElementById('highScore').innerText = savedScore;
+
+    const nameInput = document.getElementById('gameover-name-input');
+    if(nameInput) {
+        nameInput.addEventListener('input', (e) => {
+            localStorage.setItem('attSnakeCachedName', e.target.value);
+        });
+    }
+});
 
 // Absolute Failsafe
 setTimeout(dismissPreloader, 7000); 
