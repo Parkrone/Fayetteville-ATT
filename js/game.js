@@ -9,17 +9,40 @@ let animationId; let gameRunning = false; let score = 0; let path = []; let snak
 const gameBtn = document.querySelector('.btn-game');
 if(gameBtn) gameBtn.addEventListener('click', function() { playJelly(this); toggleGame(); });
 
+// UPDATED: Use smooth fade class for game area toggling
 function toggleGame() { 
     const g = document.getElementById('game-area'); 
     const lb = document.getElementById('store-leaderboard');
     const startOverlay = document.getElementById('start-overlay');
     const gameOverOverlay = document.getElementById('game-overlay');
-    if(g.style.display==='block'){ g.style.display='none'; lb.style.display='none'; stopGame(); } 
-    else { g.style.display='block'; lb.style.display='block'; g.scrollIntoView({ behavior: "smooth", block: "center" }); startOverlay.classList.remove('hidden'); gameOverOverlay.classList.add('hidden'); } 
+    
+    if(g.style.display==='block'){ 
+        g.style.display='none'; 
+        lb.style.display='none'; 
+        stopGame(); 
+    } else { 
+        g.style.display='block'; 
+        lb.style.display='block'; 
+        g.scrollIntoView({ behavior: "smooth", block: "center" }); 
+        // Use smooth fade class
+        startOverlay.classList.add('overlay-visible');
+        gameOverOverlay.classList.remove('overlay-visible'); 
+    } 
 }
 
-function startSession() { document.getElementById('start-overlay').classList.add('hidden'); initGame(); }
-function initGame() { stopGame(); document.getElementById('game-overlay').classList.add('hidden'); score = 0; snakeLength = 3; document.getElementById('score').innerText = score; headX = 140; headY = 140; path=[]; for(let i=0; i<snakeLength*10; i++){path.push({x:headX, y:headY+i});} velX=0; velY=-SPEED; nextVelX=0; nextVelY=-SPEED; spawnFood(); startCountdown(); }
+// UPDATED: Use smooth fade class
+function startSession() { 
+    document.getElementById('start-overlay').classList.remove('overlay-visible'); 
+    initGame(); 
+}
+
+// UPDATED: Use smooth fade class
+function initGame() { 
+    stopGame(); 
+    document.getElementById('game-overlay').classList.remove('overlay-visible'); 
+    score = 0; snakeLength = 3; document.getElementById('score').innerText = score; headX = 140; headY = 140; path=[]; for(let i=0; i<snakeLength*10; i++){path.push({x:headX, y:headY+i});} velX=0; velY=-SPEED; nextVelX=0; nextVelY=-SPEED; spawnFood(); startCountdown(); 
+}
+
 function restartGame() { initGame(); }
 function startCountdown() { let count=3; draw(); drawCountdownText(count); let t=setInterval(()=>{count--; if(count>0){draw(); drawCountdownText(count);}else{clearInterval(t); draw(); drawCountdownText("GO!"); setTimeout(()=>{gameRunning=true; lastTime=0; requestAnimationFrame(gameLoop);},500);}},1000); }
 function drawCountdownText(t) { if(!ctx) return; ctx.save(); ctx.fillStyle="rgba(255,255,255,0.7)"; ctx.fillRect(0,0,canvas.width,canvas.height); ctx.fillStyle="#0057B8"; ctx.font="bold 80px 'Open Sans'"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(t,canvas.width/2,canvas.height/2); ctx.restore(); }
@@ -86,11 +109,9 @@ function triggerGameOver() {
 
     document.getElementById('final-score').innerText = finalScore;
 
-    // Restore Cached Name
     const cachedName = localStorage.getItem('attSnakeCachedName');
     if(cachedName) nameInput.value = cachedName;
 
-    // --- SAVE LOGIC UPDATE (NAME VERIFICATION) ---
     if (bestScore > 0 && !submittedName) {
         document.getElementById('save-score-area').style.display = 'block';
         
@@ -140,7 +161,8 @@ function triggerGameOver() {
         gapMsg.style.display = 'none';
     }
 
-    gameOverBox.classList.remove('hidden'); 
+    // UPDATED: Use smooth fade class
+    gameOverBox.classList.add('overlay-visible'); 
 }
 
 if(canvas) {
