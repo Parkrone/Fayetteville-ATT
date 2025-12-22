@@ -9,7 +9,6 @@ let animationId; let gameRunning = false; let score = 0; let path = []; let snak
 const gameBtn = document.querySelector('.btn-game');
 if(gameBtn) gameBtn.addEventListener('click', function() { playJelly(this); toggleGame(); });
 
-// UPDATED: Use smooth fade class for game area toggling
 function toggleGame() { 
     const g = document.getElementById('game-area'); 
     const lb = document.getElementById('store-leaderboard');
@@ -24,19 +23,17 @@ function toggleGame() {
         g.style.display='block'; 
         lb.style.display='block'; 
         g.scrollIntoView({ behavior: "smooth", block: "center" }); 
-        // Use smooth fade class
+        // Force display so button is visible
         startOverlay.classList.add('overlay-visible');
         gameOverOverlay.classList.remove('overlay-visible'); 
     } 
 }
 
-// UPDATED: Use smooth fade class
 function startSession() { 
     document.getElementById('start-overlay').classList.remove('overlay-visible'); 
     initGame(); 
 }
 
-// UPDATED: Use smooth fade class
 function initGame() { 
     stopGame(); 
     document.getElementById('game-overlay').classList.remove('overlay-visible'); 
@@ -65,7 +62,6 @@ function update() {
         snakeLength++; 
         spawnFood();
         
-        // ROCKET CHECK
         if (scoreMilestones.length > 0 && score >= scoreMilestones[0]) {
             const rocket = document.getElementById('rocket-effect');
             if(rocket) {
@@ -82,7 +78,6 @@ function update() {
 function draw() { if(!ctx) return; ctx.fillStyle="#fff"; ctx.fillRect(0,0,300,300); ctx.drawImage(foodImg,food.x,food.y,20,20); const step=10; for(let i=0; i<path.length; i+=step){let idx=Math.floor(i); if(idx>=path.length) break; let seg=path[idx]; let ang=0; if(i===0){if(velX>0) ang=Math.PI/2; else if(velX<0) ang=-Math.PI/2; else if(velY>0) ang=Math.PI; else ang=0;}else{let n=Math.max(0,idx-step); let ns=path[n]; let dx=ns.x-seg.x; let dy=ns.y-seg.y; if(dx>0) ang=Math.PI/2; else if(dx<0) ang=-Math.PI/2; else if(dy>0) ang=Math.PI; else ang=0;} drawRotatedImage(snakeImg,seg.x,seg.y,ang);} }
 function drawRotatedImage(img,x,y,ang){ ctx.save(); ctx.translate(x+10,y+10); ctx.rotate(ang); ctx.drawImage(img,-10,-10,20,20); ctx.restore(); }
 
-// --- UPDATED GAME OVER TRIGGER ---
 function triggerGameOver() { 
     gameRunning = false; 
     const finalScore = score;
@@ -94,7 +89,6 @@ function triggerGameOver() {
     
     const bestScore = Math.max(finalScore, savedHighScore);
     
-    // Update Local High Score
     if (finalScore > savedHighScore) {
         localStorage.setItem('attSnakeHighScore', finalScore);
         document.getElementById('highScore').innerText = finalScore;
@@ -114,7 +108,6 @@ function triggerGameOver() {
 
     if (bestScore > 0 && !submittedName) {
         document.getElementById('save-score-area').style.display = 'block';
-        
         if (finalScore >= bestScore) {
             saveReasonMsg.innerText = "🎉 NEW HIGH SCORE!";
             saveReasonMsg.style.color = "#2ecc71";
@@ -122,10 +115,8 @@ function triggerGameOver() {
             saveReasonMsg.innerText = "Join the Leaderboard!";
             saveReasonMsg.style.color = "#fff";
         }
-        
         const msg = document.getElementById('gameover-msg');
         msg.style.display = 'none'; 
-        
     } else {
         document.getElementById('save-score-area').style.display = 'none';
         const msg = document.getElementById('gameover-msg');
@@ -134,7 +125,6 @@ function triggerGameOver() {
         msg.style.color = '#ffcc00'; 
     }
     
-    // GAP CALCULATION
     const gapMsg = document.getElementById('leaderboard-gap-msg');
     if (globalScores.length > 0) {
         let nextTarget = null;
@@ -161,7 +151,6 @@ function triggerGameOver() {
         gapMsg.style.display = 'none';
     }
 
-    // UPDATED: Use smooth fade class
     gameOverBox.classList.add('overlay-visible'); 
 }
 
