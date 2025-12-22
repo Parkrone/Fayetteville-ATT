@@ -36,7 +36,6 @@
     <style>
         /* --- CSS VARIABLES --- */
         :root {
-            /* Light Mode */
             --bg-color: #f2f2f2;
             --container-bg: rgba(255, 255, 255, 0.95);
             --text-color: #333333;
@@ -58,18 +57,13 @@
             --preloader-bg: #ffffff; 
             --btn-gray-bg: #333333;
             --btn-gray-hover: #000000;
-            
-            /* Music Player */
             --player-bg: #f8f9fa;
             --player-border: #e9ecef;
             --track-name: #000;
             --artist-name: #666;
-            
-            /* Skeleton & Particles */
             --particle-color: rgba(0, 87, 184, 0.6);
         }
 
-        /* Dark Mode */
         @media (prefers-color-scheme: dark) {
             :root {
                 --bg-color: #121212;
@@ -93,12 +87,10 @@
                 --preloader-bg: #ffffff; 
                 --btn-gray-bg: #444444;
                 --btn-gray-hover: #555555;
-                
                 --player-bg: #252525;
                 --player-border: #333;
                 --track-name: #fff;
                 --artist-name: #aaa;
-                
                 --particle-color: rgba(77, 163, 255, 0.5); 
             }
         }
@@ -153,7 +145,6 @@
             20% { opacity: 0.3; } 50% { transform: translate(40px, -60px) rotate(20deg) scale(1.0); opacity: 0.4; }
             80% { opacity: 0.3; } 100% { transform: translate(-20px, -120px) rotate(40deg) scale(0.9); opacity: 0; }
         }
-        /* Particles */
         .p1 { width:140px; height:140px; top:10%; left:5%; filter:blur(4px); animation-duration:18s; }
         .p2 { width:180px; height:180px; top:60%; left:85%; filter:blur(5px); animation-duration:22s; animation-delay:2s; }
         .p3 { width:120px; height:120px; top:40%; left:15%; filter:blur(4px); animation-duration:20s; animation-delay:5s; }
@@ -196,15 +187,11 @@
         .logo-link:hover { opacity: 0.8; }
         header img { height: 40px; width: auto; vertical-align: middle; }
         
-        /* FIX: Header Text Alignment */
         header h1 { 
             font-size: 24px; font-weight: 700; color: var(--heading-color); letter-spacing: -0.5px;
-            line-height: 1.1; /* Tighten line height for better center alignment */
-            margin-top: 4px; /* Optical adjustment to push text down slightly to match logo center */
-            margin-bottom: 0;
+            line-height: 1.1; margin-top: 4px; margin-bottom: 0;
         }
         
-        /* HEADER CONTROLS (Weather + Install) */
         .header-controls {
             position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
             display: flex; align-items: center; gap: 15px;
@@ -217,10 +204,8 @@
         }
         #weather-icon { font-size: 20px; }
 
-        /* Install Button (Header Version) */
         #headerInstallBtn {
-            display: none; /* Hidden by default, shown via JS */
-            align-items: center; gap: 6px;
+            display: none; align-items: center; gap: 6px;
             background-color: var(--att-blue); color: white;
             border: none; border-radius: 20px;
             padding: 6px 12px; font-size: 12px; font-weight: 700;
@@ -230,33 +215,16 @@
         #headerInstallBtn:hover { background-color: var(--att-blue-hover); }
         #headerInstallBtn:active { transform: scale(0.95); }
 
-        /* --- MOBILE LAYOUT ADJUSTMENTS --- */
         @media (max-width: 600px) {
-            header {
-                flex-direction: column; /* Stack vertically */
-                gap: 5px;
-                padding-bottom: 10px;
-            }
-            .header-controls {
-                position: static; /* Remove absolute positioning */
-                transform: none; /* Reset transform */
-                margin-top: 5px;
-                justify-content: center; /* Center align */
-                width: 100%;
-            }
-            header h1 {
-                font-size: 20px; /* Slightly smaller text to fit */
-                text-align: center;
-                margin-top: 5px; /* Adjust mobile spacing */
-            }
+            header { flex-direction: column; gap: 5px; padding-bottom: 10px; }
+            .header-controls { position: static; transform: none; margin-top: 5px; justify-content: center; width: 100%; }
+            header h1 { font-size: 20px; text-align: center; margin-top: 5px; }
         }
 
-        /* --- CONTAINER --- */
         .container { width: 90%; max-width: 500px; background: var(--container-bg); padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease, background-color 0.3s ease; margin-bottom: 20px; position: relative; z-index: 10; }
         .content-visible { opacity: 1; transform: translateY(0); }
         .welcome-text { margin-bottom: 25px; font-size: 16px; color: var(--subtext-color); line-height: 1.5; }
 
-        /* --- BUTTONS --- */
         .button-group { display: flex; gap: 10px; margin-bottom: 15px; }
         .button-group .btn { margin-bottom: 0; flex: 1; font-size: 16px; padding: 14px 10px; }
         .btn { display: flex; justify-content: center; align-items: center; width: 100%; padding: 16px 20px; margin-bottom: 15px; text-decoration: none; border-radius: 30px; font-weight: 600; font-size: 18px; transition: background-color 0.3s ease, transform 0.1s ease, border-color 0.3s; border: 2px solid transparent; cursor: pointer; transform-origin: center; line-height: 1.2; }
@@ -274,7 +242,6 @@
         .btn-contact:hover, .btn-call:hover { background-color: var(--btn-gray-hover); }
         @media (prefers-color-scheme: dark) { .btn-contact { background-color: #444; border: 1px solid #666;} .btn-contact:hover { background-color: #555; } }
         
-        /* Updated Icon Style */
         .icon-inline { height: 1.3em; width: auto; vertical-align: middle; margin-left: 8px; margin-top: -3px; }
 
         .status-badge { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; font-weight: 700; margin-top: 5px; opacity: 1; letter-spacing: 0.3px; min-height: 20px;}
@@ -284,11 +251,9 @@
         .dot-closed { background-color: #e74c3c; box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); animation: pulse-red 2s infinite; }
         @keyframes pulse-red { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(231, 76, 60, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); } }
 
-        /* --- OVERLAYS --- */
         .overlay-base { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--overlay-bg); display: flex; flex-direction: column; justify-content: center; align-items: center; border-radius: 10px; z-index: 10000; padding: 25px; text-align: center; }
         .hidden { display: none !important; }
 
-        /* --- NEW REDDIT-STYLE INSTALL BANNER --- */
         #install-banner {
             position: fixed; top: 15px; left: 50%; transform: translateX(-50%) translateY(-150%);
             width: 90%; max-width: 400px;
@@ -307,13 +272,8 @@
         .ib-title { font-weight: 700; font-size: 15px; color: #000; }
         .ib-url { font-size: 11px; color: #888; margin-top: 2px; }
         .ib-actions { display: flex; align-items: center; gap: 12px; }
-        .ib-install-btn { 
-            color: var(--att-blue); font-weight: 700; font-size: 14px; 
-            background: none; border: none; cursor: pointer; padding: 5px;
-        }
-        .ib-close { 
-            color: #ccc; font-size: 20px; cursor: pointer; line-height: 1; padding: 5px;
-        }
+        .ib-install-btn { color: var(--att-blue); font-weight: 700; font-size: 14px; background: none; border: none; cursor: pointer; padding: 5px; }
+        .ib-close { color: #ccc; font-size: 20px; cursor: pointer; line-height: 1; padding: 5px; }
         @media (prefers-color-scheme: dark) {
             #install-banner { background-color: #2a2a2a; }
             .ib-title { color: white; }
@@ -321,44 +281,38 @@
             .ib-install-btn { color: #4da3ff; }
         }
         
-        /* Confirmation Overlays specific styling */
         .confirm-title { color: var(--att-blue); font-size: 24px; margin-bottom: 15px; font-weight: 700; }
         .confirm-text { font-size: 15px; color: var(--subtext-color); line-height: 1.5; margin-bottom: 20px; }
         
-        /* IOS INSTALL OVERLAY - FIXED POSITIONING FIX */
         #ios-install-overlay {
-            position: fixed !important; /* Forces it to viewport */
+            position: fixed !important; 
             top: auto; bottom: 0; left: 0; right: 0;
             height: auto;
-            justify-content: flex-end; /* Align to bottom */
+            justify-content: flex-end;
             padding-bottom: 40px;
-            background: rgba(0,0,0,0.6); /* Dim background */
+            background: rgba(0,0,0,0.6);
         }
         .ios-instruction-box {
             background: white; border-radius: 15px; padding: 20px;
             color: #333; max-width: 320px; width: 90%;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             text-align: center; position: relative;
-            margin: 0 auto; /* Center horizontally */
+            margin: 0 auto;
         }
         .ios-step { display: flex; align-items: center; margin: 10px 0; font-size: 14px; text-align: left;}
         .ios-icon { font-size: 24px; margin-right: 15px; width: 30px; text-align: center; }
-        /* Share icon image styling */
         .ios-share-img { height: 24px; width: auto; vertical-align: middle; }
         .ios-arrow {
             position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%) rotate(45deg);
             width: 20px; height: 20px; background: white;
         }
         
-        /* FIX: Updated Last.fm Descriptions Sizing */
         .lastfm-desc { 
             font-size: 14px; color: var(--subtext-color); line-height: 1.5; margin-bottom: 15px; text-align: left;
-            /* Added constraints for better popup sizing */
             max-width: 450px; width: 90%; margin-left: auto; margin-right: auto;
         }
         .fine-print { 
             font-size: 9px; opacity: 0.8; color: #888; margin-bottom: 20px; line-height: 1.3; text-align: justify;
-            /* Added constraints for better popup sizing */
             max-width: 450px; width: 90%; margin-left: auto; margin-right: auto;
         }
 
@@ -370,12 +324,10 @@
         .contact-preview-box span { display: block; font-size: 15px; color: var(--preview-text); margin-bottom: 4px; }
         .overlay-actions { display: flex; gap: 10px; width: 100%; margin-top: 10px; }
         
-        /* Video Overlay */
         #video-overlay { width: 90%; max-width: 800px; padding: 0; background: #000; overflow: hidden; display: flex; flex-direction: column; }
         #video-overlay video { width: 100%; height: auto; max-height: 70vh; display: block; }
         .video-close-btn { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 18px; cursor: pointer; z-index: 2; transition: transform 0.1s ease; transform-origin: center; }
 
-        /* --- MUSIC PLAYER WIDGET --- */
         #music-section { width: 100%; margin-top: 20px; background-color: var(--player-bg); border: 1px solid var(--player-border); border-radius: 12px; padding: 15px; display: none; text-align: left; transition: all 0.3s ease; }
         .music-header { display: flex; align-items: center; gap: 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--att-blue); font-weight: 700; margin-bottom: 10px; }
         .equalizer-bar { width: 3px; height: 10px; background: var(--att-blue); animation: equalize 1s infinite; }
@@ -391,14 +343,12 @@
         .btn-music-action:hover { background: var(--att-blue-hover); }
         .lastfm-btn-icon { height: 20px; width: auto; filter: brightness(0) invert(1); }
 
-        /* --- GAME AREA --- */
         #game-area { display: none; margin-top: 20px; background: var(--game-area-bg); padding: 10px; border-radius: 10px; border: 1px solid var(--border-color); position: relative; }
         canvas { background-color: #fff; border: 4px solid #333; display: block; margin: 0 auto; touch-action: none; }
         #game-overlay h2 { color: var(--att-blue); font-size: 32px; margin-bottom: 10px; }
         .score-board { margin-bottom: 5px; font-weight: bold; color: var(--att-blue); font-size: 16px; display: flex; justify-content: space-between; padding: 0 10px; }
         .game-instructions { font-size: 12px; color: var(--subtext-color); margin-bottom: 10px; font-style: italic; }
 
-        /* ROCKET EFFECT */
         #rocket-effect {
             position: fixed; bottom: -50px; left: 50%; transform: translateX(-50%);
             font-size: 60px; pointer-events: none; z-index: 9999;
@@ -412,7 +362,6 @@
         }
         .rocket-anim { animation: rocketFly 1.5s ease-in forwards; }
 
-        /* SCREEN SHAKE */
         @keyframes shake {
             0% { transform: translate(1px, 1px) rotate(0deg); }
             10% { transform: translate(-1px, -2px) rotate(-1deg); }
@@ -428,7 +377,6 @@
         }
         .shake-screen { animation: shake 0.5s; }
 
-        /* BOUNCY GAME OVER */
         @keyframes bouncy {
             0% { transform: scale(0.1); opacity: 0; }
             60% { transform: scale(1.2); opacity: 1; }
@@ -436,10 +384,8 @@
         }
         .bouncy-box { animation: bouncy 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 
-        /* LEADERBOARD HIDDEN BY DEFAULT */
         #store-leaderboard { margin-top: 20px; border: 2px solid #0057B8; border-radius: 10px; padding: 20px; max-width: 400px; margin-left: auto; margin-right: auto; background: var(--container-bg); color: var(--text-color); width: 90%; }
 
-        /* --- FOOTER --- */
         footer { margin-top: auto; padding: 30px 20px; font-size: 13px; color: var(--footer-text); text-align: center; line-height: 1.6; z-index: 20; position: relative; }
         footer a { color: var(--att-blue); text-decoration: none; font-weight: 700; transition: color 0.2s;}
         footer a:hover { color: var(--att-blue-hover); text-decoration: underline; }
@@ -686,11 +632,16 @@
         // Fetch Scores & Set Milestones for Rocket
         async function fetchLeaderboard() {
             const targetUrl = `http://dreamlo.com/lb/${DREAMLO_PUBLIC}/json?t=${new Date().getTime()}`;
-            const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
+            // AllOrigins requires the URL to be encoded
+            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
 
             try {
                 const response = await fetch(proxyUrl);
-                const data = await response.json();
+                const dataWrapper = await response.json();
+                
+                // AllOrigins returns the actual response body inside a "contents" string
+                if (!dataWrapper.contents) throw new Error("No content from proxy");
+                const data = JSON.parse(dataWrapper.contents);
                 
                 const listContainer = document.getElementById('leaderboard-list');
                 if(listContainer) listContainer.innerHTML = ""; 
@@ -699,7 +650,6 @@
                     if(listContainer) listContainer.innerHTML = "<p>No scores yet!</p>";
                     globalScores = [];
                     scoreMilestones = [];
-                    // SYNC FIX: Leaderboard empty. Local submission status is wrong.
                     localStorage.removeItem('attSnakeSubmittedName'); 
                     return;
                 }
@@ -711,26 +661,21 @@
                 scores.sort((a, b) => parseInt(b.score) - parseInt(a.score)); 
                 globalScores = scores; 
                 
-                // --- FINGERPRINT SYNC CHECK (NAME BASED) ---
-                // Find local high score and the name we last used
+                // NAME SYNC CHECK
                 const localHigh = parseInt(localStorage.getItem('attSnakeHighScore')) || 0;
                 const localName = localStorage.getItem('attSnakeSubmittedName');
 
                 if (localHigh > 0 && localName) {
-                    // Check if ANY entry on the board matches BOTH our name AND our score
                     const isVerifiedOnBoard = globalScores.some(entry => 
                         entry.name === localName && parseInt(entry.score) === localHigh
                     );
-                    
                     if (!isVerifiedOnBoard) {
-                        console.log("Sync: Local high score not found under stored name. Resetting submission status.");
-                        // We aren't on the board with that name/score combo. Reset so we can submit again.
+                        console.log("Sync: Resetting submission status.");
                         localStorage.removeItem('attSnakeSubmittedName');
                     }
                 }
-                // -----------------------------
                 
-                // ROCKET FIX: Only calculate milestones for TOP 5 scores
+                // ROCKET FIX: Top 5 Only
                 const top5Scores = scores.slice(0, MAX_SCORES_TO_SHOW);
                 scoreMilestones = [...new Set(top5Scores.map(s => parseInt(s.score)))].sort((a,b) => a-b);
 
@@ -749,9 +694,8 @@
                         listContainer.appendChild(item);
                     });
                 }
-                
             } catch (error) {
-                console.log("Leaderboard fetch error (handled silently)");
+                console.log("Leaderboard fetch error: " + error);
             }
         }
 
@@ -761,40 +705,32 @@
             const msg = document.getElementById('gameover-msg');
             const rawName = usernameInput.value.trim();
             
-            // Get current and best scores
             const currentSessionScore = parseInt(document.getElementById('final-score').innerText) || 0;
             const allTimeHighScore = parseInt(localStorage.getItem('attSnakeHighScore')) || 0;
-            
-            // SUBMIT LOGIC: Submit the highest score available.
             const scoreToSubmit = Math.max(currentSessionScore, allTimeHighScore);
 
             if (!rawName) { alert("Please enter a name!"); return; }
             if (filter && filter.isProfane(rawName)) { alert("⚠️ Please choose a cleaner name!"); return; }
 
             const targetUrl = `http://dreamlo.com/lb/${DREAMLO_PRIVATE}/add/${encodeURIComponent(rawName)}/${scoreToSubmit}`;
-            const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
+            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
             
             try {
+                // We just need to hit the URL to submit, we don't strictly need the response content
                 await fetch(proxyUrl);
                 
-                // Fingerprint: Save the NAME used for this score.
                 localStorage.setItem('attSnakeSubmittedName', rawName);
-                
-                // Clear the cached name prepopulation (fresh start for next player)
                 localStorage.removeItem('attSnakeCachedName');
-
                 usernameInput.value = ""; 
                 alert(`Score of ${scoreToSubmit} saved to Leaderboard as ${rawName}!`);
-                
                 document.getElementById('save-score-area').style.display = 'none';
                 msg.innerText = "Score Saved!";
                 msg.style.display = 'block';
                 msg.style.color = '#2ecc71';
-
                 fetchLeaderboard(); 
-            } catch (error) {
+            } catch (error) { 
                 console.error(error);
-                alert("Saved locally. (Network issue with global board)");
+                alert("Saved locally. (Network issue - Score safe on device)"); 
             }
         }
 
