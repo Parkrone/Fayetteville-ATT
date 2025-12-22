@@ -26,22 +26,28 @@ function toggleGame() {
         
         // Fix: Use openOverlay helpers logic (manual here since it's inside game logic)
         startOverlay.classList.remove('hidden');
+        // Force reflow to ensure transition works
+        void startOverlay.offsetWidth;
         startOverlay.classList.add('overlay-visible');
+        
         gameOverOverlay.classList.remove('overlay-visible'); 
         gameOverOverlay.classList.add('hidden');
     } 
 }
 
 function startSession() { 
-    document.getElementById('start-overlay').classList.remove('overlay-visible');
-    setTimeout(() => document.getElementById('start-overlay').classList.add('hidden'), 300);
+    const startOverlay = document.getElementById('start-overlay');
+    startOverlay.classList.remove('overlay-visible');
+    setTimeout(() => startOverlay.classList.add('hidden'), 300);
     initGame(); 
 }
 
 function initGame() { 
     stopGame(); 
-    document.getElementById('game-overlay').classList.remove('overlay-visible'); 
-    document.getElementById('game-overlay').classList.add('hidden');
+    const gameOverOverlay = document.getElementById('game-overlay');
+    gameOverOverlay.classList.remove('overlay-visible'); 
+    setTimeout(() => gameOverOverlay.classList.add('hidden'), 300);
+    
     score = 0; snakeLength = 3; document.getElementById('score').innerText = score; headX = 140; headY = 140; path=[]; for(let i=0; i<snakeLength*10; i++){path.push({x:headX, y:headY+i});} velX=0; velY=-SPEED; nextVelX=0; nextVelY=-SPEED; spawnFood(); startCountdown(); 
 }
 
@@ -67,6 +73,7 @@ function update() {
         snakeLength++; 
         spawnFood();
         
+        // ROCKET CHECK
         if (scoreMilestones.length > 0 && score >= scoreMilestones[0]) {
             const rocket = document.getElementById('rocket-effect');
             if(rocket) {
@@ -95,6 +102,7 @@ function triggerGameOver() {
     
     const bestScore = Math.max(finalScore, savedHighScore);
     
+    // Update Local High Score
     if (finalScore > savedHighScore) {
         localStorage.setItem('attSnakeHighScore', finalScore);
         document.getElementById('highScore').innerText = finalScore;
@@ -114,6 +122,7 @@ function triggerGameOver() {
 
     if (bestScore > 0 && !submittedName) {
         document.getElementById('save-score-area').style.display = 'block';
+        
         if (finalScore >= bestScore) {
             saveReasonMsg.innerText = "🎉 NEW HIGH SCORE!";
             saveReasonMsg.style.color = "#2ecc71";
@@ -121,8 +130,10 @@ function triggerGameOver() {
             saveReasonMsg.innerText = "Join the Leaderboard!";
             saveReasonMsg.style.color = "#fff";
         }
+        
         const msg = document.getElementById('gameover-msg');
         msg.style.display = 'none'; 
+        
     } else {
         document.getElementById('save-score-area').style.display = 'none';
         const msg = document.getElementById('gameover-msg');
@@ -159,7 +170,6 @@ function triggerGameOver() {
 
     // FIX: REVEAL OVERLAY CORRECTLY
     gameOverBox.classList.remove('hidden');
-    // Force reflow
     void gameOverBox.offsetWidth;
     gameOverBox.classList.add('overlay-visible'); 
 }
