@@ -5,21 +5,20 @@ const MAX_SCORES_TO_SHOW = 5;
 let globalScores = []; 
 let scoreMilestones = []; 
 
-// Initialize Profanity Filter Safe
-let filter;
-try { filter = new Filter(); } catch(e) { console.log("Filter not loaded"); }
+// Simple profanity filter replacement
+function isProfane(text) {
+    const badWords = ["badword1", "badword2"]; // Add specific words if needed
+    return badWords.some(word => text.toLowerCase().includes(word));
+}
 
-// Fetch Scores & Set Milestones for Rocket
 async function fetchLeaderboard() {
     const targetUrl = `http://dreamlo.com/lb/${DREAMLO_PUBLIC}/json?t=${new Date().getTime()}`;
-    // AllOrigins requires the URL to be encoded
     const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
 
     try {
         const response = await fetch(proxyUrl);
         const dataWrapper = await response.json();
         
-        // AllOrigins returns the actual response body inside a "contents" string
         if (!dataWrapper.contents) throw new Error("No content from proxy");
         const data = JSON.parse(dataWrapper.contents);
         
@@ -37,11 +36,9 @@ async function fetchLeaderboard() {
         let scores = data.dreamlo.leaderboard.entry;
         if (!Array.isArray(scores)) scores = [scores];
 
-        // Sort High to Low
         scores.sort((a, b) => parseInt(b.score) - parseInt(a.score)); 
         globalScores = scores; 
         
-        // NAME SYNC CHECK
         const localHigh = parseInt(localStorage.getItem('attSnakeHighScore')) || 0;
         const localName = localStorage.getItem('attSnakeSubmittedName');
 
@@ -55,7 +52,6 @@ async function fetchLeaderboard() {
             }
         }
         
-        // ROCKET FIX: Top 5 Only
         const top5Scores = scores.slice(0, MAX_SCORES_TO_SHOW);
         scoreMilestones = [...new Set(top5Scores.map(s => parseInt(s.score)))].sort((a,b) => a-b);
 
@@ -79,7 +75,6 @@ async function fetchLeaderboard() {
     }
 }
 
-// Save Score
 async function submitScoreFromGame() {
     const usernameInput = document.getElementById('gameover-name-input');
     const msg = document.getElementById('gameover-msg');
@@ -90,14 +85,13 @@ async function submitScoreFromGame() {
     const scoreToSubmit = Math.max(currentSessionScore, allTimeHighScore);
 
     if (!rawName) { alert("Please enter a name!"); return; }
-    if (filter && filter.isProfane(rawName)) { alert("⚠️ Please choose a cleaner name!"); return; }
+    if (isProfane(rawName)) { alert("⚠️ Please choose a cleaner name!"); return; }
 
     const targetUrl = `http://dreamlo.com/lb/${DREAMLO_PRIVATE}/add/${encodeURIComponent(rawName)}/${scoreToSubmit}`;
     const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
     
     try {
         await fetch(proxyUrl);
-        
         localStorage.setItem('attSnakeSubmittedName', rawName);
         localStorage.removeItem('attSnakeCachedName');
         usernameInput.value = ""; 
