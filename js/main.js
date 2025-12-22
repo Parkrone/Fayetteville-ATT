@@ -70,9 +70,17 @@ async function triggerInstall() {
 // --- HELPER FUNCTIONS ---
 
 function openOverlay(id) {
-    // If opening an overlay, we ensure the game area is hidden
-    document.getElementById('game-area').style.display = 'none';
+    // FORCE GAME AREA TO CLOSE to prevent overlap
+    const gameArea = document.getElementById('game-area');
+    if(gameArea) gameArea.style.display = 'none';
     
+    // Also ensure game overlays are hidden
+    const gameOverlay = document.getElementById('game-overlay');
+    if(gameOverlay) {
+        gameOverlay.classList.remove('overlay-visible');
+        gameOverlay.classList.add('hidden');
+    }
+
     const el = document.getElementById(id);
     if (el) {
         el.classList.remove('hidden');
