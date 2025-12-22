@@ -42,7 +42,6 @@
             --game-area-bg: #f9f9f9;
             --border-color: #ddd;
             --preloader-bg: #ffffff; 
-            /* Button Colors */
             --btn-gray-bg: #444444; 
             --btn-gray-hover: #222222;
             --player-bg: #f8f9fa;
@@ -90,12 +89,20 @@
         .btn { 
             display: flex; justify-content: center; align-items: center; width: 100%; padding: 16px 20px; margin-bottom: 15px; 
             text-decoration: none; border-radius: 30px; font-weight: 600; font-size: 18px; 
-            transition: transform 0.1s ease; /* Only animate transform on click */
+            transition: background-color 0.3s ease, transform 0.1s ease, border-color 0.3s; 
             border: 2px solid transparent; cursor: pointer; transform-origin: center; line-height: 1.2; 
             position: relative; z-index: 2;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2); 
-            /* Ensure background is solid to hide the glow spinner behind it */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
             background-clip: padding-box; 
+        }
+
+        /* FIX: Prevents images inside buttons from becoming massive */
+        .icon-inline { 
+            height: 1.3em !important; 
+            width: auto !important; 
+            vertical-align: middle; 
+            margin-left: 8px; 
+            margin-top: -3px; 
         }
         
         @keyframes jellyPop { 0% { transform: scale(1); } 30% { transform: scale(0.90); } 50% { transform: scale(1.05); } 70% { transform: scale(0.98); } 100% { transform: scale(1); } }
@@ -117,43 +124,37 @@
         } 
         .btn-contact:hover, .btn-call:hover { background-color: var(--btn-gray-hover); }
 
-        /* --- FIXED GLOW ANIMATION (NO PROPELLER) --- */
+        /* --- FIXED GLOW ANIMATION (TRUE BORDER ONLY) --- */
         .btn-glow {
-            /* We don't use overflow hidden so the border sticks out */
             position: relative;
         }
-        /* The Glow Border */
+        /* This pseudo-element creates the rotating gradient */
         .btn-glow::before {
             content: "";
             position: absolute;
-            top: -3px; left: -3px; right: -3px; bottom: -3px; /* 3px border size */
-            border-radius: 34px; /* Slightly larger than button */
+            inset: -3px; /* 3px border width */
+            border-radius: 34px; 
+            padding: 3px; 
             background: conic-gradient(
                 from 0deg, 
                 transparent 0%, 
-                var(--att-blue) 20%, 
+                var(--att-blue) 10%, 
                 #00c6ff 50%, 
-                var(--att-blue) 80%, 
+                var(--att-blue) 90%, 
                 transparent 100%
             );
-            z-index: -1; /* Behind the button */
-            animation: rotateGlow 3s linear infinite;
-            filter: blur(8px); /* Soften the light */
+            /* This mask cuts out the center, leaving ONLY the ring */
+            -webkit-mask: 
+                linear-gradient(#fff 0 0) content-box, 
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            
+            z-index: -1;
+            animation: rotateGlow 4s linear infinite; /* Slow speed */
+            pointer-events: none;
         }
-        /* IMPORTANT: The Mask to hide the center */
-        /* If the button has a transparent background, this ::after element provides the solid backing */
-        .btn-glow::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            border-radius: 30px; 
-            background: inherit; /* Inherits the button's background color */
-            z-index: -1; /* Sits between glow and text */
-        }
-        /* Manually set background for secondary buttons to ensure opacity */
-        .btn-secondary.btn-glow::after { background-color: var(--btn-sec-bg); }
-        .btn-primary.btn-glow::after { background-color: var(--att-blue); }
-
+        
         @keyframes rotateGlow {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
@@ -202,6 +203,15 @@
         #headerInstallBtn:active { transform: scale(0.95); }
         @media (max-width: 600px) { header { flex-direction: column; gap: 5px; padding-bottom: 10px; } .header-controls { position: static; transform: none; margin-top: 5px; justify-content: center; width: 100%; } header h1 { font-size: 20px; text-align: center; margin-top: 5px; } }
 
+        .container { width: 90%; max-width: 500px; background: var(--container-bg); padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease, background-color 0.3s ease; margin-bottom: 20px; position: relative; z-index: 10; }
+        .content-visible { opacity: 1; transform: translateY(0); }
+        .welcome-text { margin-bottom: 25px; font-size: 16px; color: var(--subtext-color); line-height: 1.5; }
+        
+        .status-badge { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; font-weight: 700; margin-top: 5px; opacity: 1; letter-spacing: 0.3px; min-height: 20px;}
+        .pulsing-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; position: relative; }
+        .dot-open { background-color: #2ecc71; box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); animation: pulse-green 2s infinite; }
+        .dot-closed { background-color: #e74c3c; box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); animation: pulse-red 2s infinite; }
+        
         /* Overlays - Fixed Visibility & Animation (iOS Style) */
         .overlay-base { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
