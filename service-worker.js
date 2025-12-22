@@ -1,14 +1,23 @@
-const CACHE_NAME = 'att-fayetteville-v2';
+const CACHE_NAME = 'att-fayetteville-v3'; // Incremented version to force update
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
-  '/AT&T_Globe.png',
-  '/att.png',
-  '/attlogo.png',
-  '/Store-Pic.jpeg',
   '/manifest.json',
-  '/discount.png',
-  '/GoogleMapsPin.png'
+  '/js/main.js',
+  '/js/game.js',
+  '/js/leaderboard.js',
+  '/media/AT&T_Globe.png',
+  '/media/att.png',
+  '/media/attlogo.png',
+  '/media/attlogo-Dark-Mode.png',
+  '/media/Store-Pic.jpeg',
+  '/media/discount.png',
+  '/media/GoogleMapsPin.png',
+  '/media/share-icon.png',
+  '/media/lastfm-icon.png',
+  '/media/phone.png',
+  '/media/bolt.png',
+  '/media/ice-border.png'
 ];
 
 self.addEventListener('install', (event) => {
@@ -17,7 +26,7 @@ self.addEventListener('install', (event) => {
       return cache.addAll(ASSETS_TO_CACHE);
     })
   );
-  self.skipWaiting(); // Forces this new version to become active immediately
+  self.skipWaiting(); 
 });
 
 self.addEventListener('activate', (event) => {
