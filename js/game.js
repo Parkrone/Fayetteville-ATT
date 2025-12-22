@@ -1,8 +1,8 @@
 // SNAKE GAME LOGIC
 const canvas = document.getElementById("snakeCanvas"); 
 const ctx = canvas ? canvas.getContext("2d") : null; 
-const snakeImg = new Image(); snakeImg.src = 'phone.png'; 
-const foodImg = new Image(); foodImg.src = 'bolt.png'; 
+const snakeImg = new Image(); snakeImg.src = 'media/phone.png'; 
+const foodImg = new Image(); foodImg.src = 'media/bolt.png'; 
 const GRID_SIZE = 20; const SPEED = 2; const TILE_COUNT = 15; 
 let animationId; let gameRunning = false; let score = 0; let path = []; let snakeLength = 3; let headX = 0, headY = 0, velX = 0, velY = 0, nextVelX = 0, nextVelY = 0; let food = { x: 0, y: 0 }; let lastTime = 0; const targetFPS = 60; const frameInterval = 1000 / targetFPS;
 
