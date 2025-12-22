@@ -1,4 +1,4 @@
-# AT&T Fayetteville Mall Store Portal 📱🚀
+# AT&T Fayetteville Mall Store Portal
 
 ![Store Portal Hero](media/image_14c76e.png)
 
