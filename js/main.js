@@ -71,22 +71,13 @@ async function triggerInstall() {
 
 // --- HELPER FUNCTIONS ---
 
-// NEW: Open link with delay for bounce animation
-function openLinkWithDelay(url) {
-    setTimeout(() => {
-        window.open(url, '_blank');
-    }, 500); // 500ms delay
-}
-
 function closeVideoOverlay() {
     const purposeOverlay = document.getElementById('purpose-video-overlay');
     const purposeVideo = document.getElementById('purpose-video');
     purposeVideo.pause(); 
-    // Use smooth fade class
     purposeOverlay.classList.remove('overlay-visible');
 }
 
-// UPDATED: Use smooth fade class
 function closeOverlay(id) { 
     document.getElementById(id).classList.remove('overlay-visible'); 
 }
@@ -148,15 +139,12 @@ document.addEventListener("DOMContentLoaded", function () {
         btn.addEventListener('click', function(e) { playJelly(this); });
     });
 
-    //UPDATED: Use smooth fade class for contact overlay
     const contactBtn = document.getElementById('contactBtn');
     if(contactBtn) contactBtn.addEventListener('click', () => document.getElementById('contact-overlay').classList.add('overlay-visible'));
     
-    //UPDATED: Use smooth fade class for closed overlay
     const callBtn = document.getElementById('callBtn');
     if(callBtn) callBtn.addEventListener('click', () => { if(isStoreOpen()) { window.location.href = "tel:4794395471"; } else { document.getElementById('closed-overlay').classList.add('overlay-visible'); } });
     
-    //UPDATED: Use smooth fade class for Last.fm overlay
     let currentLastFmUrl = "";
     const lastFmBtn = document.getElementById('lastfm-link');
     const lastFmOverlay = document.getElementById('lastfm-confirm-overlay');
@@ -169,13 +157,11 @@ document.addEventListener("DOMContentLoaded", function () {
         lastFmOverlay.classList.add('overlay-visible');
     });
 
-    // UPDATED: Last.fm confirm uses delayed open
     if(confirmLastFm) confirmLastFm.addEventListener('click', function() {
-        openLinkWithDelay(currentLastFmUrl);
+        window.open(currentLastFmUrl, '_blank');
         lastFmOverlay.classList.remove('overlay-visible');
     });
 
-    // UPDATED: Use smooth fade class for Google overlay
     const googleBtn = document.getElementById('googleBtn');
     const googleOverlay = document.getElementById('google-confirm-overlay');
     const confirmGoogle = document.getElementById('confirm-google-btn');
@@ -185,24 +171,11 @@ document.addEventListener("DOMContentLoaded", function () {
         googleOverlay.classList.add('overlay-visible');
     });
 
-    // UPDATED: Google confirm uses delayed open
     if(confirmGoogle) confirmGoogle.addEventListener('click', function() {
-        openLinkWithDelay("https://search.google.com/local/writereview?placeid=ChIJ84Inr4tryYcRQUkKOVeSnF8");
+        window.open("https://search.google.com/local/writereview?placeid=ChIJ84Inr4tryYcRQUkKOVeSnF8", '_blank');
         googleOverlay.classList.remove('overlay-visible');
     });
 
-    // UPDATED: Deals link uses delayed open
-    const dealsLink = document.querySelector('.link-delay');
-    if(dealsLink) {
-        dealsLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            playJelly(this); // Ensure bounce happens
-            openLinkWithDelay(this.href);
-        });
-    }
-
-
-    // UPDATED: Use smooth fade class for Purpose overlay
     const purposeBtn = document.getElementById('purposeBtn');
     const purposeOverlay = document.getElementById('purpose-video-overlay');
     const purposeVideo = document.getElementById('purpose-video');
