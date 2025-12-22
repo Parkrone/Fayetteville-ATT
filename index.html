@@ -24,7 +24,8 @@
     <style>
         :root {
             --bg-color: #f2f2f2;
-            --container-bg: rgba(255, 255, 255, 0.95);
+            /* Container is now transparent, but we keep this var for popups/headers */
+            --container-bg: rgba(255, 255, 255, 0.95); 
             --text-color: #333333;
             --heading-color: #000000;
             --subtext-color: #444444;
@@ -108,24 +109,23 @@
         @keyframes jellyPop { 0% { transform: scale(1); } 30% { transform: scale(0.90); } 50% { transform: scale(1.05); } 70% { transform: scale(0.98); } 100% { transform: scale(1); } }
         .btn-animate { animation: jellyPop 0.4s ease-out forwards; }
 
-        /* --- STANDARD BUTTONS (RESTORED) --- */
+        /* --- STANDARD BUTTON COLORS --- */
+        /* IMPORTANT: These define colors for non-glow buttons like "Cancel" */
         .btn-primary { 
             background-color: var(--att-blue); 
-            color: white; 
-            /* Variable for glow logic overlap */
+            color: white !important; /* Force white text */
             --btn-bg-color: var(--att-blue); 
         }
         .btn-primary:hover { background-color: var(--att-blue-hover); }
 
         .btn-secondary { 
             background-color: var(--btn-sec-bg); 
-            color: var(--btn-sec-text); 
+            color: var(--btn-sec-text) !important; 
             border: 2px solid var(--btn-sec-border); 
-            /* Variable for glow logic overlap */
             --btn-bg-color: var(--btn-sec-bg);
         }
         .btn-secondary:hover { background-color: var(--btn-sec-hover); }
-
+        
         .btn-game { background-color: #ff7900; color: white; border: none; font-size: 15px; }
         .btn-game:hover { background-color: #e66c00; }
         
@@ -133,14 +133,14 @@
             background-color: var(--btn-gray-bg); 
             color: white; 
             border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(5px);
         } 
         .btn-contact:hover, .btn-call:hover { background-color: var(--btn-gray-hover); }
 
-        /* --- FIXED GLOW ANIMATION (FASTER) --- */
+        /* --- GLOW ANIMATION --- */
         .btn-glow {
             position: relative;
-            border: 3px solid transparent; /* Reserve space for glow */
-            /* Override background for Glow Buttons Only */
+            border: 3px solid transparent; 
             background: 
                 linear-gradient(var(--btn-bg-color), var(--btn-bg-color)) padding-box,
                 conic-gradient(
@@ -155,20 +155,10 @@
         /* --- PULSING DOTS --- */
         .status-badge { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; font-weight: 700; margin-top: 5px; opacity: 1; letter-spacing: 0.3px; min-height: 20px;}
         .pulsing-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; position: relative; }
-        
         .dot-open { background-color: #2ecc71; box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); animation: pulse-green 2s infinite; }
-        @keyframes pulse-green { 
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); } 
-            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(46, 204, 113, 0); } 
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); } 
-        }
-
+        @keyframes pulse-green { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(46, 204, 113, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); } }
         .dot-closed { background-color: #e74c3c; box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); animation: pulse-red 2s infinite; }
-        @keyframes pulse-red { 
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); } 
-            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(231, 76, 60, 0); } 
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); } 
-        }
+        @keyframes pulse-red { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(231, 76, 60, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); } }
 
         /* --- GENERAL LAYOUT --- */
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
@@ -213,11 +203,29 @@
         #headerInstallBtn:active { transform: scale(0.95); }
         @media (max-width: 600px) { header { flex-direction: column; gap: 5px; padding-bottom: 10px; } .header-controls { position: static; transform: none; margin-top: 5px; justify-content: center; width: 100%; } header h1 { font-size: 20px; text-align: center; margin-top: 5px; } }
 
-        .container { width: 90%; max-width: 500px; background: var(--container-bg); padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease, background-color 0.3s ease; margin-bottom: 20px; position: relative; z-index: 10; }
+        /* --- CONTAINER MODS (TRANSPARENT) --- */
+        .container { 
+            width: 90%; max-width: 500px; 
+            /* Transparent Background */
+            background: transparent; 
+            padding: 30px; border-radius: 8px; 
+            box-shadow: none; /* Removed box shadow */
+            text-align: center; opacity: 0; transform: translateY(20px); 
+            transition: opacity 0.8s ease, transform 0.8s ease; 
+            margin-bottom: 20px; position: relative; z-index: 10; 
+        }
         .content-visible { opacity: 1; transform: translateY(0); }
-        .welcome-text { margin-bottom: 25px; font-size: 16px; color: var(--subtext-color); line-height: 1.5; }
         
-        /* Overlays - Fixed Visibility & Animation (iOS Style) */
+        /* Brighter Welcome Text */
+        .welcome-text { 
+            margin-bottom: 25px; font-size: 16px; 
+            color: #ffffff; /* White text */
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8); /* Shadow for contrast */
+            font-weight: 600;
+            line-height: 1.5; 
+        }
+        
+        /* Overlays */
         .overlay-base { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background-color: var(--overlay-bg); 
@@ -281,7 +289,12 @@
         .btn-music-action:hover { background: var(--att-blue-hover); }
         .lastfm-btn-icon { height: 20px; width: auto; filter: brightness(0) invert(1); }
         
-        #game-area { display: none; margin-top: 20px; background: var(--game-area-bg); padding: 10px; border-radius: 10px; border: 1px solid var(--border-color); position: relative; }
+        /* Game Area with SOLID Background */
+        #game-area { 
+            display: none; margin-top: 20px; 
+            background: var(--game-area-bg); /* Kept solid bg */
+            padding: 10px; border-radius: 10px; border: 1px solid var(--border-color); position: relative; 
+        }
         canvas { background-color: #fff; border: 4px solid #333; display: block; margin: 0 auto; touch-action: none; }
         #game-overlay h2 { color: var(--att-blue); font-size: 32px; margin-bottom: 10px; }
         .score-board { margin-bottom: 5px; font-weight: bold; color: var(--att-blue); font-size: 16px; display: flex; justify-content: space-between; padding: 0 10px; }
@@ -295,7 +308,12 @@
         @keyframes bouncy { 0% { transform: scale(0.1); opacity: 0; } 60% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(1); } }
         .bouncy-box { animation: bouncy 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         
-        #store-leaderboard { margin-top: 20px; border: 2px solid #0057B8; border-radius: 10px; padding: 20px; max-width: 400px; margin-left: auto; margin-right: auto; background: var(--container-bg); color: var(--text-color); width: 90%; }
+        /* Leaderboard with SOLID Background */
+        #store-leaderboard { 
+            margin-top: 20px; border: 2px solid #0057B8; border-radius: 10px; padding: 20px; max-width: 400px; margin-left: auto; margin-right: auto; 
+            background: var(--container-bg); /* Kept solid bg */
+            color: var(--text-color); width: 90%; 
+        }
         footer { margin-top: auto; padding: 30px 20px; font-size: 13px; color: var(--footer-text); text-align: center; line-height: 1.6; z-index: 20; position: relative; }
         footer a { color: var(--att-blue); text-decoration: none; font-weight: 700; transition: color 0.2s;}
         footer a:hover { color: var(--att-blue-hover); text-decoration: underline; }
