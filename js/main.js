@@ -1,16 +1,41 @@
+// --- PRELOADER CONFIG ---
+// Define these at the very top to ensure they exist before anything calls them.
+const startTime = Date.now();
+const MIN_DISPLAY_TIME = 4000; // 4 seconds (Full animation cycle)
+
+function dismissPreloader() {
+    const loader = document.getElementById("preloader");
+    const container = document.getElementById("mainContainer");
+    
+    if(loader && !loader.classList.contains("loader-hidden")) {
+        const elapsed = Date.now() - startTime;
+        const remaining = MIN_DISPLAY_TIME - elapsed;
+
+        // If 4s hasn't passed, wait the remaining time
+        if (remaining > 0) {
+            setTimeout(dismissPreloader, remaining);
+            return;
+        }
+
+        // Otherwise dismiss
+        loader.classList.add("loader-hidden");
+        if(container) container.classList.add("content-visible");
+        setTimeout(() => { if(loader.parentNode) loader.parentNode.removeChild(loader); }, 500);
+    }
+}
+
 // --- MAIN CONFIG ---
 const storeSchedule = { 0: { open: 1200, close: 1800 }, 1: { open: 1100, close: 2000 }, 2: { open: 1100, close: 2000 }, 3: { open: 1100, close: 2000 }, 4: { open: 1100, close: 2000 }, 5: { open: 1100, close: 2000 }, 6: { open: 1100, close: 2000 } };
 const LASTFM_USER = 'ATTFayetteville'; 
 const LASTFM_API_KEY = 'f7020f441263b35598d85540e23c950c';
 
-// --- PWA LOGIC (UPDATED FOR iOS) ---
+// --- PWA LOGIC (iOS UPDATED) ---
 let deferredPrompt;
 const installBtn = document.getElementById('headerInstallBtn');
 const installBanner = document.getElementById('install-banner');
 const bannerInstallBtn = document.getElementById('banner-install-btn');
 const bannerCloseBtn = document.getElementById('banner-close');
 
-// Check for iOS
 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
 
@@ -26,7 +51,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
     }
 });
 
-// FORCE SHOW BUTTON ON IOS (If not already installed)
+// Force button on iOS
 if (isIOS && !isStandalone && installBtn) {
     installBtn.style.display = 'flex';
 }
@@ -42,15 +67,14 @@ async function triggerInstall() {
         deferredPrompt = null; 
         if(installBtn) installBtn.style.display = 'none';
     } else if (isIOS) {
-        // Show iOS Instructions
         document.getElementById('ios-install-overlay').classList.remove('hidden');
     }
 }
 
-// --- MAIN INITIALIZATION ---
+// --- INITIALIZATION ---
 document.addEventListener("DOMContentLoaded", function () {
-    // Attempt fast preloader dismiss
-    setTimeout(dismissPreloader, 800);
+    // Attempt dismissal (will be deferred by logic if < 4s)
+    dismissPreloader();
 
     const container = document.getElementById("mainContainer");
     const video = document.getElementById("bg-video");
@@ -119,7 +143,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const savedScore = localStorage.getItem('attSnakeHighScore');
     if(savedScore) document.getElementById('highScore').innerText = savedScore;
 
-    // FIX: Save name to local storage as user types
     const nameInput = document.getElementById('gameover-name-input');
     if(nameInput) {
         nameInput.addEventListener('input', (e) => {
@@ -166,30 +189,8 @@ async function fetchNowPlaying() {
     } catch (error) { console.log("Music error"); }
 }
 
-// SAFE PRELOADER DISMISSAL (MIN 4 SECONDS)
-const startTime = Date.now();
-const MIN_DISPLAY_TIME = 4000; // 4 seconds
-
-function dismissPreloader() {
-    const loader = document.getElementById("preloader");
-    const container = document.getElementById("mainContainer");
-    
-    if(loader && !loader.classList.contains("loader-hidden")) {
-        const elapsed = Date.now() - startTime;
-        const remaining = MIN_DISPLAY_TIME - elapsed;
-
-        if (remaining > 0) {
-            setTimeout(dismissPreloader, remaining);
-            return;
-        }
-
-        loader.classList.add("loader-hidden");
-        if(container) container.classList.add("content-visible");
-        setTimeout(() => { if(loader.parentNode) loader.parentNode.removeChild(loader); }, 500);
-    }
-}
-
-setTimeout(dismissPreloader, 7000); // Absolute Failsafe
+// Absolute Failsafe
+setTimeout(dismissPreloader, 7000); 
 window.addEventListener('load', dismissPreloader);
 
 if ('serviceWorker' in navigator) {
