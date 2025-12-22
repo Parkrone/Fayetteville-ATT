@@ -1,4 +1,3 @@
-// SNAKE GAME LOGIC
 const canvas = document.getElementById("snakeCanvas"); 
 const ctx = canvas ? canvas.getContext("2d") : null; 
 const snakeImg = new Image(); snakeImg.src = 'media/phone.png'; 
@@ -14,22 +13,13 @@ function toggleGame() {
     const lb = document.getElementById('store-leaderboard');
     const startOverlay = document.getElementById('start-overlay');
     const gameOverOverlay = document.getElementById('game-overlay');
-    
     if(g.style.display==='block'){ 
-        g.style.display='none'; 
-        lb.style.display='none'; 
-        stopGame(); 
+        g.style.display='none'; lb.style.display='none'; stopGame(); 
     } else { 
-        g.style.display='block'; 
-        lb.style.display='block'; 
+        g.style.display='block'; lb.style.display='block'; 
         g.scrollIntoView({ behavior: "smooth", block: "center" }); 
-        
-        // Fix: Use openOverlay helpers logic (manual here since it's inside game logic)
         startOverlay.classList.remove('hidden');
-        // Force reflow to ensure transition works
-        void startOverlay.offsetWidth;
         startOverlay.classList.add('overlay-visible');
-        
         gameOverOverlay.classList.remove('overlay-visible'); 
         gameOverOverlay.classList.add('hidden');
     } 
@@ -45,9 +35,8 @@ function startSession() {
 function initGame() { 
     stopGame(); 
     const gameOverOverlay = document.getElementById('game-overlay');
-    gameOverOverlay.classList.remove('overlay-visible'); 
-    setTimeout(() => gameOverOverlay.classList.add('hidden'), 300);
-    
+    gameOverOverlay.classList.remove('overlay-visible');
+    gameOverOverlay.classList.add('hidden');
     score = 0; snakeLength = 3; document.getElementById('score').innerText = score; headX = 140; headY = 140; path=[]; for(let i=0; i<snakeLength*10; i++){path.push({x:headX, y:headY+i});} velX=0; velY=-SPEED; nextVelX=0; nextVelY=-SPEED; spawnFood(); startCountdown(); 
 }
 
@@ -73,7 +62,6 @@ function update() {
         snakeLength++; 
         spawnFood();
         
-        // ROCKET CHECK
         if (scoreMilestones.length > 0 && score >= scoreMilestones[0]) {
             const rocket = document.getElementById('rocket-effect');
             if(rocket) {
@@ -90,7 +78,6 @@ function update() {
 function draw() { if(!ctx) return; ctx.fillStyle="#fff"; ctx.fillRect(0,0,300,300); ctx.drawImage(foodImg,food.x,food.y,20,20); const step=10; for(let i=0; i<path.length; i+=step){let idx=Math.floor(i); if(idx>=path.length) break; let seg=path[idx]; let ang=0; if(i===0){if(velX>0) ang=Math.PI/2; else if(velX<0) ang=-Math.PI/2; else if(velY>0) ang=Math.PI; else ang=0;}else{let n=Math.max(0,idx-step); let ns=path[n]; let dx=ns.x-seg.x; let dy=ns.y-seg.y; if(dx>0) ang=Math.PI/2; else if(dx<0) ang=-Math.PI/2; else if(dy>0) ang=Math.PI; else ang=0;} drawRotatedImage(snakeImg,seg.x,seg.y,ang);} }
 function drawRotatedImage(img,x,y,ang){ ctx.save(); ctx.translate(x+10,y+10); ctx.rotate(ang); ctx.drawImage(img,-10,-10,20,20); ctx.restore(); }
 
-// --- UPDATED GAME OVER TRIGGER ---
 function triggerGameOver() { 
     gameRunning = false; 
     const finalScore = score;
@@ -102,12 +89,10 @@ function triggerGameOver() {
     
     const bestScore = Math.max(finalScore, savedHighScore);
     
-    // Update Local High Score
     if (finalScore > savedHighScore) {
         localStorage.setItem('attSnakeHighScore', finalScore);
         document.getElementById('highScore').innerText = finalScore;
         localStorage.removeItem('attSnakeSubmittedName');
-        
         if (globalScores.length > 0 && finalScore > parseInt(globalScores[0].score)) {
             if(typeof confetti === "function") confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
             gameOverBox.classList.add('bouncy-box');
@@ -116,13 +101,11 @@ function triggerGameOver() {
     }
 
     document.getElementById('final-score').innerText = finalScore;
-
     const cachedName = localStorage.getItem('attSnakeCachedName');
     if(cachedName) nameInput.value = cachedName;
 
     if (bestScore > 0 && !submittedName) {
         document.getElementById('save-score-area').style.display = 'block';
-        
         if (finalScore >= bestScore) {
             saveReasonMsg.innerText = "🎉 NEW HIGH SCORE!";
             saveReasonMsg.style.color = "#2ecc71";
@@ -130,47 +113,17 @@ function triggerGameOver() {
             saveReasonMsg.innerText = "Join the Leaderboard!";
             saveReasonMsg.style.color = "#fff";
         }
-        
-        const msg = document.getElementById('gameover-msg');
-        msg.style.display = 'none'; 
-        
+        document.getElementById('gameover-msg').style.display = 'none'; 
     } else {
         document.getElementById('save-score-area').style.display = 'none';
-        const msg = document.getElementById('gameover-msg');
-        msg.innerText = "Keep practicing! 🐍";
-        msg.style.display = 'block';
-        msg.style.color = '#ffcc00'; 
+        document.getElementById('gameover-msg').innerText = "Keep practicing! 🐍";
+        document.getElementById('gameover-msg').style.display = 'block';
+        document.getElementById('gameover-msg').style.color = '#ffcc00'; 
     }
     
-    const gapMsg = document.getElementById('leaderboard-gap-msg');
-    if (globalScores.length > 0) {
-        let nextTarget = null;
-        let rank = 0;
-        for (let i = globalScores.length - 1; i >= 0; i--) {
-            if (parseInt(globalScores[i].score) > bestScore) {
-                nextTarget = globalScores[i];
-                rank = i + 1;
-                break; 
-            }
-        }
-        if (nextTarget) {
-            const diff = parseInt(nextTarget.score) - bestScore + 1;
-            gapMsg.innerText = `🔥 You need ${diff} more points to overtake #${rank} (${nextTarget.name})!`;
-            gapMsg.style.display = 'block';
-        } else if (globalScores.length < 5) {
-                gapMsg.innerText = "Top 5 is wide open! Go for it!";
-                gapMsg.style.display = 'block';
-        } else {
-            gapMsg.innerText = "You are the Snake Champion! 👑";
-            gapMsg.style.display = 'block';
-        }
-    } else {
-        gapMsg.style.display = 'none';
-    }
-
     // FIX: REVEAL OVERLAY CORRECTLY
     gameOverBox.classList.remove('hidden');
-    void gameOverBox.offsetWidth;
+    void gameOverBox.offsetWidth; // Force reflow
     gameOverBox.classList.add('overlay-visible'); 
 }
 
@@ -181,9 +134,7 @@ if(canvas) {
 }
 
 window.addEventListener('keydown', e => {
-    if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
-        e.preventDefault();
-    }
+    if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) { e.preventDefault(); }
     if(!gameRunning || e.repeat) return; 
     switch(e.code) {
         case "ArrowLeft": handleInput(-100, 0); break;
