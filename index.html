@@ -154,6 +154,8 @@
             --glow-angle: 0deg; /* Updated by JS */
             --glow-color: #00c6ff; /* Cyan */
             
+            /* Layer 1: Solid background inside the padding box (covers center) */
+            /* Layer 2: Conic gradient inside the border box (shows on edges) */
             background: 
                 linear-gradient(var(--btn-bg-color), var(--btn-bg-color)) padding-box,
                 conic-gradient(
@@ -163,7 +165,8 @@
                     transparent 20%
                 ) border-box;
             
-            border: 3px solid transparent; 
+            border: 3px solid transparent; /* The width of the glow */
+            /* Ensure text sits on top */
             z-index: 10;
         }
 
@@ -338,24 +341,29 @@
         footer a { color: var(--att-blue); text-decoration: none; font-weight: 700; transition: color 0.2s;}
         footer a:hover { color: var(--att-blue-hover); text-decoration: underline; }
 
-        /* --- REP SELECTOR STYLES --- */
+        /* --- REP SELECTOR STYLES (UPDATED) --- */
         #rep-selector-overlay {
-            /* Override overlay-base centering to align to bottom for mobile slide-up feel */
+            /* Dimmed background, not opaque white */
+            background-color: rgba(0, 0, 0, 0.5);
+            /* Align content to bottom for slide-up effect */
             justify-content: flex-end;
             padding-bottom: 0;
+            overflow: hidden; /* Prevent scrolling on the overlay itself if possible */
         }
         
         .rep-selector-content {
             background: #fff;
             width: 100%;
             max-width: 500px;
-            border-radius: 20px 20px 0 0; /* Rounded top corners only */
+            border-radius: 20px 20px 0 0;
             padding: 30px 20px;
             text-align: center;
             position: relative;
             box-shadow: 0 -5px 20px rgba(0,0,0,0.2);
-            /* Slide up animation */
             animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            /* Ensure content is scrollable if it gets too tall */
+            max-height: 85vh; 
+            overflow-y: auto;
         }
         
         @keyframes slideUp {
@@ -364,20 +372,27 @@
         }
 
         @media (min-width: 600px) {
-            #rep-selector-overlay { justify-content: center; padding-bottom: 25px; }
-            .rep-selector-content { border-radius: 20px; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+            #rep-selector-overlay { 
+                justify-content: center; 
+                padding-bottom: 25px; 
+                align-items: center;
+            }
+            .rep-selector-content { 
+                border-radius: 20px; 
+                animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+                max-height: auto;
+            }
             @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         }
 
         .globe-spinner {
             width: 50px; height: 50px;
-            background-image: url('media/AT&T_Globe.png');
+            background-image: url('media/attstarry.gif'); /* UPDATED: starry gif */
             background-size: contain;
             background-repeat: no-repeat;
             margin: 0 auto 15px;
-            animation: spinGlobe 10s linear infinite;
+            /* Removed rotation animation */
         }
-        @keyframes spinGlobe { 100% { transform: rotate(360deg); } }
 
         .rep-selector-content h2 { margin: 0 0 10px; color: var(--att-blue); font-size: 22px; }
         .rep-selector-content p { color: #666; font-size: 14px; margin-bottom: 20px; }
@@ -417,6 +432,17 @@
         .rep-role {
             font-size: 11px;
             color: #888;
+        }
+        
+        /* CORNER SHOE */
+        #corner-shoe {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px; /* Adjust size as needed */
+            height: auto;
+            z-index: 9999; /* On top of everything */
+            pointer-events: none; /* Let clicks pass through */
         }
 
         /* Dark Mode overrides for Rep Selector */
@@ -639,6 +665,8 @@
     </div>
 
     <footer>&copy; 2025 Fayetteville Mall Store Location.<br>Built by <a href="https://parkrone.github.io/Parker-Design-Lab/" target="_blank">Parker Thompson</a></footer>
+    
+    <img id="corner-shoe" src="media/attshoe.gif" alt="ATT Shoe">
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
