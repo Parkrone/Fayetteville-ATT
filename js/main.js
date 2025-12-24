@@ -26,14 +26,15 @@ const storeSchedule = { 0: { open: 1200, close: 1800 }, 1: { open: 1100, close: 
 const LASTFM_USER = 'ATTFayetteville'; 
 const LASTFM_API_KEY = 'f7020f441263b35598d85540e23c950c';
 
-// --- PWA LOGIC (iOS UPDATED) ---
+// --- PWA LOGIC (UPDATED FOR iOS) ---
 let deferredPrompt;
 const installBtn = document.getElementById('headerInstallBtn');
 const installBanner = document.getElementById('install-banner');
 const bannerInstallBtn = document.getElementById('banner-install-btn');
 const bannerCloseBtn = document.getElementById('banner-close');
 
-const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+// iPad Detection Fix: Check for MacIntel + Touch Points
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.userAgent.includes("Mac") && "ontouchend" in document);
 const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
 
 window.addEventListener('beforeinstallprompt', (e) => {
@@ -48,6 +49,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
     }
 });
 
+// Force button on iOS/iPadOS if not standalone
 if (isIOS && !isStandalone && installBtn) {
     installBtn.style.display = 'flex';
 }
@@ -70,11 +72,9 @@ async function triggerInstall() {
 // --- HELPER FUNCTIONS ---
 
 function openOverlay(id) {
-    // FORCE GAME AREA TO CLOSE to prevent overlap
     const gameArea = document.getElementById('game-area');
     if(gameArea) gameArea.style.display = 'none';
     
-    // Also ensure game overlays are hidden
     const gameOverlay = document.getElementById('game-overlay');
     if(gameOverlay) {
         gameOverlay.classList.remove('overlay-visible');
@@ -167,7 +167,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const contactBtn = document.getElementById('contactBtn');
     if(contactBtn) contactBtn.addEventListener('click', () => openOverlay('contact-overlay'));
     
-    // Call Store Logic
     const callBtn = document.getElementById('callBtn');
     if(callBtn) callBtn.addEventListener('click', () => { 
         if(!isStoreOpen()) { 
@@ -235,14 +234,13 @@ document.addEventListener("DOMContentLoaded", function () {
     // --- BUTTON GLOW ANIMATION (TIME-BASED) ---
     let angle = 0;
     let lastTime = 0;
-    const ROTATION_SPEED = 90; // Standardized Speed (90 deg/sec)
+    const ROTATION_SPEED = 90; 
 
     const rotateGradient = (timestamp) => {
         if (!lastTime) lastTime = timestamp;
-        const deltaTime = (timestamp - lastTime) / 1000; // Convert to seconds
+        const deltaTime = (timestamp - lastTime) / 1000; 
         lastTime = timestamp;
 
-        // Update angle based on time passed, not frames painted
         angle = (angle + (ROTATION_SPEED * deltaTime)) % 360;
         
         const glowButtons = document.querySelectorAll('.btn-glow');
