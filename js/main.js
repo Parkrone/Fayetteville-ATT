@@ -167,7 +167,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const contactBtn = document.getElementById('contactBtn');
     if(contactBtn) contactBtn.addEventListener('click', () => openOverlay('contact-overlay'));
     
-    // FIX: ADDED ELSE BLOCK TO CALL STORE WHEN OPEN
+    // Call Store Logic
     const callBtn = document.getElementById('callBtn');
     if(callBtn) callBtn.addEventListener('click', () => { 
         if(!isStoreOpen()) { 
@@ -177,6 +177,10 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
     
+    // Rep Selector Logic
+    const repBtn = document.getElementById('repSelectorBtn');
+    if(repBtn) repBtn.addEventListener('click', () => openOverlay('rep-selector-overlay'));
+
     let currentLastFmUrl = "";
     const lastFmBtn = document.getElementById('lastfm-link');
     const lastFmOverlay = document.getElementById('lastfm-confirm-overlay');
