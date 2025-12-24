@@ -17,6 +17,11 @@ function dismissPreloader() {
 
         loader.classList.add("loader-hidden");
         if(container) container.classList.add("content-visible");
+        
+        // HIDE SHOE WHEN PRELOADER ENDS
+        const shoe = document.getElementById("corner-shoe");
+        if(shoe) shoe.style.display = 'none';
+
         setTimeout(() => { if(loader.parentNode) loader.parentNode.removeChild(loader); }, 500);
     }
 }
@@ -26,7 +31,7 @@ const storeSchedule = { 0: { open: 1200, close: 1800 }, 1: { open: 1100, close: 
 const LASTFM_USER = 'ATTFayetteville'; 
 const LASTFM_API_KEY = 'f7020f441263b35598d85540e23c950c';
 
-// --- PWA LOGIC (UPDATED FOR iOS) ---
+// --- PWA LOGIC (iOS UPDATED) ---
 let deferredPrompt;
 const installBtn = document.getElementById('headerInstallBtn');
 const installBanner = document.getElementById('install-banner');
@@ -72,6 +77,7 @@ async function triggerInstall() {
 // --- HELPER FUNCTIONS ---
 
 function openOverlay(id) {
+    // Force game closed
     const gameArea = document.getElementById('game-area');
     if(gameArea) gameArea.style.display = 'none';
     
@@ -88,6 +94,10 @@ function openOverlay(id) {
             el.classList.add('overlay-visible');
         }, 10);
     }
+
+    // SHOW SHOE WHEN MENU OPENS
+    const shoe = document.getElementById("corner-shoe");
+    if(shoe) shoe.style.display = 'block';
 }
 
 function closeOverlay(id) { 
@@ -98,6 +108,10 @@ function closeOverlay(id) {
             el.classList.add('hidden');
         }, 300);
     }
+    
+    // HIDE SHOE WHEN MENU CLOSES
+    const shoe = document.getElementById("corner-shoe");
+    if(shoe) shoe.style.display = 'none';
 }
 
 function closeVideoOverlay() {
@@ -145,6 +159,10 @@ async function fetchNowPlaying() {
 
 // --- INITIALIZATION ---
 document.addEventListener("DOMContentLoaded", function () {
+    // Show Shoe on Load
+    const shoe = document.getElementById("corner-shoe");
+    if(shoe) shoe.style.display = 'block';
+
     dismissPreloader();
 
     const container = document.getElementById("mainContainer");
@@ -167,6 +185,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const contactBtn = document.getElementById('contactBtn');
     if(contactBtn) contactBtn.addEventListener('click', () => openOverlay('contact-overlay'));
     
+    // Call Store Logic
     const callBtn = document.getElementById('callBtn');
     if(callBtn) callBtn.addEventListener('click', () => { 
         if(!isStoreOpen()) { 
