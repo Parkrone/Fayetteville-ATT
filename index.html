@@ -154,8 +154,6 @@
             --glow-angle: 0deg; /* Updated by JS */
             --glow-color: #00c6ff; /* Cyan */
             
-            /* Layer 1: Solid background inside the padding box (covers center) */
-            /* Layer 2: Conic gradient inside the border box (shows on edges) */
             background: 
                 linear-gradient(var(--btn-bg-color), var(--btn-bg-color)) padding-box,
                 conic-gradient(
@@ -165,8 +163,7 @@
                     transparent 20%
                 ) border-box;
             
-            border: 3px solid transparent; /* The width of the glow */
-            /* Ensure text sits on top */
+            border: 3px solid transparent; 
             z-index: 10;
         }
 
@@ -329,7 +326,6 @@
         
         #store-leaderboard { margin-top: 20px; border: 2px solid #0057B8; border-radius: 10px; padding: 20px; max-width: 400px; margin-left: auto; margin-right: auto; background: var(--container-bg); color: var(--text-color); width: 90%; }
         
-        /* Refresh Button Styles */
         .refresh-btn {
             background: none; border: none; cursor: pointer; color: var(--att-blue); 
             font-size: 20px; padding: 0 5px; transition: transform 0.2s;
@@ -341,6 +337,94 @@
         footer { margin-top: auto; padding: 30px 20px; font-size: 13px; color: var(--footer-text); text-align: center; line-height: 1.6; z-index: 20; position: relative; }
         footer a { color: var(--att-blue); text-decoration: none; font-weight: 700; transition: color 0.2s;}
         footer a:hover { color: var(--att-blue-hover); text-decoration: underline; }
+
+        /* --- REP SELECTOR STYLES --- */
+        #rep-selector-overlay {
+            /* Override overlay-base centering to align to bottom for mobile slide-up feel */
+            justify-content: flex-end;
+            padding-bottom: 0;
+        }
+        
+        .rep-selector-content {
+            background: #fff;
+            width: 100%;
+            max-width: 500px;
+            border-radius: 20px 20px 0 0; /* Rounded top corners only */
+            padding: 30px 20px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.2);
+            /* Slide up animation */
+            animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        @media (min-width: 600px) {
+            #rep-selector-overlay { justify-content: center; padding-bottom: 25px; }
+            .rep-selector-content { border-radius: 20px; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+            @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        }
+
+        .globe-spinner {
+            width: 50px; height: 50px;
+            background-image: url('media/AT&T_Globe.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            margin: 0 auto 15px;
+            animation: spinGlobe 10s linear infinite;
+        }
+        @keyframes spinGlobe { 100% { transform: rotate(360deg); } }
+
+        .rep-selector-content h2 { margin: 0 0 10px; color: var(--att-blue); font-size: 22px; }
+        .rep-selector-content p { color: #666; font-size: 14px; margin-bottom: 20px; }
+
+        .rep-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .rep-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .rep-card:hover { transform: translateY(-5px); }
+        
+        .rep-img {
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--att-blue);
+            margin-bottom: 8px;
+            background: #eee;
+        }
+        
+        .rep-name {
+            font-weight: 700;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .rep-role {
+            font-size: 11px;
+            color: #888;
+        }
+
+        /* Dark Mode overrides for Rep Selector */
+        @media (prefers-color-scheme: dark) {
+            .rep-selector-content { background: #1e1e1e; }
+            .rep-name { color: #fff; }
+            .rep-role { color: #aaa; }
+        }
     </style>
 </head>
 <body>
@@ -435,6 +519,32 @@
         </div>
     </div>
 
+    <div id="rep-selector-overlay" class="overlay-base hidden">
+        <div class="rep-selector-content">
+            <div class="globe-spinner"></div>
+            <h2>Select Your Rep</h2>
+            <p>Support your store by choosing who helped you today!</p>
+            <div class="rep-grid">
+                <a href="https://www.att.com/mystore/VH597WY3" target="_blank" class="rep-card">
+                    <img src="media/Parker.png" alt="Parker" class="rep-img">
+                    <span class="rep-name">Parker</span>
+                    <span class="rep-role">Sales Consultant</span>
+                </a>
+                <a href="https://www.att.com/mystore/MN002SN5" target="_blank" class="rep-card">
+                    <img src="media/Ashley.png" alt="Ashley" class="rep-img">
+                    <span class="rep-name">Ashley</span>
+                    <span class="rep-role">Sales Consultant</span>
+                </a>
+                <a href="https://www.att.com/mystore/TD256CZ0" target="_blank" class="rep-card">
+                    <img src="media/Momilynn.png" alt="Momilynn" class="rep-img">
+                    <span class="rep-name">Momilynn</span>
+                    <span class="rep-role">Sales Consultant</span>
+                </a>
+            </div>
+            <button onclick="closeOverlay('rep-selector-overlay')" class="btn btn-secondary" style="width: 100%;">Close</button>
+        </div>
+    </div>
+
     <div id="purpose-video-overlay" class="overlay-base hidden" style="background: rgba(0,0,0,0.85);">
         <div id="video-overlay">
             <button onclick="closeVideoOverlay()" class="video-close-btn">&times;</button>
@@ -478,6 +588,8 @@
         
         <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0;">
 
+        <button id="repSelectorBtn" class="btn btn-primary btn-glow" style="margin-bottom: 15px;">Order Online & Support Us 🛒</button>
+
         <a href="https://www.att.com/stores/arkansas/fayetteville/146068" class="btn btn-primary link-delay btn-glow" target="_blank">Explore Fayetteville Mall Deals <img src="media/discount.png" class="icon-inline" alt=""></a>
         <a href="https://search.google.com/local/writereview?placeid=ChIJ84Inr4tryYcRQUkKOVeSnF8" id="googleBtn" class="btn btn-secondary btn-glow">Review us on Google <img src="media/GoogleMapsPin.png" class="icon-inline" alt=""></a>
         <button id="purposeBtn" class="btn btn-secondary btn-glow" style="margin-top: 15px;">Our Purpose: Connecting People <img src="media/AT&T_Globe.png" class="icon-inline" alt=""></button>
@@ -517,6 +629,7 @@
 
         <div id="store-leaderboard" style="display: none;">
             <h3 style="color: var(--att-blue); margin-top: 0; margin-bottom: 10px;">🏆 High Scores</h3>
+            <button id="refresh-scores-btn" class="refresh-btn" aria-label="Refresh Scores">↻</button>
             <div id="leaderboard-list" style="text-align: left;">
                 <p>Loading scores...</p>
             </div>
