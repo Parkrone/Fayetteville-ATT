@@ -26,6 +26,15 @@ function dismissPreloader() {
     }
 }
 
+// Check readyState immediately
+if (document.readyState === "complete" || document.readyState === "interactive") {
+    setTimeout(dismissPreloader, 800); 
+} else {
+    window.addEventListener('load', dismissPreloader);
+}
+// Absolute failsafe
+setTimeout(dismissPreloader, 7000); 
+
 // --- MAIN CONFIG ---
 const storeSchedule = { 0: { open: 1200, close: 1800 }, 1: { open: 1100, close: 2000 }, 2: { open: 1100, close: 2000 }, 3: { open: 1100, close: 2000 }, 4: { open: 1100, close: 2000 }, 5: { open: 1100, close: 2000 }, 6: { open: 1100, close: 2000 } };
 const LASTFM_USER = 'ATTFayetteville'; 
@@ -38,7 +47,7 @@ const installBanner = document.getElementById('install-banner');
 const bannerInstallBtn = document.getElementById('banner-install-btn');
 const bannerCloseBtn = document.getElementById('banner-close');
 
-// iPad Detection Fix: Check for MacIntel + Touch Points
+// iPad Detection Fix
 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.userAgent.includes("Mac") && "ontouchend" in document);
 const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
 
@@ -54,7 +63,6 @@ window.addEventListener('beforeinstallprompt', (e) => {
     }
 });
 
-// Force button on iOS/iPadOS if not standalone
 if (isIOS && !isStandalone && installBtn) {
     installBtn.style.display = 'flex';
 }
@@ -77,7 +85,6 @@ async function triggerInstall() {
 // --- HELPER FUNCTIONS ---
 
 function openOverlay(id) {
-    // Force game closed
     const gameArea = document.getElementById('game-area');
     if(gameArea) gameArea.style.display = 'none';
     
@@ -163,7 +170,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const shoe = document.getElementById("corner-shoe");
     if(shoe) shoe.style.display = 'block';
 
-    dismissPreloader();
+    // (Preloader dismissal handled by separate function above)
 
     const container = document.getElementById("mainContainer");
     const video = document.getElementById("bg-video");
@@ -236,7 +243,8 @@ document.addEventListener("DOMContentLoaded", function () {
     
     if(purposeBtn) purposeBtn.addEventListener('click', function() {
         openOverlay('purpose-video-overlay');
-        purposeVideo.currentTime = 0; purposeVideo.play();
+        purposeVideo.load(); // Force reload to fix iOS black screen
+        purposeVideo.play().catch(e => console.log(e));
     });
     if(purposeOverlay) purposeOverlay.addEventListener('click', function(e) { if (e.target === purposeOverlay) closeVideoOverlay(); });
 
@@ -271,14 +279,3 @@ document.addEventListener("DOMContentLoaded", function () {
     };
     requestAnimationFrame(rotateGradient);
 });
-
-// Absolute Failsafe
-setTimeout(dismissPreloader, 7000); 
-window.addEventListener('load', dismissPreloader);
-
-if ('serviceWorker' in navigator) {
-window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./service-worker.js')
-    .catch(err => console.log('SW Failed:', err));
-});
-}
