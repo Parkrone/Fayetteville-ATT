@@ -6,10 +6,20 @@ function dismissPreloader() {
     const loader = document.getElementById("preloader");
     const container = document.getElementById("mainContainer");
     
+    // Ensure we don't try to hide elements that don't exist yet (if called too early)
+    if (!loader || !container) {
+        if (document.readyState === 'loading') {
+            // If DOM isn't ready, try again on DOMContentLoaded
+            document.addEventListener("DOMContentLoaded", dismissPreloader);
+            return;
+        }
+    }
+
     if(loader && !loader.classList.contains("loader-hidden")) {
         const elapsed = Date.now() - startTime;
         const remaining = MIN_DISPLAY_TIME - elapsed;
 
+        // Enforce the 3.5s Minimum, but NOT based on asset loading
         if (remaining > 0) {
             setTimeout(dismissPreloader, remaining);
             return;
@@ -18,21 +28,24 @@ function dismissPreloader() {
         loader.classList.add("loader-hidden");
         if(container) container.classList.add("content-visible");
         
-        // HIDE SHOE WHEN PRELOADER ENDS
+        // Ensure shoe is visible after load
         const shoe = document.getElementById("corner-shoe");
-        if(shoe) shoe.style.display = 'none';
+        if(shoe) shoe.style.display = 'block';
 
         setTimeout(() => { if(loader.parentNode) loader.parentNode.removeChild(loader); }, 500);
     }
 }
 
-// Check readyState immediately
-if (document.readyState === "complete" || document.readyState === "interactive") {
-    setTimeout(dismissPreloader, 800); 
+// --- LOGIC UPDATE: Use DOMContentLoaded instead of load ---
+// This prevents waiting for the video/images on slow wifi
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", dismissPreloader);
 } else {
-    window.addEventListener('load', dismissPreloader);
+    // If HTML is already parsed, start the timer logic immediately
+    dismissPreloader();
 }
-// Absolute failsafe
+
+// Absolute failsafe (Backup only)
 setTimeout(dismissPreloader, 7000); 
 
 // --- MAIN CONFIG ---
@@ -192,7 +205,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const contactBtn = document.getElementById('contactBtn');
     if(contactBtn) contactBtn.addEventListener('click', () => openOverlay('contact-overlay'));
     
-    // Call Store Logic
+    // Call Store Logic (Restored)
     const callBtn = document.getElementById('callBtn');
     if(callBtn) callBtn.addEventListener('click', () => { 
         if(!isStoreOpen()) { 
@@ -243,7 +256,7 @@ document.addEventListener("DOMContentLoaded", function () {
     
     if(purposeBtn) purposeBtn.addEventListener('click', function() {
         openOverlay('purpose-video-overlay');
-        purposeVideo.load(); // Force reload to fix iOS black screen
+        purposeVideo.load(); 
         purposeVideo.play().catch(e => console.log(e));
     });
     if(purposeOverlay) purposeOverlay.addEventListener('click', function(e) { if (e.target === purposeOverlay) closeVideoOverlay(); });
@@ -279,3 +292,14 @@ document.addEventListener("DOMContentLoaded", function () {
     };
     requestAnimationFrame(rotateGradient);
 });
+
+// Absolute Failsafe
+setTimeout(dismissPreloader, 7000); 
+window.addEventListener('load', dismissPreloader);
+
+if ('serviceWorker' in navigator) {
+window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js')
+    .catch(err => console.log('SW Failed:', err));
+});
+}
