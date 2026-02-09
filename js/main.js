@@ -6,10 +6,9 @@ function dismissPreloader() {
     const loader = document.getElementById("preloader");
     const container = document.getElementById("mainContainer");
     
-    // Ensure we don't try to hide elements that don't exist yet (if called too early)
+    // Ensure we don't try to hide elements that don't exist yet
     if (!loader || !container) {
         if (document.readyState === 'loading') {
-            // If DOM isn't ready, try again on DOMContentLoaded
             document.addEventListener("DOMContentLoaded", dismissPreloader);
             return;
         }
@@ -19,7 +18,6 @@ function dismissPreloader() {
         const elapsed = Date.now() - startTime;
         const remaining = MIN_DISPLAY_TIME - elapsed;
 
-        // Enforce the 3.5s Minimum, but NOT based on asset loading
         if (remaining > 0) {
             setTimeout(dismissPreloader, remaining);
             return;
@@ -36,16 +34,14 @@ function dismissPreloader() {
     }
 }
 
-// --- LOGIC UPDATE: Use DOMContentLoaded instead of load ---
-// This prevents waiting for the video/images on slow wifi
+// Logic: Use DOMContentLoaded to avoid waiting for heavy assets on slow wifi
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", dismissPreloader);
 } else {
-    // If HTML is already parsed, start the timer logic immediately
     dismissPreloader();
 }
 
-// Absolute failsafe (Backup only)
+// Absolute failsafe
 setTimeout(dismissPreloader, 7000); 
 
 // --- MAIN CONFIG ---
@@ -154,9 +150,11 @@ async function fetchWeather() { try { const lat = 36.0822; const lon = -94.1719;
 function updateWeatherUI(temp, code, isDay) { const tempEl = document.getElementById('weather-temp'); const iconEl = document.getElementById('weather-icon'); if(!tempEl || !iconEl) return; tempEl.classList.remove('skeleton', 'skeleton-text'); tempEl.style.width = 'auto'; iconEl.classList.remove('skeleton', 'skeleton-text'); iconEl.style.width = 'auto'; tempEl.innerText = `${temp}°F`; if (temp <= 32) document.getElementById('ice-border').style.display = 'block'; if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) { iconEl.innerText = "🌧️"; startPrecipitation('rain'); } else if ([71, 73, 75, 77, 85, 86].includes(code)) { iconEl.innerText = "❄️"; startPrecipitation('snow'); } else if ([45, 48].includes(code)) { iconEl.innerText = "🌫️"; document.getElementById('fog-container').style.display = 'block'; } else if ([95, 96, 99].includes(code)) { iconEl.innerText = "⛈️"; startPrecipitation('rain'); } else if (code <= 3) { if (code === 0) { iconEl.innerText = isDay === 1 ? "☀️" : "🌙"; } else { iconEl.innerText = isDay === 1 ? "☁️" : "☁️"; } } }
 function startPrecipitation(type) { const container = document.getElementById('weather-container'); if(!container) return; for (let i = 0; i < 50; i++) { const p = document.createElement('div'); p.classList.add(type); p.style.left = Math.random() * 100 + 'vw'; p.style.animationDuration = (Math.random() * 1 + 0.5) + 's'; p.style.animationDelay = Math.random() * 2 + 's'; container.appendChild(p); } }
 
+// --- UPDATED: CACHE BUSTING ADDED ---
 async function fetchNowPlaying() {
     try {
-        const url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${LASTFM_USER}&api_key=${LASTFM_API_KEY}&format=json&limit=1`;
+        // We add '&_t=' + Date.now() to force a fresh request every time
+        const url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${LASTFM_USER}&api_key=${LASTFM_API_KEY}&format=json&limit=1&_t=${Date.now()}`;
         const response = await fetch(url);
         const data = await response.json();
         const track = data.recenttracks.track[0];
@@ -183,7 +181,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const shoe = document.getElementById("corner-shoe");
     if(shoe) shoe.style.display = 'block';
 
-    // (Preloader dismissal handled by separate function above)
+    dismissPreloader();
 
     const container = document.getElementById("mainContainer");
     const video = document.getElementById("bg-video");
@@ -205,7 +203,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const contactBtn = document.getElementById('contactBtn');
     if(contactBtn) contactBtn.addEventListener('click', () => openOverlay('contact-overlay'));
     
-    // Call Store Logic (Restored)
+    // Call Store Logic
     const callBtn = document.getElementById('callBtn');
     if(callBtn) callBtn.addEventListener('click', () => { 
         if(!isStoreOpen()) { 
